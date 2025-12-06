@@ -1,1 +1,226 @@
-test
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nagaraju | Technology & Innovation</title>
+  <meta name="description" content="Professional portfolio of Nagaraju – Engineer, Innovator, and Technology Enthusiast." />
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #0f172a;
+      --secondary: #334155;
+      --accent: #2563eb;
+      --bg: #f8fafc;
+      --card: #ffffff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--secondary);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 2rem;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-bottom: 4rem;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    header p {
+      max-width: 700px;
+      font-size: 1.1rem;
+      color: var(--secondary);
+    }
+
+    nav {
+      margin-top: 1.5rem;
+    }
+
+    nav a {
+      margin-right: 1.5rem;
+      text-decoration: none;
+      color: var(--secondary);
+      font-weight: 500;
+    }
+
+    nav a:hover {
+      color: var(--accent);
+    }
+
+    section {
+      margin-bottom: 4rem;
+    }
+
+    section h2 {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid var(--accent);
+      display: inline-block;
+      padding-bottom: 0.3rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+
+    .card {
+      background: var(--card);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    }
+
+    .card h3 {
+      margin-bottom: 0.7rem;
+      color: var(--primary);
+    }
+
+    .badge {
+      display: inline-block;
+      background: #eef2ff;
+      color: var(--accent);
+      padding: 0.3rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      margin: 0.3rem 0.3rem 0 0;
+    }
+
+    footer {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+      margin: 0 0.5rem;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header>
+      <h1>Nagaraju</h1>
+      <p>
+        Engineer • Innovator • Entrepreneurial Technologist  
+        <br>
+        Building reliable systems across Embedded Systems, IoT, Cloud, and Automation.
+      </p>
+
+      <nav>
+        <a href="#about">About</a>
+        <a href="#expertise">Expertise</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <section id="about">
+      <h2>About</h2>
+      <p>
+        I am a technology-focused engineer with hands-on experience in embedded systems,
+        IoT architectures, cloud integrations, and real-world problem solving.
+        I enjoy designing systems that are practical, scalable, and ready for production.
+      </p>
+    </section>
+
+    <section id="expertise">
+      <h2>Expertise</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Embedded & IoT</h3>
+          <span class="badge">ESP32</span>
+          <span class="badge">LoRa</span>
+          <span class="badge">Sensors</span>
+          <span class="badge">Motor Control</span>
+        </div>
+        <div class="card">
+          <h3>Backend & Cloud</h3>
+          <span class="badge">MQTT</span>
+          <span class="badge">AWS</span>
+          <span class="badge">REST APIs</span>
+        </div>
+        <div class="card">
+          <h3>Engineering</h3>
+          <span class="badge">PCB Design</span>
+          <span class="badge">Power Electronics</span>
+          <span class="badge">System Design</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <h2>Projects</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>LoRa-Based Motor Starter</h3>
+          <p>
+            Remote-controlled motor starter using ESP32 and LoRa with secure command execution,
+            acknowledgment handling, and MQTT cloud integration.
+          </p>
+        </div>
+        <div class="card">
+          <h3>IoT Monitoring Platform</h3>
+          <p>
+            Real-time telemetry system with cloud dashboard, OTA updates, and mobile integration.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Battery Powered Induction System</h3>
+          <p>
+            Feasibility study and prototype design for a low-cost battery-powered induction solution.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>
+        Interested in collaboration, consulting, or project work?
+      </p>
+      <p>
+        📧 Email: <strong>youremail@example.com</strong><br>
+        🌐 GitHub: <a href="https://github.com/agritechnexus" target="_blank">agritechnexus</a>
+      </p>
+    </section>
+
+    <footer>
+      © <span id="year"></span> Nagaraju · Built with GitHub Pages · Secure by HTTPS
+    </footer>
+
+  </div>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+
