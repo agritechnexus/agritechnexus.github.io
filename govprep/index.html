@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>GovPrep - Exam Preparation Tracker</title>
+  <meta name="description" content="Your personal exam GPS for Indian government exam preparation. Track progress, stay motivated, ace your exam." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --blue: #2563eb; --blue-light: #eff6ff; --blue-dark: #1d4ed8;
+      --green: #16a34a; --green-light: #f0fdf4; --green-bg: #dcfce7;
+      --red: #dc2626; --red-light: #fef2f2; --red-bg: #fecaca;
+      --orange: #f59e0b; --orange-light: #fffbeb;
+      --purple: #7c3aed; --purple-light: #f5f3ff;
+      --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
+      --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280;
+      --gray-600: #4b5563; --gray-700: #374151; --gray-800: #1f2937;
+    }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: var(--gray-50); color: var(--gray-800); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    button { cursor: pointer; border: none; font-family: inherit; }
+    input, select { font-family: inherit; }
+
+    /* App container */
+    .app { max-width: 480px; margin: 0 auto; min-height: 100vh; background: #fff; position: relative; }
+
+    /* Screens */
+    .screen { display: none; padding: 24px 20px 100px; min-height: 100vh; }
+    .screen.active { display: block; }
+
+    /* Bottom Nav */
+    .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: #fff; border-top: 1px solid var(--gray-200); display: flex; z-index: 100; }
+    .bottom-nav button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 64px; background: none; color: var(--gray-400); font-size: 11px; font-weight: 500; gap: 2px; transition: color 0.2s; }
+    .bottom-nav button.active { color: var(--blue); }
+    .bottom-nav .nav-icon { font-size: 22px; }
+
+    /* Auth screens */
+    .auth-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; }
+    .auth-title { font-size: 32px; font-weight: 700; }
+    .auth-sub { color: var(--gray-500); margin-top: 4px; margin-bottom: 32px; }
+    .auth-form { width: 100%; max-width: 360px; }
+    .auth-form input { width: 100%; padding: 14px 16px; border: 1px solid var(--gray-300); border-radius: 10px; font-size: 16px; margin-bottom: 12px; outline: none; transition: border 0.2s; }
+    .auth-form input:focus { border-color: var(--blue); }
+    .btn-primary { width: 100%; padding: 14px; background: var(--blue); color: #fff; border-radius: 10px; font-size: 16px; font-weight: 600; transition: background 0.2s; }
+    .btn-primary:hover { background: var(--blue-dark); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .auth-switch { margin-top: 24px; color: var(--gray-500); font-size: 14px; }
+    .auth-switch a { color: var(--blue); font-weight: 600; cursor: pointer; text-decoration: none; }
+    .error-msg { background: var(--red-light); color: var(--red); padding: 12px; border-radius: 10px; margin-bottom: 16px; font-size: 14px; }
+
+    /* Onboarding */
+    .onb-progress { width: 100%; height: 6px; background: var(--gray-200); border-radius: 99px; margin-bottom: 24px; }
+    .onb-progress-fill { height: 100%; background: var(--blue); border-radius: 99px; transition: width 0.3s; }
+    .onb-step-label { color: var(--gray-500); font-size: 14px; margin-bottom: 4px; }
+    .onb-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+    .exam-option { width: 100%; text-align: left; padding: 16px; border: 1px solid var(--gray-200); border-radius: 10px; background: #fff; font-size: 15px; font-weight: 500; margin-bottom: 10px; transition: all 0.2s; }
+    .exam-option:hover { border-color: var(--blue); background: var(--blue-light); }
+    .rating-card { border: 1px solid var(--gray-200); border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+    .rating-card .subject-name { font-weight: 500; margin-bottom: 10px; }
+    .rating-btns { display: flex; gap: 8px; }
+    .rating-btn { flex: 1; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 500; background: var(--gray-100); color: var(--gray-600); text-transform: capitalize; transition: all 0.2s; }
+    .rating-btn.weak.selected { background: var(--red); color: #fff; }
+    .rating-btn.medium.selected { background: var(--orange); color: #fff; }
+    .rating-btn.strong.selected { background: var(--green); color: #fff; }
+    .btn-row { display: flex; gap: 12px; margin-top: 24px; }
+    .btn-row button { flex: 1; }
+    .btn-outline { padding: 14px; border: 1px solid var(--gray-300); border-radius: 10px; background: #fff; font-size: 15px; font-weight: 600; color: var(--gray-700); }
+
+    /* Home */
+    .home-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .home-name { font-size: 20px; font-weight: 700; }
+    .home-exam { color: var(--gray-500); font-size: 13px; }
+    .logout-btn { font-size: 13px; color: var(--gray-400); background: none; }
+    .countdown-card { background: var(--blue-light); border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 20px; }
+    .countdown-num { font-size: 48px; font-weight: 700; color: var(--blue); line-height: 1; }
+    .countdown-label { font-size: 13px; font-weight: 500; color: var(--blue); }
+    .stats-row { display: flex; gap: 12px; margin-bottom: 24px; }
+    .stat-card { flex: 1; border-radius: 14px; padding: 16px; text-align: center; }
+    .stat-card.streak { background: var(--orange-light); }
+    .stat-card.xp { background: var(--purple-light); }
+    .stat-val { font-size: 22px; font-weight: 700; }
+    .stat-card.streak .stat-val { color: var(--orange); }
+    .stat-card.xp .stat-val { color: var(--purple); }
+    .stat-label { font-size: 11px; font-weight: 500; }
+    .stat-card.streak .stat-label { color: #b45309; }
+    .stat-card.xp .stat-label { color: var(--purple); }
+
+    /* Progress Ring */
+    .ring-wrap { display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; }
+    .ring-container { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+    .ring-text { position: absolute; font-size: 24px; font-weight: 700; }
+    .ring-label { font-size: 13px; color: var(--gray-500); margin-top: 8px; }
+
+    /* Section */
+    .section-title { font-size: 17px; font-weight: 600; margin-bottom: 12px; }
+
+    /* Today tasks */
+    .task-item { display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid var(--gray-200); border-radius: 10px; margin-bottom: 8px; font-weight: 500; }
+    .task-item.done { background: var(--green-light); border-color: #bbf7d0; }
+    .task-done-mark { color: var(--green); font-weight: 700; font-size: 18px; }
+    .btn-green { width: 100%; padding: 14px; background: var(--green); color: #fff; border-radius: 10px; font-size: 15px; font-weight: 600; margin-top: 8px; }
+    .btn-green:hover { background: #15803d; }
+    .done-msg { text-align: center; color: var(--green); font-weight: 500; margin-top: 8px; font-size: 14px; }
+    .badge-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .badge-tag { padding: 6px 12px; background: #fef9c3; color: #92400e; border-radius: 99px; font-size: 13px; font-weight: 500; }
+
+    /* Plan */
+    .plan-day { padding: 16px; border: 2px solid var(--gray-200); border-radius: 12px; margin-bottom: 10px; }
+    .plan-day.done { border-color: #86efac; background: var(--green-light); }
+    .plan-day.missed { border-color: var(--red-bg); background: var(--red-light); }
+    .plan-day.today { border-color: var(--blue); background: var(--blue-light); }
+    .plan-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .plan-date { font-size: 14px; font-weight: 600; }
+    .today-badge { font-size: 11px; background: var(--blue); color: #fff; padding: 2px 8px; border-radius: 99px; margin-left: 8px; }
+    .plan-status { font-size: 13px; font-weight: 500; }
+    .plan-status.done { color: var(--green); }
+    .plan-status.missed { color: var(--red); }
+    .plan-status.upcoming { color: var(--gray-400); }
+    .plan-subjects { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .plan-subj-tag { font-size: 13px; padding: 4px 10px; background: #fff; border: 1px solid var(--gray-200); border-radius: 6px; }
+    .plan-actions { display: flex; gap: 8px; margin-top: 8px; }
+    .plan-actions button { flex: 1; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+    .btn-mark-done { background: var(--green); color: #fff; }
+    .btn-skip { background: var(--red-light); color: var(--red); }
+
+    /* Progress page */
+    .alert-banner { padding: 12px; border-radius: 10px; margin-bottom: 12px; font-size: 13px; font-weight: 500; }
+    .alert-red { background: var(--red-light); border: 1px solid var(--red-bg); color: #b91c1c; }
+    .alert-orange { background: var(--orange-light); border: 1px solid #fed7aa; color: #92400e; }
+    .subject-card { border: 1px solid var(--gray-200); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+    .subject-header { display: flex; align-items: center; justify-content: space-between; padding: 16px; cursor: pointer; width: 100%; background: none; text-align: left; }
+    .subject-bar-wrap { flex: 1; margin-right: 16px; }
+    .subject-bar-name { font-weight: 500; font-size: 14px; margin-bottom: 6px; }
+    .progress-bar { width: 100%; height: 6px; background: var(--gray-200); border-radius: 99px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 99px; transition: width 0.4s; }
+    .progress-fill.green { background: var(--green); }
+    .progress-fill.yellow { background: var(--orange); }
+    .progress-fill.red { background: var(--red); }
+    .subject-pct { font-size: 14px; font-weight: 600; color: var(--gray-600); }
+    .topic-list { border-top: 1px solid var(--gray-100); padding: 16px; }
+    .topic-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; }
+    .topic-name { font-size: 13px; flex: 1; }
+    .topic-select { font-size: 12px; padding: 4px 8px; border-radius: 6px; border: none; font-weight: 500; cursor: pointer; outline: none; }
+    .topic-select.not_started { background: var(--gray-100); color: var(--gray-600); }
+    .topic-select.in_progress { background: #dbeafe; color: #1d4ed8; }
+    .topic-select.revised { background: #fef3c7; color: #92400e; }
+    .topic-select.confident { background: var(--green-bg); color: #15803d; }
+
+    /* Leaderboard */
+    .lb-entry { display: flex; align-items: center; padding: 14px; border: 2px solid var(--gray-100); border-radius: 10px; margin-bottom: 8px; background: #fff; }
+    .lb-entry.me { border-color: #93c5fd; background: var(--blue-light); }
+    .lb-rank { width: 40px; text-align: center; font-size: 18px; }
+    .lb-rank-num { font-weight: 700; color: var(--gray-400); }
+    .lb-info { flex: 1; margin-left: 12px; }
+    .lb-name { font-size: 14px; font-weight: 600; }
+    .lb-name .you { color: var(--blue); font-weight: 600; }
+    .lb-badges { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
+    .lb-badge { font-size: 10px; padding: 2px 6px; background: #fef9c3; color: #92400e; border-radius: 4px; }
+    .lb-stats { text-align: right; }
+    .lb-xp { font-weight: 700; color: var(--blue); font-size: 14px; }
+    .lb-streak { font-size: 12px; color: var(--orange); }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--gray-400); }
+    .empty-icon { font-size: 48px; margin-bottom: 8px; }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .app { max-width: 100%; }
+      .bottom-nav { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- LOGIN SCREEN -->
+  <div class="screen auth-screen active" id="screen-login">
+    <div class="auth-form">
+      <h1 class="auth-title" style="text-align:center;">GovPrep</h1>
+      <p class="auth-sub" style="text-align:center;">Your exam preparation GPS</p>
+      <div id="login-error" class="error-msg" style="display:none;"></div>
+      <input type="email" id="login-email" placeholder="Email" />
+      <input type="password" id="login-password" placeholder="Password" />
+      <button class="btn-primary" onclick="handleLogin()">Log In</button>
+      <p class="auth-switch" style="text-align:center;">Don't have an account? <a onclick="showScreen('register')">Sign Up</a></p>
+    </div>
+  </div>
+
+  <!-- REGISTER SCREEN -->
+  <div class="screen auth-screen" id="screen-register">
+    <div class="auth-form">
+      <h1 class="auth-title" style="text-align:center;">GovPrep</h1>
+      <p class="auth-sub" style="text-align:center;">Create your account</p>
+      <div id="register-error" class="error-msg" style="display:none;"></div>
+      <input type="text" id="reg-name" placeholder="Full Name" />
+      <input type="email" id="reg-email" placeholder="Email" />
+      <input type="password" id="reg-password" placeholder="Password (min 6 characters)" />
+      <button class="btn-primary" onclick="handleRegister()">Sign Up</button>
+      <p class="auth-switch" style="text-align:center;">Already have an account? <a onclick="showScreen('login')">Log In</a></p>
+    </div>
+  </div>
+
+  <!-- ONBOARDING SCREEN -->
+  <div class="screen" id="screen-onboarding" style="padding-bottom:40px;">
+    <h1 style="font-size:22px;font-weight:700;margin-bottom:4px;">Setup Your Prep</h1>
+    <p class="onb-step-label" id="onb-step-label">Step 1 of 3</p>
+    <div class="onb-progress"><div class="onb-progress-fill" id="onb-progress-fill" style="width:33%"></div></div>
+    <div id="onb-step-1">
+      <h2 class="onb-title">Which exam are you preparing for?</h2>
+      <div id="exam-list"></div>
+    </div>
+    <div id="onb-step-2" style="display:none;">
+      <h2 class="onb-title">When is your exam?</h2>
+      <input type="date" id="exam-date-input" style="width:100%;padding:14px 16px;border:1px solid var(--gray-300);border-radius:10px;font-size:16px;outline:none;" />
+      <div class="btn-row">
+        <button class="btn-outline" onclick="onbBack(1)">Back</button>
+        <button class="btn-primary" onclick="onbNext(3)">Next</button>
+      </div>
+    </div>
+    <div id="onb-step-3" style="display:none;">
+      <h2 class="onb-title">Rate your subjects</h2>
+      <div id="rating-list"></div>
+      <div class="btn-row">
+        <button class="btn-outline" onclick="onbBack(2)">Back</button>
+        <button class="btn-primary" onclick="completeOnboarding()">Start Prep!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOME SCREEN -->
+  <div class="screen" id="screen-home">
+    <div class="home-header">
+      <div>
+        <div class="home-name" id="home-name">Hi!</div>
+        <div class="home-exam" id="home-exam"></div>
+      </div>
+      <button class="logout-btn" onclick="handleLogout()">Logout</button>
+    </div>
+    <div class="countdown-card">
+      <div class="countdown-num" id="days-left">0</div>
+      <div class="countdown-label">days left</div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card streak">
+        <div class="stat-val" id="home-streak">🔥 0</div>
+        <div class="stat-label">Day Streak</div>
+      </div>
+      <div class="stat-card xp">
+        <div class="stat-val" id="home-xp">⚡ 0</div>
+        <div class="stat-label">XP Points</div>
+      </div>
+    </div>
+    <div class="ring-wrap">
+      <div class="ring-container"><svg id="ring-svg" width="130" height="130"></svg><span class="ring-text" id="ring-pct">0%</span></div>
+      <div class="ring-label">Exam Readiness</div>
+    </div>
+    <h2 class="section-title">Today's Focus</h2>
+    <div id="today-tasks"></div>
+    <div id="home-badges"></div>
+  </div>
+
+  <!-- PLAN SCREEN -->
+  <div class="screen" id="screen-plan">
+    <h1 style="font-size:20px;font-weight:700;margin-bottom:4px;">Study Plan</h1>
+    <p style="color:var(--gray-500);font-size:13px;margin-bottom:20px;" id="plan-total"></p>
+    <div id="plan-list"></div>
+  </div>
+
+  <!-- PROGRESS SCREEN -->
+  <div class="screen" id="screen-progress">
+    <h1 style="font-size:20px;font-weight:700;margin-bottom:4px;">Progress</h1>
+    <p style="color:var(--gray-500);font-size:13px;margin-bottom:16px;" id="progress-overall"></p>
+    <div id="progress-alerts"></div>
+    <div id="progress-list"></div>
+  </div>
+
+  <!-- LEADERBOARD SCREEN -->
+  <div class="screen" id="screen-leaderboard">
+    <h1 style="font-size:20px;font-weight:700;margin-bottom:4px;">Leaderboard</h1>
+    <p style="color:var(--gray-500);font-size:13px;margin-bottom:20px;" id="lb-subtitle"></p>
+    <div id="lb-list"></div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav" id="bottom-nav" style="display:none;">
+    <button class="active" onclick="navigate('home')"><span class="nav-icon">🏠</span>Home</button>
+    <button onclick="navigate('plan')"><span class="nav-icon">📅</span>Plan</button>
+    <button onclick="navigate('progress')"><span class="nav-icon">📊</span>Progress</button>
+    <button onclick="navigate('leaderboard')"><span class="nav-icon">🏆</span>Rank</button>
+  </nav>
+</div>
+
+<script>
+// ─── EXAM SYLLABUS DATA ───
+const EXAMS = {
+  "SSC CGL": [
+    { name: "Quantitative Aptitude", topics: ["Number System","Algebra","Geometry","Trigonometry","Mensuration","Data Interpretation","Percentage","Ratio & Proportion","Profit & Loss","Time & Work","Time & Distance","SI & CI","Average","Mixture & Alligation"] },
+    { name: "General Awareness", topics: ["Indian History","Indian Polity","Geography","Economics","General Science","Current Affairs","Static GK"] },
+    { name: "English Language", topics: ["Reading Comprehension","Cloze Test","Error Spotting","Sentence Improvement","Synonyms & Antonyms","Idioms & Phrases","One Word Substitution","Spelling Correction"] },
+    { name: "Reasoning", topics: ["Analogy","Classification","Series","Coding-Decoding","Blood Relations","Direction Sense","Syllogism","Venn Diagram","Matrix","Paper Folding","Mirror Image","Non-Verbal Reasoning"] }
+  ],
+  "SSC CHSL": [
+    { name: "Quantitative Aptitude", topics: ["Number System","Algebra","Geometry","Trigonometry","Percentage","Ratio & Proportion","Profit & Loss","Time & Work","Time & Distance","SI & CI","Average","Data Interpretation"] },
+    { name: "General Awareness", topics: ["Indian History","Indian Polity","Geography","Economics","General Science","Current Affairs"] },
+    { name: "English Language", topics: ["Reading Comprehension","Error Spotting","Sentence Improvement","Synonyms & Antonyms","Idioms & Phrases","One Word Substitution","Fill in the Blanks"] },
+    { name: "Reasoning", topics: ["Analogy","Classification","Series","Coding-Decoding","Blood Relations","Direction Sense","Syllogism","Venn Diagram","Non-Verbal Reasoning"] }
+  ],
+  "IBPS PO": [
+    { name: "Quantitative Aptitude", topics: ["Number Series","Data Interpretation","Quadratic Equations","Simplification","Percentage","Ratio & Proportion","Profit & Loss","Time & Work","Time & Distance","SI & CI","Average","Probability"] },
+    { name: "Reasoning Ability", topics: ["Seating Arrangement","Puzzles","Syllogism","Coding-Decoding","Blood Relations","Direction Sense","Inequality","Data Sufficiency","Input-Output","Order & Ranking"] },
+    { name: "English Language", topics: ["Reading Comprehension","Cloze Test","Error Spotting","Sentence Rearrangement","Fill in the Blanks","Vocabulary"] },
+    { name: "General Awareness", topics: ["Banking Awareness","Financial Awareness","Current Affairs","Static GK","Indian Economy"] },
+    { name: "Computer Knowledge", topics: ["Computer Fundamentals","Networking","Database","MS Office","Internet","Computer Security"] }
+  ],
+  "SBI PO": [
+    { name: "Quantitative Aptitude", topics: ["Number Series","Data Interpretation","Quadratic Equations","Simplification","Percentage","Ratio & Proportion","Profit & Loss","Time & Work","Time & Distance","Probability","Permutation & Combination"] },
+    { name: "Reasoning Ability", topics: ["Seating Arrangement","Puzzles","Syllogism","Coding-Decoding","Blood Relations","Direction Sense","Inequality","Data Sufficiency","Critical Reasoning","Input-Output"] },
+    { name: "English Language", topics: ["Reading Comprehension","Cloze Test","Error Spotting","Sentence Rearrangement","Para Jumbles","Vocabulary","Grammar"] },
+    { name: "General Awareness", topics: ["Banking Awareness","Financial Awareness","Current Affairs","Static GK","Indian Economy","Budget & Policy"] }
+  ],
+  "UPSC Prelims": [
+    { name: "Indian History", topics: ["Ancient India","Medieval India","Modern India","Art & Culture","Indian National Movement"] },
+    { name: "Indian Polity", topics: ["Constitution","Fundamental Rights","DPSP","Parliament","Judiciary","Federalism","Local Government","Constitutional Bodies","Amendments"] },
+    { name: "Geography", topics: ["Physical Geography","Indian Geography","World Geography","Climatology","Oceanography","Environmental Geography"] },
+    { name: "Economics", topics: ["Indian Economy","Economic Planning","Monetary Policy","Fiscal Policy","International Trade","Banking & Finance","Budget"] },
+    { name: "General Science", topics: ["Physics","Chemistry","Biology","Environment & Ecology","Science & Technology"] },
+    { name: "Current Affairs", topics: ["National Events","International Events","Awards & Honours","Sports","Government Schemes","Summits & Conferences"] },
+    { name: "CSAT", topics: ["Comprehension","Logical Reasoning","Analytical Ability","Data Interpretation","Decision Making","Basic Numeracy"] }
+  ],
+  "TSPSC Group-2": [
+    { name: "General Studies Paper-1", topics: ["Indian History","Indian Polity","Indian Economy","Geography","General Science","Disaster Management"] },
+    { name: "General Studies Paper-2", topics: ["Telangana History","Telangana Movement","Telangana Economy","Telangana Geography","Telangana Culture","Telangana Governance"] },
+    { name: "General Studies Paper-3", topics: ["Indian Constitution","Public Administration","Good Governance","Social Issues","Current Affairs","Science & Technology"] }
+  ],
+  "RRB NTPC": [
+    { name: "Mathematics", topics: ["Number System","Algebra","Percentage","Ratio & Proportion","Profit & Loss","Time & Work","Time & Distance","SI & CI","Mensuration","Geometry","Trigonometry","Data Interpretation"] },
+    { name: "General Intelligence & Reasoning", topics: ["Analogy","Classification","Series","Coding-Decoding","Blood Relations","Direction Sense","Syllogism","Venn Diagram","Statement & Conclusion","Calendar & Clock"] },
+    { name: "General Awareness", topics: ["Indian History","Indian Polity","Geography","Economics","General Science","Current Affairs","Static GK","Computer Awareness"] }
+  ]
+};
+
+// ─── LOCAL STORAGE HELPERS ───
+const DB = {
+  get(key) { try { return JSON.parse(localStorage.getItem('gp_' + key)); } catch { return null; } },
+  set(key, val) { localStorage.setItem('gp_' + key, JSON.stringify(val)); },
+  remove(key) { localStorage.removeItem('gp_' + key); }
+};
+
+// ─── STATE ───
+let currentUser = null;
+let currentScreen = 'login';
+let onbStep = 1;
+let selectedExam = '';
+let subjectRatings = {};
+
+// ─── INIT ───
+function init() {
+  const userId = DB.get('currentUser');
+  if (userId) {
+    const users = DB.get('users') || {};
+    if (users[userId]) {
+      currentUser = users[userId];
+      if (!currentUser.onboarded) {
+        showScreen('onboarding');
+        renderOnboarding();
+      } else {
+        showScreen('home');
+        renderHome();
+      }
+      return;
+    }
+  }
+  showScreen('login');
+}
+
+// ─── SCREEN NAV ───
+function showScreen(name) {
+  currentScreen = name;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('screen-' + name);
+  if (el) el.classList.add('active');
+
+  const nav = document.getElementById('bottom-nav');
+  const mainScreens = ['home', 'plan', 'progress', 'leaderboard'];
+  nav.style.display = (currentUser && currentUser.onboarded && mainScreens.includes(name)) ? 'flex' : 'none';
+
+  // Update nav active
+  if (mainScreens.includes(name)) {
+    nav.querySelectorAll('button').forEach((btn, i) => {
+      btn.classList.toggle('active', mainScreens[i] === name);
+    });
+  }
+}
+
+function navigate(name) {
+  showScreen(name);
+  if (name === 'home') renderHome();
+  else if (name === 'plan') renderPlan();
+  else if (name === 'progress') renderProgress();
+  else if (name === 'leaderboard') renderLeaderboard();
+}
+
+// ─── AUTH ───
+function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+
+  if (!email || !password) { errEl.textContent = 'Please fill all fields'; errEl.style.display = 'block'; return; }
+
+  const users = DB.get('users') || {};
+  const user = Object.values(users).find(u => u.email === email);
+  if (!user || user.password !== password) { errEl.textContent = 'Invalid credentials'; errEl.style.display = 'block'; return; }
+
+  currentUser = user;
+  DB.set('currentUser', user.id);
+  if (!user.onboarded) { showScreen('onboarding'); renderOnboarding(); }
+  else { showScreen('home'); renderHome(); }
+}
+
+function handleRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const errEl = document.getElementById('register-error');
+  errEl.style.display = 'none';
+
+  if (!name || !email || !password) { errEl.textContent = 'Please fill all fields'; errEl.style.display = 'block'; return; }
+  if (password.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; errEl.style.display = 'block'; return; }
+
+  const users = DB.get('users') || {};
+  if (Object.values(users).find(u => u.email === email)) { errEl.textContent = 'Email already registered'; errEl.style.display = 'block'; return; }
+
+  const id = 'u_' + Date.now();
+  const user = { id, name, email, password, targetExam: '', examDate: '', subjects: [], streak: { count: 0, lastActiveDate: null }, xp: 0, badges: [], onboarded: false, createdAt: new Date().toISOString() };
+  users[id] = user;
+  DB.set('users', users);
+  currentUser = user;
+  DB.set('currentUser', id);
+  showScreen('onboarding');
+  renderOnboarding();
+}
+
+function handleLogout() {
+  currentUser = null;
+  DB.remove('currentUser');
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-password').value = '';
+  showScreen('login');
+}
+
+// ─── ONBOARDING ───
+function renderOnboarding() {
+  const list = document.getElementById('exam-list');
+  list.innerHTML = Object.keys(EXAMS).map(name =>
+    `<button class="exam-option" onclick="selectExam('${name}')">${name}</button>`
+  ).join('');
+  onbStep = 1;
+  updateOnbUI();
+}
+
+function selectExam(name) {
+  selectedExam = name;
+  subjectRatings = {};
+  EXAMS[name].forEach(s => { subjectRatings[s.name] = 'medium'; });
+  onbNext(2);
+}
+
+function onbNext(step) {
+  if (step === 3) {
+    const dateVal = document.getElementById('exam-date-input').value;
+    if (!dateVal) return;
+  }
+  onbStep = step;
+  updateOnbUI();
+  if (step === 3) renderRatings();
+}
+
+function onbBack(step) {
+  onbStep = step;
+  updateOnbUI();
+}
+
+function updateOnbUI() {
+  document.getElementById('onb-step-label').textContent = `Step ${onbStep} of 3`;
+  document.getElementById('onb-progress-fill').style.width = `${(onbStep / 3) * 100}%`;
+  document.getElementById('onb-step-1').style.display = onbStep === 1 ? 'block' : 'none';
+  document.getElementById('onb-step-2').style.display = onbStep === 2 ? 'block' : 'none';
+  document.getElementById('onb-step-3').style.display = onbStep === 3 ? 'block' : 'none';
+
+  // Set min date
+  const inp = document.getElementById('exam-date-input');
+  inp.min = new Date().toISOString().split('T')[0];
+}
+
+function renderRatings() {
+  const list = document.getElementById('rating-list');
+  list.innerHTML = EXAMS[selectedExam].map(s => `
+    <div class="rating-card">
+      <div class="subject-name">${s.name}</div>
+      <div class="rating-btns">
+        ${['weak','medium','strong'].map(r => `
+          <button class="rating-btn ${r} ${subjectRatings[s.name] === r ? 'selected' : ''}" onclick="setRating('${s.name}','${r}')">${r}</button>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function setRating(subject, rating) {
+  subjectRatings[subject] = rating;
+  renderRatings();
+}
+
+function completeOnboarding() {
+  const examDate = document.getElementById('exam-date-input').value;
+  currentUser.targetExam = selectedExam;
+  currentUser.examDate = examDate;
+  currentUser.subjects = Object.entries(subjectRatings).map(([name, selfRating]) => ({ name, selfRating }));
+  currentUser.onboarded = true;
+
+  // Check Early Bird badge
+  const daysUntil = Math.ceil((new Date(examDate) - new Date()) / 86400000);
+  if (daysUntil >= 180 && !currentUser.badges.includes('Early Bird')) {
+    currentUser.badges.push('Early Bird');
+  }
+
+  saveUser();
+
+  // Generate plan
+  generatePlan();
+
+  // Initialize progress
+  initProgress();
+
+  showScreen('home');
+  renderHome();
+}
+
+// ─── STUDY PLAN GENERATOR ───
+function generatePlan() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const examDate = new Date(currentUser.examDate); examDate.setHours(0,0,0,0);
+  const totalDays = Math.max(1, Math.ceil((examDate - today) / 86400000));
+
+  const weights = { weak: 3, medium: 2, strong: 1 };
+  const pool = [];
+  currentUser.subjects.forEach(s => {
+    const w = weights[s.selfRating] || 2;
+    for (let i = 0; i < w; i++) pool.push(s.name);
+  });
+
+  const days = [];
+  let pi = 0;
+  for (let d = 0; d < totalDays; d++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() + d);
+    const count = d % 3 === 0 ? 3 : 2;
+    const subs = new Set();
+    for (let s = 0; s < count; s++) {
+      subs.add(pool[pi % pool.length]);
+      pi++;
+    }
+    days.push({ date: date.toISOString().split('T')[0], subjects: Array.from(subs), status: 'upcoming' });
+  }
+
+  DB.set('plan_' + currentUser.id, { days, generatedAt: new Date().toISOString() });
+}
+
+function getPlan() {
+  const plan = DB.get('plan_' + currentUser.id);
+  if (!plan) return null;
+
+  // Auto-mark past upcoming as missed
+  const today = todayStr();
+  let changed = false;
+  plan.days.forEach(d => {
+    if (d.date < today && d.status === 'upcoming') { d.status = 'missed'; changed = true; }
+  });
+  if (changed) DB.set('plan_' + currentUser.id, plan);
+  return plan;
+}
+
+function todayStr() {
+  return new Date().toISOString().split('T')[0];
+}
+
+// ─── PROGRESS ───
+function initProgress() {
+  const subjects = EXAMS[currentUser.targetExam].map(s => ({
+    name: s.name,
+    topics: s.topics.map(t => ({ name: t, status: 'not_started', lastUpdated: new Date().toISOString() }))
+  }));
+  DB.set('progress_' + currentUser.id, { subjects });
+}
+
+function getProgress() {
+  return DB.get('progress_' + currentUser.id);
+}
+
+function calcReadiness(progress) {
+  if (!progress) return 0;
+  const all = progress.subjects.flatMap(s => s.topics);
+  if (all.length === 0) return 0;
+  const w = { not_started: 0, in_progress: 0.25, revised: 0.7, confident: 1 };
+  return (all.reduce((sum, t) => sum + (w[t.status] || 0), 0) / all.length) * 100;
+}
+
+function subjectProgress(subject) {
+  const total = subject.topics.length;
+  if (total === 0) return 0;
+  const w = { not_started: 0, in_progress: 0.25, revised: 0.7, confident: 1 };
+  return Math.round((subject.topics.reduce((sum, t) => sum + (w[t.status] || 0), 0) / total) * 100);
+}
+
+// ─── SAVE USER ───
+function saveUser() {
+  const users = DB.get('users') || {};
+  users[currentUser.id] = currentUser;
+  DB.set('users', users);
+}
+
+// ─── GAMIFICATION ───
+function awardDayDone(daySubjects) {
+  // XP
+  currentUser.xp += daySubjects.length * 10 + 50;
+
+  // Streak
+  const today = todayStr();
+  const last = currentUser.streak.lastActiveDate;
+  if (last) {
+    const diff = Math.floor((new Date(today) - new Date(last)) / 86400000);
+    if (diff === 1) currentUser.streak.count += 1;
+    else if (diff > 1) currentUser.streak.count = 1;
+  } else {
+    currentUser.streak.count = 1;
+  }
+  currentUser.streak.lastActiveDate = today;
+
+  // Streak badges
+  if (currentUser.streak.count >= 7 && !currentUser.badges.includes('7-Day Streak')) {
+    currentUser.badges.push('7-Day Streak');
+    currentUser.xp += 100;
+  }
+  if (currentUser.streak.count >= 30 && !currentUser.badges.includes('30-Day Streak')) {
+    currentUser.badges.push('30-Day Streak');
+    currentUser.xp += 100;
+  }
+
+  saveUser();
+}
+
+function checkCoverageBadges() {
+  const progress = getProgress();
+  if (!progress) return;
+  const all = progress.subjects.flatMap(s => s.topics);
+  const total = all.length;
+  const covered = all.filter(t => t.status === 'revised' || t.status === 'confident').length;
+  const pct = total > 0 ? (covered / total) * 100 : 0;
+  if (pct >= 50 && !currentUser.badges.includes('50% Covered')) currentUser.badges.push('50% Covered');
+  if (pct >= 100 && !currentUser.badges.includes('100% Covered')) currentUser.badges.push('100% Covered');
+  saveUser();
+}
+
+// ─── RENDER: HOME ───
+function renderHome() {
+  const progress = getProgress();
+  const plan = getPlan();
+
+  document.getElementById('home-name').textContent = 'Hi, ' + (currentUser.name.split(' ')[0]) + '!';
+  document.getElementById('home-exam').textContent = currentUser.targetExam;
+
+  // Days left
+  const dl = Math.max(0, Math.ceil((new Date(currentUser.examDate) - new Date()) / 86400000));
+  document.getElementById('days-left').textContent = dl;
+
+  // Stats
+  document.getElementById('home-streak').textContent = '🔥 ' + (currentUser.streak.count || 0);
+  document.getElementById('home-xp').textContent = '⚡ ' + (currentUser.xp || 0);
+
+  // Ring
+  const readiness = calcReadiness(progress);
+  drawRing(readiness);
+
+  // Today's tasks
+  const today = todayStr();
+  const todayPlan = plan?.days.find(d => d.date === today);
+  const tasksEl = document.getElementById('today-tasks');
+
+  if (todayPlan) {
+    let html = todayPlan.subjects.map(s =>
+      `<div class="task-item ${todayPlan.status === 'done' ? 'done' : ''}">
+        <span>${s}</span>
+        ${todayPlan.status === 'done' ? '<span class="task-done-mark">✓</span>' : ''}
+      </div>`
+    ).join('');
+
+    if (todayPlan.status !== 'done') {
+      html += `<button class="btn-green" onclick="markTodayDone()">Mark All Done ✓</button>`;
+    } else {
+      html += `<div class="done-msg">Great job today! 🎉</div>`;
+    }
+    tasksEl.innerHTML = html;
+  } else {
+    tasksEl.innerHTML = '<p style="text-align:center;color:var(--gray-400);padding:20px;">No tasks for today</p>';
+  }
+
+  // Badges
+  const badgesEl = document.getElementById('home-badges');
+  if (currentUser.badges.length > 0) {
+    badgesEl.innerHTML = `<h2 class="section-title" style="margin-top:24px;">Badges</h2>
+      <div class="badge-list">${currentUser.badges.map(b => `<span class="badge-tag">🏅 ${b}</span>`).join('')}</div>`;
+  } else {
+    badgesEl.innerHTML = '';
+  }
+}
+
+function drawRing(pct) {
+  const size = 130, sw = 10;
+  const r = (size - sw) / 2;
+  const circ = r * 2 * Math.PI;
+  const offset = circ - (pct / 100) * circ;
+  const color = pct >= 70 ? '#16a34a' : pct >= 40 ? '#f59e0b' : '#dc2626';
+
+  document.getElementById('ring-svg').innerHTML = `
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="#e5e7eb" stroke-width="${sw}" fill="none"/>
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="${color}" stroke-width="${sw}" fill="none"
+      stroke-dasharray="${circ}" stroke-dashoffset="${offset}" stroke-linecap="round"
+      transform="rotate(-90 ${size/2} ${size/2})" style="transition:stroke-dashoffset 0.7s"/>`;
+  const pctEl = document.getElementById('ring-pct');
+  pctEl.textContent = Math.round(pct) + '%';
+  pctEl.style.color = color;
+}
+
+function markTodayDone() {
+  const plan = getPlan();
+  if (!plan) return;
+  const today = todayStr();
+  const day = plan.days.find(d => d.date === today);
+  if (!day) return;
+  day.status = 'done';
+  DB.set('plan_' + currentUser.id, plan);
+  awardDayDone(day.subjects);
+  renderHome();
+}
+
+// ─── RENDER: PLAN ───
+function renderPlan() {
+  const plan = getPlan();
+  if (!plan) { document.getElementById('plan-list').innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div>No plan found</div>'; return; }
+
+  document.getElementById('plan-total').textContent = plan.days.length + ' days total';
+  const today = todayStr();
+
+  // Show past 7 days + future
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 7);
+  const cutoffStr = cutoff.toISOString().split('T')[0];
+
+  const visible = plan.days.filter(d => d.date >= cutoffStr);
+
+  document.getElementById('plan-list').innerHTML = visible.map(d => {
+    const isToday = d.date === today;
+    const cls = d.status === 'done' ? 'done' : d.status === 'missed' ? 'missed' : isToday ? 'today' : '';
+    const dateObj = new Date(d.date + 'T00:00:00');
+    const dateLabel = dateObj.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' });
+
+    let statusHtml = '';
+    if (d.status === 'done') statusHtml = '<span class="plan-status done">✓ Done</span>';
+    else if (d.status === 'missed') statusHtml = '<span class="plan-status missed">✗ Missed</span>';
+    else statusHtml = '<span class="plan-status upcoming">○ Upcoming</span>';
+
+    let actions = '';
+    if (isToday && d.status === 'upcoming') {
+      actions = `<div class="plan-actions">
+        <button class="btn-mark-done" onclick="markPlanDay('${d.date}','done')">Mark Done ✓</button>
+        <button class="btn-skip" onclick="markPlanDay('${d.date}','missed')">Skip</button>
+      </div>`;
+    }
+
+    return `<div class="plan-day ${cls}">
+      <div class="plan-header">
+        <div><span class="plan-date">${dateLabel}</span>${isToday ? '<span class="today-badge">TODAY</span>' : ''}</div>
+        ${statusHtml}
+      </div>
+      <div class="plan-subjects">${d.subjects.map(s => `<span class="plan-subj-tag">${s}</span>`).join('')}</div>
+      ${actions}
+    </div>`;
+  }).join('');
+}
+
+function markPlanDay(date, status) {
+  const plan = getPlan();
+  if (!plan) return;
+  const day = plan.days.find(d => d.date === date);
+  if (!day) return;
+  day.status = status;
+
+  if (status === 'done') {
+    awardDayDone(day.subjects);
+  }
+
+  if (status === 'missed') {
+    // Redistribute missed subjects
+    const upcoming = plan.days.filter(d => d.status === 'upcoming' && d.date > date);
+    day.subjects.forEach((sub, i) => {
+      if (upcoming.length > 0) {
+        const target = upcoming[i % upcoming.length];
+        if (!target.subjects.includes(sub)) target.subjects.push(sub);
+      }
+    });
+  }
+
+  DB.set('plan_' + currentUser.id, plan);
+  renderPlan();
+}
+
+// ─── RENDER: PROGRESS ───
+function renderProgress() {
+  const progress = getProgress();
+  if (!progress) { document.getElementById('progress-list').innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div>No data</div>'; return; }
+
+  const overall = Math.round(calcReadiness(progress));
+  document.getElementById('progress-overall').textContent = `Overall: ${overall}% ready`;
+
+  // Alerts
+  const allTopics = progress.subjects.flatMap(s => s.topics);
+  const untouched = allTopics.filter(t => t.status === 'not_started').length;
+  const untouchedPct = allTopics.length > 0 ? Math.round((untouched / allTopics.length) * 100) : 0;
+
+  const now = new Date();
+  const neglected = progress.subjects.filter(s => {
+    const latest = s.topics.reduce((max, t) => {
+      const d = new Date(t.lastUpdated);
+      return d > max ? d : max;
+    }, new Date(0));
+    return Math.floor((now - latest) / 86400000) > 7;
+  }).map(s => s.name);
+
+  let alertsHtml = '';
+  if (untouchedPct > 30) alertsHtml += `<div class="alert-banner alert-red">⚠️ ${untouchedPct}% syllabus untouched</div>`;
+  if (neglected.length > 0) alertsHtml += `<div class="alert-banner alert-orange">⚠️ Neglected: ${neglected.join(', ')}</div>`;
+  document.getElementById('progress-alerts').innerHTML = alertsHtml;
+
+  // Subjects
+  document.getElementById('progress-list').innerHTML = progress.subjects.map((s, si) => {
+    const pct = subjectProgress(s);
+    const barClass = pct >= 70 ? 'green' : pct >= 40 ? 'yellow' : 'red';
+
+    const topicRows = s.topics.map((t, ti) =>
+      `<div class="topic-row">
+        <span class="topic-name">${t.name}</span>
+        <select class="topic-select ${t.status}" onchange="updateTopic(${si},${ti},this.value)">
+          <option value="not_started" ${t.status==='not_started'?'selected':''}>Not Started</option>
+          <option value="in_progress" ${t.status==='in_progress'?'selected':''}>In Progress</option>
+          <option value="revised" ${t.status==='revised'?'selected':''}>Revised</option>
+          <option value="confident" ${t.status==='confident'?'selected':''}>Confident</option>
+        </select>
+      </div>`
+    ).join('');
+
+    return `<div class="subject-card">
+      <button class="subject-header" onclick="toggleSubject(this)">
+        <div class="subject-bar-wrap">
+          <div class="subject-bar-name">${s.name}</div>
+          <div class="progress-bar"><div class="progress-fill ${barClass}" style="width:${pct}%"></div></div>
+        </div>
+        <span class="subject-pct">${pct}%</span>
+      </button>
+      <div class="topic-list" style="display:none;">${topicRows}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleSubject(btn) {
+  const topicList = btn.nextElementSibling;
+  topicList.style.display = topicList.style.display === 'none' ? 'block' : 'none';
+}
+
+function updateTopic(si, ti, status) {
+  const progress = getProgress();
+  progress.subjects[si].topics[ti].status = status;
+  progress.subjects[si].topics[ti].lastUpdated = new Date().toISOString();
+  DB.set('progress_' + currentUser.id, progress);
+
+  // Award XP
+  currentUser.xp += 20;
+  checkCoverageBadges();
+  saveUser();
+
+  renderProgress();
+}
+
+// ─── RENDER: LEADERBOARD ───
+function renderLeaderboard() {
+  document.getElementById('lb-subtitle').textContent = (currentUser.targetExam || '') + ' — Top 50';
+
+  const users = DB.get('users') || {};
+  const sameExam = Object.values(users)
+    .filter(u => u.targetExam === currentUser.targetExam && u.onboarded)
+    .sort((a, b) => b.xp - a.xp)
+    .slice(0, 50);
+
+  if (sameExam.length === 0) {
+    document.getElementById('lb-list').innerHTML = '<div class="empty-state"><div class="empty-icon">🏆</div>No users yet. Be the first!</div>';
+    return;
+  }
+
+  document.getElementById('lb-list').innerHTML = sameExam.map((u, i) => {
+    const rank = i + 1;
+    const isMe = u.id === currentUser.id;
+    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+
+    return `<div class="lb-entry ${isMe ? 'me' : ''}">
+      <div class="lb-rank">${medal || `<span class="lb-rank-num">#${rank}</span>`}</div>
+      <div class="lb-info">
+        <div class="lb-name">${u.name}${isMe ? ' <span class="you">(You)</span>' : ''}</div>
+        ${u.badges.length > 0 ? `<div class="lb-badges">${u.badges.slice(0,3).map(b => `<span class="lb-badge">${b}</span>`).join('')}</div>` : ''}
+      </div>
+      <div class="lb-stats">
+        <div class="lb-xp">${u.xp} XP</div>
+        <div class="lb-streak">🔥 ${u.streak?.count || 0}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── BOOT ───
+init();
+</script>
+</body>
+</html>
