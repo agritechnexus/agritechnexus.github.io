@@ -4,281 +4,378 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>GovPrep - Exam Preparation Tracker</title>
-  <meta name="description" content="Your personal exam GPS for Indian government exam preparation. Track progress, stay motivated, ace your exam." />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <meta name="description" content="Your personal exam GPS for Indian government exam preparation." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --blue: #2563eb; --blue-light: #eff6ff; --blue-dark: #1d4ed8;
-      --green: #16a34a; --green-light: #f0fdf4; --green-bg: #dcfce7;
-      --red: #dc2626; --red-light: #fef2f2; --red-bg: #fecaca;
-      --orange: #f59e0b; --orange-light: #fffbeb;
-      --purple: #7c3aed; --purple-light: #f5f3ff;
-      --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
-      --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280;
-      --gray-600: #4b5563; --gray-700: #374151; --gray-800: #1f2937;
+      --bg: #0a0a0f; --bg-card: rgba(255,255,255,0.04); --bg-card-hover: rgba(255,255,255,0.07);
+      --glass: rgba(255,255,255,0.06); --glass-border: rgba(255,255,255,0.08);
+      --accent: #6366f1; --accent-light: #818cf8; --accent-glow: rgba(99,102,241,0.3);
+      --green: #22c55e; --green-glow: rgba(34,197,94,0.25); --green-bg: rgba(34,197,94,0.1);
+      --red: #ef4444; --red-glow: rgba(239,68,68,0.2); --red-bg: rgba(239,68,68,0.1);
+      --orange: #f59e0b; --orange-glow: rgba(245,158,11,0.25); --orange-bg: rgba(245,158,11,0.1);
+      --cyan: #06b6d4; --cyan-glow: rgba(6,182,212,0.25);
+      --text: #f1f5f9; --text-secondary: #94a3b8; --text-muted: #64748b;
+      --border: rgba(255,255,255,0.06);
+      --gradient-1: linear-gradient(135deg, #6366f1, #8b5cf6, #a78bfa);
+      --gradient-2: linear-gradient(135deg, #06b6d4, #22d3ee);
+      --gradient-3: linear-gradient(135deg, #f59e0b, #fbbf24);
+      --radius: 16px; --radius-sm: 10px; --radius-xs: 6px;
     }
-    body { font-family: 'Inter', -apple-system, sans-serif; background: var(--gray-50); color: var(--gray-800); line-height: 1.5; -webkit-font-smoothing: antialiased; }
-    button { cursor: pointer; border: none; font-family: inherit; }
-    input, select { font-family: inherit; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    button { cursor: pointer; border: none; font-family: inherit; background: none; color: inherit; }
+    input, select { font-family: inherit; color: inherit; }
+    .app { max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; overflow: hidden; }
 
-    /* App container */
-    .app { max-width: 480px; margin: 0 auto; min-height: 100vh; background: #fff; position: relative; }
+    /* Ambient background */
+    .ambient { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+    .ambient-orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; }
+    .ambient-orb.o1 { width: 300px; height: 300px; background: #6366f1; top: -10%; left: -10%; animation: orbFloat 12s ease-in-out infinite; }
+    .ambient-orb.o2 { width: 250px; height: 250px; background: #06b6d4; bottom: 20%; right: -15%; animation: orbFloat 15s ease-in-out infinite reverse; }
+    .ambient-orb.o3 { width: 200px; height: 200px; background: #f59e0b; top: 40%; left: 50%; animation: orbFloat 18s ease-in-out infinite 3s; }
+    @keyframes orbFloat { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(40px,-30px) scale(1.1); } 66% { transform: translate(-20px,40px) scale(0.9); } }
 
     /* Screens */
-    .screen { display: none; padding: 24px 20px 100px; min-height: 100vh; }
-    .screen.active { display: block; }
-
-    /* Bottom Nav */
-    .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: #fff; border-top: 1px solid var(--gray-200); display: flex; z-index: 100; }
-    .bottom-nav button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 64px; background: none; color: var(--gray-400); font-size: 11px; font-weight: 500; gap: 2px; transition: color 0.2s; }
-    .bottom-nav button.active { color: var(--blue); }
-    .bottom-nav .nav-icon { font-size: 22px; }
-
-    /* Auth screens */
+    .screen { display: none; padding: 20px 20px 100px; min-height: 100vh; position: relative; z-index: 1; }
+    .screen.active { display: block; animation: screenIn 0.4s ease; }
     .auth-screen { flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; }
     .auth-screen.active { display: flex; }
-    .auth-title { font-size: 32px; font-weight: 700; }
-    .auth-sub { color: var(--gray-500); margin-top: 4px; margin-bottom: 32px; }
+    @keyframes screenIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Bottom Nav */
+    .bottom-nav { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 440px; background: rgba(15,15,25,0.85); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border: 1px solid var(--glass-border); border-radius: 20px; display: flex; z-index: 100; padding: 4px; }
+    .bottom-nav button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 56px; border-radius: 16px; color: var(--text-muted); font-size: 10px; font-weight: 500; gap: 2px; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); position: relative; }
+    .bottom-nav button.active { color: #fff; background: var(--accent); box-shadow: 0 4px 20px var(--accent-glow); }
+    .bottom-nav .nav-icon { font-size: 20px; transition: transform 0.3s; }
+    .bottom-nav button.active .nav-icon { transform: scale(1.15); }
+
+    /* Auth */
+    .auth-logo { font-size: 48px; margin-bottom: 8px; }
+    .auth-title { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .auth-sub { color: var(--text-muted); margin-top: 4px; margin-bottom: 36px; font-size: 14px; }
     .auth-form { width: 100%; max-width: 360px; }
-    .auth-form input { width: 100%; padding: 14px 16px; border: 1px solid var(--gray-300); border-radius: 10px; font-size: 16px; margin-bottom: 12px; outline: none; transition: border 0.2s; }
-    .auth-form input:focus { border-color: var(--blue); }
-    .btn-primary { width: 100%; padding: 14px; background: var(--blue); color: #fff; border-radius: 10px; font-size: 16px; font-weight: 600; transition: background 0.2s; }
-    .btn-primary:hover { background: var(--blue-dark); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-    .auth-switch { margin-top: 24px; color: var(--gray-500); font-size: 14px; }
-    .auth-switch a { color: var(--blue); font-weight: 600; cursor: pointer; text-decoration: none; }
-    .error-msg { background: var(--red-light); color: var(--red); padding: 12px; border-radius: 10px; margin-bottom: 16px; font-size: 14px; }
+    .input-wrap { position: relative; margin-bottom: 14px; }
+    .input-wrap input { width: 100%; padding: 16px 18px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); font-size: 15px; color: var(--text); outline: none; transition: all 0.3s; }
+    .input-wrap input::placeholder { color: var(--text-muted); }
+    .input-wrap input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow), inset 0 0 0 1px var(--accent); }
+    .btn-glow { width: 100%; padding: 16px; background: var(--gradient-1); color: #fff; border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; letter-spacing: 0.3px; transition: all 0.3s; position: relative; overflow: hidden; }
+    .btn-glow::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent, rgba(255,255,255,0.15), transparent); transform: translateX(-100%); transition: transform 0.5s; }
+    .btn-glow:hover::after { transform: translateX(100%); }
+    .btn-glow:hover { box-shadow: 0 8px 30px var(--accent-glow); transform: translateY(-1px); }
+    .btn-glow:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .auth-switch { margin-top: 28px; color: var(--text-muted); font-size: 14px; }
+    .auth-switch a { color: var(--accent-light); font-weight: 600; cursor: pointer; text-decoration: none; transition: color 0.2s; }
+    .auth-switch a:hover { color: #fff; }
+    .error-msg { background: var(--red-bg); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 16px; font-size: 13px; animation: shake 0.4s ease; }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
 
     /* Onboarding */
-    .onb-progress { width: 100%; height: 6px; background: var(--gray-200); border-radius: 99px; margin-bottom: 24px; }
-    .onb-progress-fill { height: 100%; background: var(--blue); border-radius: 99px; transition: width 0.3s; }
-    .onb-step-label { color: var(--gray-500); font-size: 14px; margin-bottom: 4px; }
-    .onb-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
-    .exam-option { width: 100%; text-align: left; padding: 16px; border: 1px solid var(--gray-200); border-radius: 10px; background: #fff; font-size: 15px; font-weight: 500; margin-bottom: 10px; transition: all 0.2s; }
-    .exam-option:hover { border-color: var(--blue); background: var(--blue-light); }
-    .rating-card { border: 1px solid var(--gray-200); border-radius: 10px; padding: 16px; margin-bottom: 12px; }
-    .rating-card .subject-name { font-weight: 500; margin-bottom: 10px; }
+    .onb-progress { width: 100%; height: 4px; background: rgba(255,255,255,0.06); border-radius: 99px; margin-bottom: 28px; overflow: hidden; }
+    .onb-progress-fill { height: 100%; background: var(--gradient-1); border-radius: 99px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
+    .onb-step-label { color: var(--text-muted); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+    .onb-title { font-size: 22px; font-weight: 700; margin-bottom: 24px; letter-spacing: -0.3px; }
+    .exam-option { width: 100%; text-align: left; padding: 18px 20px; border: 1px solid var(--glass-border); border-radius: var(--radius); background: var(--glass); font-size: 15px; font-weight: 500; margin-bottom: 10px; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); display: flex; align-items: center; gap: 14px; }
+    .exam-option::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); opacity: 0.4; flex-shrink: 0; transition: all 0.3s; }
+    .exam-option:hover { background: var(--bg-card-hover); border-color: var(--accent); transform: translateX(4px); }
+    .exam-option:hover::before { opacity: 1; box-shadow: 0 0 10px var(--accent-glow); }
+    .rating-card { border: 1px solid var(--glass-border); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; background: var(--glass); backdrop-filter: blur(10px); }
+    .rating-card .subject-name { font-weight: 600; margin-bottom: 12px; font-size: 14px; }
     .rating-btns { display: flex; gap: 8px; }
-    .rating-btn { flex: 1; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 500; background: var(--gray-100); color: var(--gray-600); text-transform: capitalize; transition: all 0.2s; }
-    .rating-btn.weak.selected { background: var(--red); color: #fff; }
-    .rating-btn.medium.selected { background: var(--orange); color: #fff; }
-    .rating-btn.strong.selected { background: var(--green); color: #fff; }
-    .btn-row { display: flex; gap: 12px; margin-top: 24px; }
+    .rating-btn { flex: 1; padding: 10px; border-radius: var(--radius-xs); font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.04); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.3s; border: 1px solid transparent; }
+    .rating-btn.weak.selected { background: var(--red-bg); color: #fca5a5; border-color: rgba(239,68,68,0.3); box-shadow: 0 0 15px var(--red-glow); }
+    .rating-btn.medium.selected { background: var(--orange-bg); color: #fcd34d; border-color: rgba(245,158,11,0.3); box-shadow: 0 0 15px var(--orange-glow); }
+    .rating-btn.strong.selected { background: var(--green-bg); color: #86efac; border-color: rgba(34,197,94,0.3); box-shadow: 0 0 15px var(--green-glow); }
+    .btn-row { display: flex; gap: 12px; margin-top: 28px; }
     .btn-row button { flex: 1; }
-    .btn-outline { padding: 14px; border: 1px solid var(--gray-300); border-radius: 10px; background: #fff; font-size: 15px; font-weight: 600; color: var(--gray-700); }
+    .btn-outline { padding: 16px; border: 1px solid var(--glass-border); border-radius: var(--radius-sm); background: var(--glass); font-size: 15px; font-weight: 600; color: var(--text-secondary); transition: all 0.3s; }
+    .btn-outline:hover { border-color: var(--accent); color: #fff; }
 
     /* Home */
-    .home-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-    .home-name { font-size: 20px; font-weight: 700; }
-    .home-exam { color: var(--gray-500); font-size: 13px; }
-    .logout-btn { font-size: 13px; color: var(--gray-400); background: none; }
-    .countdown-card { background: var(--blue-light); border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 20px; }
-    .countdown-num { font-size: 48px; font-weight: 700; color: var(--blue); line-height: 1; }
-    .countdown-label { font-size: 13px; font-weight: 500; color: var(--blue); }
-    .stats-row { display: flex; gap: 12px; margin-bottom: 24px; }
-    .stat-card { flex: 1; border-radius: 14px; padding: 16px; text-align: center; }
-    .stat-card.streak { background: var(--orange-light); }
-    .stat-card.xp { background: var(--purple-light); }
-    .stat-val { font-size: 22px; font-weight: 700; }
+    .home-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; }
+    .home-greeting { font-size: 14px; color: var(--text-muted); font-weight: 400; }
+    .home-name { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-top: 2px; }
+    .home-exam { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; padding: 4px 12px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 99px; font-size: 12px; color: var(--accent-light); font-weight: 500; }
+    .home-exam::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s ease infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .logout-btn { font-size: 12px; color: var(--text-muted); background: var(--glass); padding: 8px 14px; border-radius: var(--radius-xs); border: 1px solid var(--glass-border); transition: all 0.3s; }
+    .logout-btn:hover { border-color: var(--red); color: #fca5a5; }
+
+    /* Countdown hero */
+    .countdown-hero { position: relative; border-radius: 24px; padding: 32px 24px; margin-bottom: 20px; overflow: hidden; background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.1), rgba(6,182,212,0.08)); border: 1px solid rgba(99,102,241,0.15); }
+    .countdown-hero::before { content: ''; position: absolute; top: -50%; right: -20%; width: 200px; height: 200px; background: radial-gradient(circle, var(--accent-glow), transparent 70%); border-radius: 50%; }
+    .countdown-hero::after { content: ''; position: absolute; bottom: -30%; left: -10%; width: 150px; height: 150px; background: radial-gradient(circle, var(--cyan-glow), transparent 70%); border-radius: 50%; }
+    .countdown-content { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; }
+    .countdown-left .countdown-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 500; }
+    .countdown-num { font-size: 64px; font-weight: 800; letter-spacing: -2px; line-height: 1; background: linear-gradient(135deg, #fff, var(--accent-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .countdown-unit { font-size: 16px; font-weight: 600; color: var(--accent-light); margin-top: -4px; }
+    .countdown-ring { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
+
+    /* Stats grid */
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
+    .stat-card { padding: 16px 12px; border-radius: var(--radius); background: var(--glass); border: 1px solid var(--glass-border); text-align: center; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); position: relative; overflow: hidden; }
+    .stat-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.12); }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; border-radius: 2px 2px 0 0; }
+    .stat-card.streak::before { background: var(--gradient-3); }
+    .stat-card.xp::before { background: var(--gradient-1); }
+    .stat-card.ready::before { background: var(--gradient-2); }
+    .stat-icon { font-size: 20px; margin-bottom: 6px; }
+    .stat-val { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
     .stat-card.streak .stat-val { color: var(--orange); }
-    .stat-card.xp .stat-val { color: var(--purple); }
-    .stat-label { font-size: 11px; font-weight: 500; }
-    .stat-card.streak .stat-label { color: #b45309; }
-    .stat-card.xp .stat-label { color: var(--purple); }
+    .stat-card.xp .stat-val { color: var(--accent-light); }
+    .stat-card.ready .stat-val { color: var(--cyan); }
+    .stat-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-top: 2px; }
 
-    /* Progress Ring */
-    .ring-wrap { display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; }
-    .ring-container { position: relative; display: inline-flex; align-items: center; justify-content: center; }
-    .ring-text { position: absolute; font-size: 24px; font-weight: 700; }
-    .ring-label { font-size: 13px; color: var(--gray-500); margin-top: 8px; }
+    /* Readiness bar */
+    .readiness-section { margin-bottom: 28px; }
+    .readiness-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .readiness-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+    .readiness-pct { font-size: 14px; font-weight: 700; }
+    .readiness-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.06); border-radius: 99px; overflow: hidden; position: relative; }
+    .readiness-fill { height: 100%; border-radius: 99px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); position: relative; }
+    .readiness-fill::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 40px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3)); border-radius: 99px; animation: shimmer 2s ease infinite; }
+    @keyframes shimmer { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
 
-    /* Section */
-    .section-title { font-size: 17px; font-weight: 600; margin-bottom: 12px; }
+    /* Section header */
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .section-title { font-size: 16px; font-weight: 700; letter-spacing: -0.2px; }
+    .section-link { font-size: 12px; color: var(--accent-light); font-weight: 500; }
 
     /* Today tasks */
-    .task-item { display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid var(--gray-200); border-radius: 10px; margin-bottom: 8px; font-weight: 500; }
-    .task-item.done { background: var(--green-light); border-color: #bbf7d0; }
-    .task-done-mark { color: var(--green); font-weight: 700; font-size: 18px; }
-    .btn-green { width: 100%; padding: 14px; background: var(--green); color: #fff; border-radius: 10px; font-size: 15px; font-weight: 600; margin-top: 8px; }
-    .btn-green:hover { background: #15803d; }
-    .done-msg { text-align: center; color: var(--green); font-weight: 500; margin-top: 8px; font-size: 14px; }
-    .badge-list { display: flex; flex-wrap: wrap; gap: 8px; }
-    .badge-tag { padding: 6px 12px; background: #fef9c3; color: #92400e; border-radius: 99px; font-size: 13px; font-weight: 500; }
+    .task-item { display: flex; align-items: center; gap: 14px; padding: 16px; border: 1px solid var(--glass-border); border-radius: var(--radius); margin-bottom: 8px; background: var(--glass); transition: all 0.3s; position: relative; overflow: hidden; }
+    .task-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); border-radius: 0 3px 3px 0; opacity: 0.5; }
+    .task-item.done { border-color: rgba(34,197,94,0.2); background: var(--green-bg); }
+    .task-item.done::before { background: var(--green); opacity: 1; }
+    .task-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; background: rgba(99,102,241,0.1); flex-shrink: 0; }
+    .task-item.done .task-icon { background: var(--green-bg); }
+    .task-name { font-size: 14px; font-weight: 500; flex: 1; }
+    .task-done-mark { color: var(--green); font-weight: 700; font-size: 16px; }
+    .btn-complete { width: 100%; padding: 16px; background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; margin-top: 8px; transition: all 0.3s; letter-spacing: 0.3px; }
+    .btn-complete:hover { box-shadow: 0 8px 25px var(--green-glow); transform: translateY(-1px); }
+    .done-msg { text-align: center; padding: 20px; color: var(--green); font-weight: 600; font-size: 14px; background: var(--green-bg); border-radius: var(--radius); border: 1px solid rgba(34,197,94,0.15); margin-top: 8px; }
+
+    /* Badges */
+    .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+    .badge-item { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(251,191,36,0.05)); border: 1px solid rgba(245,158,11,0.15); border-radius: 99px; font-size: 12px; font-weight: 600; color: #fcd34d; animation: badgePop 0.4s ease; }
+    @keyframes badgePop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
     /* Plan */
-    .plan-day { padding: 16px; border: 2px solid var(--gray-200); border-radius: 12px; margin-bottom: 10px; }
-    .plan-day.done { border-color: #86efac; background: var(--green-light); }
-    .plan-day.missed { border-color: var(--red-bg); background: var(--red-light); }
-    .plan-day.today { border-color: var(--blue); background: var(--blue-light); }
-    .plan-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .plan-date { font-size: 14px; font-weight: 600; }
-    .today-badge { font-size: 11px; background: var(--blue); color: #fff; padding: 2px 8px; border-radius: 99px; margin-left: 8px; }
-    .plan-status { font-size: 13px; font-weight: 500; }
+    .plan-day { padding: 18px; border: 1px solid var(--glass-border); border-radius: var(--radius); margin-bottom: 10px; background: var(--glass); transition: all 0.3s; position: relative; overflow: hidden; }
+    .plan-day::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--text-muted); opacity: 0.2; }
+    .plan-day.done::before { background: var(--green); opacity: 1; }
+    .plan-day.missed::before { background: var(--red); opacity: 1; }
+    .plan-day.today { border-color: var(--accent); }
+    .plan-day.today::before { background: var(--accent); opacity: 1; }
+    .plan-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .plan-date { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .today-badge { font-size: 10px; background: var(--accent); color: #fff; padding: 2px 8px; border-radius: 99px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .plan-status { font-size: 12px; font-weight: 600; }
     .plan-status.done { color: var(--green); }
     .plan-status.missed { color: var(--red); }
-    .plan-status.upcoming { color: var(--gray-400); }
-    .plan-subjects { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-    .plan-subj-tag { font-size: 13px; padding: 4px 10px; background: #fff; border: 1px solid var(--gray-200); border-radius: 6px; }
-    .plan-actions { display: flex; gap: 8px; margin-top: 8px; }
-    .plan-actions button { flex: 1; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; }
-    .btn-mark-done { background: var(--green); color: #fff; }
-    .btn-skip { background: var(--red-light); color: var(--red); }
+    .plan-status.upcoming { color: var(--text-muted); }
+    .plan-subjects { display: flex; flex-wrap: wrap; gap: 6px; }
+    .plan-subj-tag { font-size: 12px; padding: 5px 12px; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: 99px; font-weight: 500; color: var(--text-secondary); }
+    .plan-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .plan-actions button { flex: 1; padding: 10px; border-radius: var(--radius-xs); font-size: 13px; font-weight: 600; transition: all 0.3s; }
+    .btn-mark-done { background: var(--green-bg); color: #86efac; border: 1px solid rgba(34,197,94,0.2); }
+    .btn-mark-done:hover { box-shadow: 0 0 15px var(--green-glow); }
+    .btn-skip { background: var(--red-bg); color: #fca5a5; border: 1px solid rgba(239,68,68,0.15); }
 
-    /* Progress page */
-    .alert-banner { padding: 12px; border-radius: 10px; margin-bottom: 12px; font-size: 13px; font-weight: 500; }
-    .alert-red { background: var(--red-light); border: 1px solid var(--red-bg); color: #b91c1c; }
-    .alert-orange { background: var(--orange-light); border: 1px solid #fed7aa; color: #92400e; }
-    .subject-card { border: 1px solid var(--gray-200); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
-    .subject-header { display: flex; align-items: center; justify-content: space-between; padding: 16px; cursor: pointer; width: 100%; background: none; text-align: left; }
+    /* Progress */
+    .alert-banner { padding: 14px 16px; border-radius: var(--radius-sm); margin-bottom: 12px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+    .alert-red { background: var(--red-bg); border: 1px solid rgba(239,68,68,0.15); color: #fca5a5; }
+    .alert-orange { background: var(--orange-bg); border: 1px solid rgba(245,158,11,0.15); color: #fcd34d; }
+    .subject-card { border: 1px solid var(--glass-border); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; background: var(--glass); transition: all 0.3s; }
+    .subject-card:hover { border-color: rgba(255,255,255,0.1); }
+    .subject-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; cursor: pointer; width: 100%; text-align: left; }
     .subject-bar-wrap { flex: 1; margin-right: 16px; }
-    .subject-bar-name { font-weight: 500; font-size: 14px; margin-bottom: 6px; }
-    .progress-bar { width: 100%; height: 6px; background: var(--gray-200); border-radius: 99px; overflow: hidden; }
-    .progress-fill { height: 100%; border-radius: 99px; transition: width 0.4s; }
+    .subject-bar-name { font-weight: 600; font-size: 14px; margin-bottom: 8px; }
+    .progress-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.06); border-radius: 99px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 99px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
     .progress-fill.green { background: var(--green); }
     .progress-fill.yellow { background: var(--orange); }
     .progress-fill.red { background: var(--red); }
-    .subject-pct { font-size: 14px; font-weight: 600; color: var(--gray-600); }
-    .topic-list { border-top: 1px solid var(--gray-100); padding: 16px; }
-    .topic-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; }
-    .topic-name { font-size: 13px; flex: 1; }
-    .topic-select { font-size: 12px; padding: 4px 8px; border-radius: 6px; border: none; font-weight: 500; cursor: pointer; outline: none; }
-    .topic-select.not_started { background: var(--gray-100); color: var(--gray-600); }
-    .topic-select.in_progress { background: #dbeafe; color: #1d4ed8; }
-    .topic-select.revised { background: #fef3c7; color: #92400e; }
-    .topic-select.confident { background: var(--green-bg); color: #15803d; }
+    .subject-pct { font-size: 14px; font-weight: 700; color: var(--text-secondary); min-width: 40px; text-align: right; }
+    .topic-list { border-top: 1px solid var(--border); padding: 14px 18px; }
+    .topic-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .topic-row:last-child { border-bottom: none; }
+    .topic-name { font-size: 13px; flex: 1; color: var(--text-secondary); }
+    .topic-select { font-size: 11px; padding: 5px 10px; border-radius: var(--radius-xs); border: 1px solid var(--glass-border); font-weight: 600; cursor: pointer; outline: none; background: var(--glass); color: var(--text-secondary); transition: all 0.3s; appearance: none; -webkit-appearance: none; }
+    .topic-select.not_started { background: rgba(255,255,255,0.04); }
+    .topic-select.in_progress { background: rgba(99,102,241,0.1); color: var(--accent-light); border-color: rgba(99,102,241,0.2); }
+    .topic-select.revised { background: var(--orange-bg); color: #fcd34d; border-color: rgba(245,158,11,0.2); }
+    .topic-select.confident { background: var(--green-bg); color: #86efac; border-color: rgba(34,197,94,0.2); }
 
     /* Leaderboard */
-    .lb-entry { display: flex; align-items: center; padding: 14px; border: 2px solid var(--gray-100); border-radius: 10px; margin-bottom: 8px; background: #fff; }
-    .lb-entry.me { border-color: #93c5fd; background: var(--blue-light); }
-    .lb-rank { width: 40px; text-align: center; font-size: 18px; }
-    .lb-rank-num { font-weight: 700; color: var(--gray-400); }
+    .lb-entry { display: flex; align-items: center; padding: 14px 16px; border: 1px solid var(--glass-border); border-radius: var(--radius); margin-bottom: 8px; background: var(--glass); transition: all 0.3s; }
+    .lb-entry:hover { border-color: rgba(255,255,255,0.1); transform: translateX(2px); }
+    .lb-entry.me { border-color: rgba(99,102,241,0.3); background: rgba(99,102,241,0.08); }
+    .lb-rank { width: 36px; text-align: center; font-size: 18px; flex-shrink: 0; }
+    .lb-rank-num { font-weight: 800; color: var(--text-muted); font-size: 14px; }
     .lb-info { flex: 1; margin-left: 12px; }
     .lb-name { font-size: 14px; font-weight: 600; }
-    .lb-name .you { color: var(--blue); font-weight: 600; }
+    .lb-name .you { color: var(--accent-light); }
     .lb-badges { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
-    .lb-badge { font-size: 10px; padding: 2px 6px; background: #fef9c3; color: #92400e; border-radius: 4px; }
+    .lb-badge { font-size: 10px; padding: 2px 6px; background: var(--orange-bg); color: #fcd34d; border-radius: 4px; font-weight: 600; }
     .lb-stats { text-align: right; }
-    .lb-xp { font-weight: 700; color: var(--blue); font-size: 14px; }
+    .lb-xp { font-weight: 800; color: var(--accent-light); font-size: 14px; }
     .lb-streak { font-size: 12px; color: var(--orange); }
-    .empty-state { text-align: center; padding: 60px 20px; color: var(--gray-400); }
-    .empty-icon { font-size: 48px; margin-bottom: 8px; }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+    .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+
+    /* Motivational quote */
+    .quote-card { padding: 20px; border-radius: var(--radius); background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(6,182,212,0.05)); border: 1px solid rgba(99,102,241,0.1); margin-top: 24px; margin-bottom: 8px; }
+    .quote-text { font-size: 14px; font-style: italic; color: var(--text-secondary); line-height: 1.6; }
+    .quote-author { font-size: 12px; color: var(--text-muted); margin-top: 8px; font-weight: 500; }
+
+    /* Page subtitle */
+    .page-subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
 
     /* Responsive */
-    @media (max-width: 480px) {
-      .app { max-width: 100%; }
-      .bottom-nav { max-width: 100%; }
-    }
+    @media (max-width: 480px) { .app { max-width: 100%; } .bottom-nav { max-width: calc(100% - 32px); } }
   </style>
 </head>
 <body>
+<div class="ambient"><div class="ambient-orb o1"></div><div class="ambient-orb o2"></div><div class="ambient-orb o3"></div></div>
 <div class="app" id="app">
 
-  <!-- LOGIN SCREEN -->
+  <!-- LOGIN -->
   <div class="screen auth-screen active" id="screen-login">
     <div class="auth-form">
-      <h1 class="auth-title" style="text-align:center;">GovPrep</h1>
-      <p class="auth-sub" style="text-align:center;">Your exam preparation GPS</p>
+      <div class="auth-logo">🎯</div>
+      <h1 class="auth-title">GovPrep</h1>
+      <p class="auth-sub">Your exam preparation GPS</p>
       <div id="login-error" class="error-msg" style="display:none;"></div>
-      <input type="email" id="login-email" placeholder="Email" />
-      <input type="password" id="login-password" placeholder="Password" />
-      <button class="btn-primary" onclick="handleLogin()">Log In</button>
-      <p class="auth-switch" style="text-align:center;">Don't have an account? <a onclick="showScreen('register')">Sign Up</a></p>
+      <div class="input-wrap"><input type="email" id="login-email" placeholder="Email address" /></div>
+      <div class="input-wrap"><input type="password" id="login-password" placeholder="Password" /></div>
+      <button class="btn-glow" onclick="handleLogin()">Log In</button>
+      <p class="auth-switch" style="text-align:center;">New here? <a onclick="showScreen('register')">Create Account</a></p>
     </div>
   </div>
 
-  <!-- REGISTER SCREEN -->
+  <!-- REGISTER -->
   <div class="screen auth-screen" id="screen-register">
     <div class="auth-form">
-      <h1 class="auth-title" style="text-align:center;">GovPrep</h1>
-      <p class="auth-sub" style="text-align:center;">Create your account</p>
+      <div class="auth-logo">🚀</div>
+      <h1 class="auth-title">Join GovPrep</h1>
+      <p class="auth-sub">Start your preparation journey</p>
       <div id="register-error" class="error-msg" style="display:none;"></div>
-      <input type="text" id="reg-name" placeholder="Full Name" />
-      <input type="email" id="reg-email" placeholder="Email" />
-      <input type="password" id="reg-password" placeholder="Password (min 6 characters)" />
-      <button class="btn-primary" onclick="handleRegister()">Sign Up</button>
-      <p class="auth-switch" style="text-align:center;">Already have an account? <a onclick="showScreen('login')">Log In</a></p>
+      <div class="input-wrap"><input type="text" id="reg-name" placeholder="Full Name" /></div>
+      <div class="input-wrap"><input type="email" id="reg-email" placeholder="Email address" /></div>
+      <div class="input-wrap"><input type="password" id="reg-password" placeholder="Password (min 6 chars)" /></div>
+      <button class="btn-glow" onclick="handleRegister()">Create Account</button>
+      <p class="auth-switch" style="text-align:center;">Already a member? <a onclick="showScreen('login')">Log In</a></p>
     </div>
   </div>
 
-  <!-- ONBOARDING SCREEN -->
+  <!-- ONBOARDING -->
   <div class="screen" id="screen-onboarding" style="padding-bottom:40px;">
-    <h1 style="font-size:22px;font-weight:700;margin-bottom:4px;">Setup Your Prep</h1>
     <p class="onb-step-label" id="onb-step-label">Step 1 of 3</p>
+    <h1 style="font-size:22px;font-weight:800;margin-bottom:4px;letter-spacing:-0.3px;">Setup Your Prep</h1>
     <div class="onb-progress"><div class="onb-progress-fill" id="onb-progress-fill" style="width:33%"></div></div>
     <div id="onb-step-1">
-      <h2 class="onb-title">Which exam are you preparing for?</h2>
+      <h2 class="onb-title">Which exam are you targeting?</h2>
       <div id="exam-list"></div>
     </div>
     <div id="onb-step-2" style="display:none;">
       <h2 class="onb-title">When is your exam?</h2>
-      <input type="date" id="exam-date-input" style="width:100%;padding:14px 16px;border:1px solid var(--gray-300);border-radius:10px;font-size:16px;outline:none;" />
+      <div class="input-wrap"><input type="date" id="exam-date-input" /></div>
       <div class="btn-row">
         <button class="btn-outline" onclick="onbBack(1)">Back</button>
-        <button class="btn-primary" onclick="onbNext(3)">Next</button>
+        <button class="btn-glow" onclick="onbNext(3)">Continue</button>
       </div>
     </div>
     <div id="onb-step-3" style="display:none;">
-      <h2 class="onb-title">Rate your subjects</h2>
+      <h2 class="onb-title">How confident are you?</h2>
       <div id="rating-list"></div>
       <div class="btn-row">
         <button class="btn-outline" onclick="onbBack(2)">Back</button>
-        <button class="btn-primary" onclick="completeOnboarding()">Start Prep!</button>
+        <button class="btn-glow" onclick="completeOnboarding()">Launch Prep 🚀</button>
       </div>
     </div>
   </div>
 
-  <!-- HOME SCREEN -->
+  <!-- HOME -->
   <div class="screen" id="screen-home">
     <div class="home-header">
       <div>
+        <div class="home-greeting" id="home-greeting">Good morning</div>
         <div class="home-name" id="home-name">Hi!</div>
         <div class="home-exam" id="home-exam"></div>
       </div>
-      <button class="logout-btn" onclick="handleLogout()">Logout</button>
+      <button class="logout-btn" onclick="handleLogout()">Sign Out</button>
     </div>
-    <div class="countdown-card">
-      <div class="countdown-num" id="days-left">0</div>
-      <div class="countdown-label">days left</div>
+
+    <div class="countdown-hero">
+      <div class="countdown-content">
+        <div class="countdown-left">
+          <div class="countdown-label">Exam Countdown</div>
+          <div class="countdown-num" id="days-left">0</div>
+          <div class="countdown-unit">days remaining</div>
+        </div>
+        <div class="countdown-ring"><svg id="ring-svg" width="80" height="80"></svg></div>
+      </div>
     </div>
-    <div class="stats-row">
+
+    <div class="stats-grid">
       <div class="stat-card streak">
-        <div class="stat-val" id="home-streak">🔥 0</div>
-        <div class="stat-label">Day Streak</div>
+        <div class="stat-icon">🔥</div>
+        <div class="stat-val" id="home-streak">0</div>
+        <div class="stat-label">Streak</div>
       </div>
       <div class="stat-card xp">
-        <div class="stat-val" id="home-xp">⚡ 0</div>
+        <div class="stat-icon">⚡</div>
+        <div class="stat-val" id="home-xp">0</div>
         <div class="stat-label">XP Points</div>
       </div>
+      <div class="stat-card ready">
+        <div class="stat-icon">📊</div>
+        <div class="stat-val" id="home-ready">0%</div>
+        <div class="stat-label">Readiness</div>
+      </div>
     </div>
-    <div class="ring-wrap">
-      <div class="ring-container"><svg id="ring-svg" width="130" height="130"></svg><span class="ring-text" id="ring-pct">0%</span></div>
-      <div class="ring-label">Exam Readiness</div>
+
+    <div class="readiness-section">
+      <div class="readiness-header">
+        <span class="readiness-title">Overall Progress</span>
+        <span class="readiness-pct" id="readiness-pct" style="color:var(--accent-light)">0%</span>
+      </div>
+      <div class="readiness-bar"><div class="readiness-fill" id="readiness-fill" style="width:0;background:var(--gradient-1);"></div></div>
     </div>
-    <h2 class="section-title">Today's Focus</h2>
+
+    <div class="section-header">
+      <span class="section-title">Today's Focus</span>
+    </div>
     <div id="today-tasks"></div>
+
     <div id="home-badges"></div>
+
+    <div class="quote-card" id="quote-card">
+      <div class="quote-text" id="quote-text"></div>
+      <div class="quote-author" id="quote-author"></div>
+    </div>
   </div>
 
-  <!-- PLAN SCREEN -->
+  <!-- PLAN -->
   <div class="screen" id="screen-plan">
-    <h1 style="font-size:20px;font-weight:700;margin-bottom:4px;">Study Plan</h1>
-    <p style="color:var(--gray-500);font-size:13px;margin-bottom:20px;" id="plan-total"></p>
+    <h1 style="font-size:22px;font-weight:800;letter-spacing:-0.3px;">Study Plan</h1>
+    <p class="page-subtitle" id="plan-total"></p>
     <div id="plan-list"></div>
   </div>
 
-  <!-- PROGRESS SCREEN -->
+  <!-- PROGRESS -->
   <div class="screen" id="screen-progress">
-    <h1 style="font-size:20px;font-weight:700;margin-bottom:4px;">Progress</h1>
-    <p style="color:var(--gray-500);font-size:13px;margin-bottom:16px;" id="progress-overall"></p>
+    <h1 style="font-size:22px;font-weight:800;letter-spacing:-0.3px;">Progress</h1>
+    <p class="page-subtitle" id="progress-overall"></p>
     <div id="progress-alerts"></div>
     <div id="progress-list"></div>
   </div>
 
-  <!-- LEADERBOARD SCREEN -->
+  <!-- LEADERBOARD -->
   <div class="screen" id="screen-leaderboard">
-    <h1 style="font-size:20px;font-weight:700;margin-bottom:4px;">Leaderboard</h1>
-    <p style="color:var(--gray-500);font-size:13px;margin-bottom:20px;" id="lb-subtitle"></p>
+    <h1 style="font-size:22px;font-weight:800;letter-spacing:-0.3px;">Leaderboard</h1>
+    <p class="page-subtitle" id="lb-subtitle"></p>
     <div id="lb-list"></div>
   </div>
 
@@ -292,7 +389,7 @@
 </div>
 
 <script>
-// ─── EXAM SYLLABUS DATA ───
+// ─── EXAM DATA ───
 const EXAMS = {
   "SSC CGL": [
     { name: "Quantitative Aptitude", topics: ["Number System","Algebra","Geometry","Trigonometry","Mensuration","Data Interpretation","Percentage","Ratio & Proportion","Profit & Loss","Time & Work","Time & Distance","SI & CI","Average","Mixture & Alligation"] },
@@ -340,14 +437,35 @@ const EXAMS = {
   ]
 };
 
-// ─── LOCAL STORAGE HELPERS ───
+const QUOTES = [
+  { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" },
+  { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
+  { text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius" },
+  { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+  { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+  { text: "Hard work beats talent when talent doesn't work hard.", author: "Tim Notke" },
+  { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
+  { text: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
+  { text: "Discipline is the bridge between goals and accomplishment.", author: "Jim Rohn" },
+  { text: "Education is the most powerful weapon which you can use to change the world.", author: "Nelson Mandela" }
+];
+
+const SUBJECT_ICONS = { "Quantitative": "🔢", "Mathematics": "🔢", "General Awareness": "🌍", "English": "📝", "Reasoning": "🧩", "Indian History": "🏛️", "Indian Polity": "⚖️", "Geography": "🗺️", "Economics": "📈", "General Science": "🔬", "Current Affairs": "📰", "CSAT": "🧠", "Computer": "💻", "Banking": "🏦", "General Studies": "📚", "General Intelligence": "🧩" };
+
+function getSubjectIcon(name) {
+  for (const [key, icon] of Object.entries(SUBJECT_ICONS)) {
+    if (name.includes(key)) return icon;
+  }
+  return "📘";
+}
+
+// ─── DB ───
 const DB = {
   get(key) { try { return JSON.parse(localStorage.getItem('gp_' + key)); } catch { return null; } },
   set(key, val) { localStorage.setItem('gp_' + key, JSON.stringify(val)); },
   remove(key) { localStorage.removeItem('gp_' + key); }
 };
 
-// ─── STATE ───
 let currentUser = null;
 let currentScreen = 'login';
 let onbStep = 1;
@@ -361,35 +479,25 @@ function init() {
     const users = DB.get('users') || {};
     if (users[userId]) {
       currentUser = users[userId];
-      if (!currentUser.onboarded) {
-        showScreen('onboarding');
-        renderOnboarding();
-      } else {
-        showScreen('home');
-        renderHome();
-      }
+      if (!currentUser.onboarded) { showScreen('onboarding'); renderOnboarding(); }
+      else { showScreen('home'); renderHome(); }
       return;
     }
   }
   showScreen('login');
 }
 
-// ─── SCREEN NAV ───
+// ─── SCREENS ───
 function showScreen(name) {
   currentScreen = name;
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const el = document.getElementById('screen-' + name);
   if (el) el.classList.add('active');
-
   const nav = document.getElementById('bottom-nav');
   const mainScreens = ['home', 'plan', 'progress', 'leaderboard'];
   nav.style.display = (currentUser && currentUser.onboarded && mainScreens.includes(name)) ? 'flex' : 'none';
-
-  // Update nav active
   if (mainScreens.includes(name)) {
-    nav.querySelectorAll('button').forEach((btn, i) => {
-      btn.classList.toggle('active', mainScreens[i] === name);
-    });
+    nav.querySelectorAll('button').forEach((btn, i) => btn.classList.toggle('active', mainScreens[i] === name));
   }
 }
 
@@ -407,13 +515,10 @@ function handleLogin() {
   const password = document.getElementById('login-password').value;
   const errEl = document.getElementById('login-error');
   errEl.style.display = 'none';
-
   if (!email || !password) { errEl.textContent = 'Please fill all fields'; errEl.style.display = 'block'; return; }
-
   const users = DB.get('users') || {};
   const user = Object.values(users).find(u => u.email === email);
   if (!user || user.password !== password) { errEl.textContent = 'Invalid credentials'; errEl.style.display = 'block'; return; }
-
   currentUser = user;
   DB.set('currentUser', user.id);
   if (!user.onboarded) { showScreen('onboarding'); renderOnboarding(); }
@@ -426,13 +531,10 @@ function handleRegister() {
   const password = document.getElementById('reg-password').value;
   const errEl = document.getElementById('register-error');
   errEl.style.display = 'none';
-
   if (!name || !email || !password) { errEl.textContent = 'Please fill all fields'; errEl.style.display = 'block'; return; }
   if (password.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; errEl.style.display = 'block'; return; }
-
   const users = DB.get('users') || {};
   if (Object.values(users).find(u => u.email === email)) { errEl.textContent = 'Email already registered'; errEl.style.display = 'block'; return; }
-
   const id = 'u_' + Date.now();
   const user = { id, name, email, password, targetExam: '', examDate: '', subjects: [], streak: { count: 0, lastActiveDate: null }, xp: 0, badges: [], onboarded: false, createdAt: new Date().toISOString() };
   users[id] = user;
@@ -453,8 +555,7 @@ function handleLogout() {
 
 // ─── ONBOARDING ───
 function renderOnboarding() {
-  const list = document.getElementById('exam-list');
-  list.innerHTML = Object.keys(EXAMS).map(name =>
+  document.getElementById('exam-list').innerHTML = Object.keys(EXAMS).map(name =>
     `<button class="exam-option" onclick="selectExam('${name}')">${name}</button>`
   ).join('');
   onbStep = 1;
@@ -469,37 +570,26 @@ function selectExam(name) {
 }
 
 function onbNext(step) {
-  if (step === 3) {
-    const dateVal = document.getElementById('exam-date-input').value;
-    if (!dateVal) return;
-  }
+  if (step === 3) { if (!document.getElementById('exam-date-input').value) return; }
   onbStep = step;
   updateOnbUI();
   if (step === 3) renderRatings();
 }
-
-function onbBack(step) {
-  onbStep = step;
-  updateOnbUI();
-}
+function onbBack(step) { onbStep = step; updateOnbUI(); }
 
 function updateOnbUI() {
-  document.getElementById('onb-step-label').textContent = `Step ${onbStep} of 3`;
+  document.getElementById('onb-step-label').textContent = `STEP ${onbStep} OF 3`;
   document.getElementById('onb-progress-fill').style.width = `${(onbStep / 3) * 100}%`;
   document.getElementById('onb-step-1').style.display = onbStep === 1 ? 'block' : 'none';
   document.getElementById('onb-step-2').style.display = onbStep === 2 ? 'block' : 'none';
   document.getElementById('onb-step-3').style.display = onbStep === 3 ? 'block' : 'none';
-
-  // Set min date
-  const inp = document.getElementById('exam-date-input');
-  inp.min = new Date().toISOString().split('T')[0];
+  document.getElementById('exam-date-input').min = new Date().toISOString().split('T')[0];
 }
 
 function renderRatings() {
-  const list = document.getElementById('rating-list');
-  list.innerHTML = EXAMS[selectedExam].map(s => `
+  document.getElementById('rating-list').innerHTML = EXAMS[selectedExam].map(s => `
     <div class="rating-card">
-      <div class="subject-name">${s.name}</div>
+      <div class="subject-name">${getSubjectIcon(s.name)} ${s.name}</div>
       <div class="rating-btns">
         ${['weak','medium','strong'].map(r => `
           <button class="rating-btn ${r} ${subjectRatings[s.name] === r ? 'selected' : ''}" onclick="setRating('${s.name}','${r}')">${r}</button>
@@ -508,11 +598,7 @@ function renderRatings() {
     </div>
   `).join('');
 }
-
-function setRating(subject, rating) {
-  subjectRatings[subject] = rating;
-  renderRatings();
-}
+function setRating(subject, rating) { subjectRatings[subject] = rating; renderRatings(); }
 
 function completeOnboarding() {
   const examDate = document.getElementById('exam-date-input').value;
@@ -520,85 +606,54 @@ function completeOnboarding() {
   currentUser.examDate = examDate;
   currentUser.subjects = Object.entries(subjectRatings).map(([name, selfRating]) => ({ name, selfRating }));
   currentUser.onboarded = true;
-
-  // Check Early Bird badge
   const daysUntil = Math.ceil((new Date(examDate) - new Date()) / 86400000);
-  if (daysUntil >= 180 && !currentUser.badges.includes('Early Bird')) {
-    currentUser.badges.push('Early Bird');
-  }
-
+  if (daysUntil >= 180 && !currentUser.badges.includes('Early Bird')) currentUser.badges.push('Early Bird');
   saveUser();
-
-  // Generate plan
   generatePlan();
-
-  // Initialize progress
   initProgress();
-
   showScreen('home');
   renderHome();
 }
 
-// ─── STUDY PLAN GENERATOR ───
+// ─── PLAN GENERATOR ───
 function generatePlan() {
   const today = new Date(); today.setHours(0,0,0,0);
   const examDate = new Date(currentUser.examDate); examDate.setHours(0,0,0,0);
   const totalDays = Math.max(1, Math.ceil((examDate - today) / 86400000));
-
   const weights = { weak: 3, medium: 2, strong: 1 };
   const pool = [];
-  currentUser.subjects.forEach(s => {
-    const w = weights[s.selfRating] || 2;
-    for (let i = 0; i < w; i++) pool.push(s.name);
-  });
-
+  currentUser.subjects.forEach(s => { for (let i = 0; i < (weights[s.selfRating] || 2); i++) pool.push(s.name); });
   const days = [];
   let pi = 0;
   for (let d = 0; d < totalDays; d++) {
-    const date = new Date(today);
-    date.setDate(today.getDate() + d);
+    const date = new Date(today); date.setDate(today.getDate() + d);
     const count = d % 3 === 0 ? 3 : 2;
     const subs = new Set();
-    for (let s = 0; s < count; s++) {
-      subs.add(pool[pi % pool.length]);
-      pi++;
-    }
+    for (let s = 0; s < count; s++) { subs.add(pool[pi % pool.length]); pi++; }
     days.push({ date: date.toISOString().split('T')[0], subjects: Array.from(subs), status: 'upcoming' });
   }
-
   DB.set('plan_' + currentUser.id, { days, generatedAt: new Date().toISOString() });
 }
 
 function getPlan() {
   const plan = DB.get('plan_' + currentUser.id);
   if (!plan) return null;
-
-  // Auto-mark past upcoming as missed
   const today = todayStr();
   let changed = false;
-  plan.days.forEach(d => {
-    if (d.date < today && d.status === 'upcoming') { d.status = 'missed'; changed = true; }
-  });
+  plan.days.forEach(d => { if (d.date < today && d.status === 'upcoming') { d.status = 'missed'; changed = true; } });
   if (changed) DB.set('plan_' + currentUser.id, plan);
   return plan;
 }
-
-function todayStr() {
-  return new Date().toISOString().split('T')[0];
-}
+function todayStr() { return new Date().toISOString().split('T')[0]; }
 
 // ─── PROGRESS ───
 function initProgress() {
   const subjects = EXAMS[currentUser.targetExam].map(s => ({
-    name: s.name,
-    topics: s.topics.map(t => ({ name: t, status: 'not_started', lastUpdated: new Date().toISOString() }))
+    name: s.name, topics: s.topics.map(t => ({ name: t, status: 'not_started', lastUpdated: new Date().toISOString() }))
   }));
   DB.set('progress_' + currentUser.id, { subjects });
 }
-
-function getProgress() {
-  return DB.get('progress_' + currentUser.id);
-}
+function getProgress() { return DB.get('progress_' + currentUser.id); }
 
 function calcReadiness(progress) {
   if (!progress) return 0;
@@ -615,40 +670,18 @@ function subjectProgress(subject) {
   return Math.round((subject.topics.reduce((sum, t) => sum + (w[t.status] || 0), 0) / total) * 100);
 }
 
-// ─── SAVE USER ───
-function saveUser() {
-  const users = DB.get('users') || {};
-  users[currentUser.id] = currentUser;
-  DB.set('users', users);
-}
+function saveUser() { const users = DB.get('users') || {}; users[currentUser.id] = currentUser; DB.set('users', users); }
 
 // ─── GAMIFICATION ───
 function awardDayDone(daySubjects) {
-  // XP
   currentUser.xp += daySubjects.length * 10 + 50;
-
-  // Streak
   const today = todayStr();
   const last = currentUser.streak.lastActiveDate;
-  if (last) {
-    const diff = Math.floor((new Date(today) - new Date(last)) / 86400000);
-    if (diff === 1) currentUser.streak.count += 1;
-    else if (diff > 1) currentUser.streak.count = 1;
-  } else {
-    currentUser.streak.count = 1;
-  }
+  if (last) { const diff = Math.floor((new Date(today) - new Date(last)) / 86400000); currentUser.streak.count = diff === 1 ? currentUser.streak.count + 1 : diff > 1 ? 1 : currentUser.streak.count; }
+  else currentUser.streak.count = 1;
   currentUser.streak.lastActiveDate = today;
-
-  // Streak badges
-  if (currentUser.streak.count >= 7 && !currentUser.badges.includes('7-Day Streak')) {
-    currentUser.badges.push('7-Day Streak');
-    currentUser.xp += 100;
-  }
-  if (currentUser.streak.count >= 30 && !currentUser.badges.includes('30-Day Streak')) {
-    currentUser.badges.push('30-Day Streak');
-    currentUser.xp += 100;
-  }
-
+  if (currentUser.streak.count >= 7 && !currentUser.badges.includes('7-Day Streak')) { currentUser.badges.push('7-Day Streak'); currentUser.xp += 100; }
+  if (currentUser.streak.count >= 30 && !currentUser.badges.includes('30-Day Streak')) { currentUser.badges.push('30-Day Streak'); currentUser.xp += 100; }
   saveUser();
 }
 
@@ -668,75 +701,78 @@ function checkCoverageBadges() {
 function renderHome() {
   const progress = getProgress();
   const plan = getPlan();
+  const readiness = calcReadiness(progress);
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
-  document.getElementById('home-name').textContent = 'Hi, ' + (currentUser.name.split(' ')[0]) + '!';
+  document.getElementById('home-greeting').textContent = greeting;
+  document.getElementById('home-name').textContent = currentUser.name.split(' ')[0];
   document.getElementById('home-exam').textContent = currentUser.targetExam;
 
-  // Days left
   const dl = Math.max(0, Math.ceil((new Date(currentUser.examDate) - new Date()) / 86400000));
   document.getElementById('days-left').textContent = dl;
+  document.getElementById('home-streak').textContent = currentUser.streak.count || 0;
+  document.getElementById('home-xp').textContent = currentUser.xp || 0;
+  document.getElementById('home-ready').textContent = Math.round(readiness) + '%';
 
-  // Stats
-  document.getElementById('home-streak').textContent = '🔥 ' + (currentUser.streak.count || 0);
-  document.getElementById('home-xp').textContent = '⚡ ' + (currentUser.xp || 0);
+  // Readiness bar
+  const rPct = Math.round(readiness);
+  document.getElementById('readiness-pct').textContent = rPct + '%';
+  const rFill = document.getElementById('readiness-fill');
+  const rColor = rPct >= 70 ? 'linear-gradient(90deg, #22c55e, #4ade80)' : rPct >= 40 ? 'linear-gradient(90deg, #f59e0b, #fbbf24)' : 'linear-gradient(90deg, #ef4444, #f87171)';
+  rFill.style.background = rColor;
+  setTimeout(() => { rFill.style.width = rPct + '%'; }, 100);
 
-  // Ring
-  const readiness = calcReadiness(progress);
+  // Mini ring in countdown
   drawRing(readiness);
 
-  // Today's tasks
+  // Today tasks
   const today = todayStr();
   const todayPlan = plan?.days.find(d => d.date === today);
   const tasksEl = document.getElementById('today-tasks');
-
   if (todayPlan) {
     let html = todayPlan.subjects.map(s =>
       `<div class="task-item ${todayPlan.status === 'done' ? 'done' : ''}">
-        <span>${s}</span>
+        <div class="task-icon">${getSubjectIcon(s)}</div>
+        <span class="task-name">${s}</span>
         ${todayPlan.status === 'done' ? '<span class="task-done-mark">✓</span>' : ''}
       </div>`
     ).join('');
-
-    if (todayPlan.status !== 'done') {
-      html += `<button class="btn-green" onclick="markTodayDone()">Mark All Done ✓</button>`;
-    } else {
-      html += `<div class="done-msg">Great job today! 🎉</div>`;
-    }
+    if (todayPlan.status !== 'done') html += `<button class="btn-complete" onclick="markTodayDone()">Complete Today's Study ✓</button>`;
+    else html += `<div class="done-msg">🎉 Great work today! Keep the momentum going.</div>`;
     tasksEl.innerHTML = html;
   } else {
-    tasksEl.innerHTML = '<p style="text-align:center;color:var(--gray-400);padding:20px;">No tasks for today</p>';
+    tasksEl.innerHTML = '<div class="empty-state" style="padding:24px;"><div class="empty-icon">✨</div>No tasks scheduled for today</div>';
   }
 
   // Badges
   const badgesEl = document.getElementById('home-badges');
   if (currentUser.badges.length > 0) {
-    badgesEl.innerHTML = `<h2 class="section-title" style="margin-top:24px;">Badges</h2>
-      <div class="badge-list">${currentUser.badges.map(b => `<span class="badge-tag">🏅 ${b}</span>`).join('')}</div>`;
-  } else {
-    badgesEl.innerHTML = '';
-  }
+    badgesEl.innerHTML = `<div class="section-header" style="margin-top:24px;"><span class="section-title">Achievements</span></div>
+      <div class="badge-row">${currentUser.badges.map(b => `<span class="badge-item">🏅 ${b}</span>`).join('')}</div>`;
+  } else badgesEl.innerHTML = '';
+
+  // Quote
+  const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+  document.getElementById('quote-text').textContent = `"${q.text}"`;
+  document.getElementById('quote-author').textContent = `— ${q.author}`;
 }
 
 function drawRing(pct) {
-  const size = 130, sw = 10;
-  const r = (size - sw) / 2;
+  const size = 80, sw = 6, r = (size - sw) / 2;
   const circ = r * 2 * Math.PI;
   const offset = circ - (pct / 100) * circ;
-  const color = pct >= 70 ? '#16a34a' : pct >= 40 ? '#f59e0b' : '#dc2626';
-
+  const color = pct >= 70 ? '#22c55e' : pct >= 40 ? '#f59e0b' : '#6366f1';
   document.getElementById('ring-svg').innerHTML = `
-    <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="#e5e7eb" stroke-width="${sw}" fill="none"/>
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="rgba(255,255,255,0.06)" stroke-width="${sw}" fill="none"/>
     <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="${color}" stroke-width="${sw}" fill="none"
       stroke-dasharray="${circ}" stroke-dashoffset="${offset}" stroke-linecap="round"
-      transform="rotate(-90 ${size/2} ${size/2})" style="transition:stroke-dashoffset 0.7s"/>`;
-  const pctEl = document.getElementById('ring-pct');
-  pctEl.textContent = Math.round(pct) + '%';
-  pctEl.style.color = color;
+      transform="rotate(-90 ${size/2} ${size/2})" style="transition:stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1)"/>
+    <text x="${size/2}" y="${size/2+4}" text-anchor="middle" fill="${color}" font-size="16" font-weight="800" font-family="Inter">${Math.round(pct)}%</text>`;
 }
 
 function markTodayDone() {
-  const plan = getPlan();
-  if (!plan) return;
+  const plan = getPlan(); if (!plan) return;
   const today = todayStr();
   const day = plan.days.find(d => d.date === today);
   if (!day) return;
@@ -749,16 +785,12 @@ function markTodayDone() {
 // ─── RENDER: PLAN ───
 function renderPlan() {
   const plan = getPlan();
-  if (!plan) { document.getElementById('plan-list').innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div>No plan found</div>'; return; }
-
-  document.getElementById('plan-total').textContent = plan.days.length + ' days total';
+  if (!plan) { document.getElementById('plan-list').innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div>No plan generated yet</div>'; return; }
+  const done = plan.days.filter(d => d.status === 'done').length;
+  document.getElementById('plan-total').textContent = `${done} of ${plan.days.length} days completed`;
   const today = todayStr();
-
-  // Show past 7 days + future
-  const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - 7);
+  const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 7);
   const cutoffStr = cutoff.toISOString().split('T')[0];
-
   const visible = plan.days.filter(d => d.date >= cutoffStr);
 
   document.getElementById('plan-list').innerHTML = visible.map(d => {
@@ -766,53 +798,34 @@ function renderPlan() {
     const cls = d.status === 'done' ? 'done' : d.status === 'missed' ? 'missed' : isToday ? 'today' : '';
     const dateObj = new Date(d.date + 'T00:00:00');
     const dateLabel = dateObj.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' });
-
-    let statusHtml = '';
-    if (d.status === 'done') statusHtml = '<span class="plan-status done">✓ Done</span>';
-    else if (d.status === 'missed') statusHtml = '<span class="plan-status missed">✗ Missed</span>';
-    else statusHtml = '<span class="plan-status upcoming">○ Upcoming</span>';
-
+    let statusHtml = d.status === 'done' ? '<span class="plan-status done">✓ Done</span>' : d.status === 'missed' ? '<span class="plan-status missed">✗ Missed</span>' : '<span class="plan-status upcoming">○ Upcoming</span>';
     let actions = '';
     if (isToday && d.status === 'upcoming') {
       actions = `<div class="plan-actions">
-        <button class="btn-mark-done" onclick="markPlanDay('${d.date}','done')">Mark Done ✓</button>
+        <button class="btn-mark-done" onclick="markPlanDay('${d.date}','done')">Done ✓</button>
         <button class="btn-skip" onclick="markPlanDay('${d.date}','missed')">Skip</button>
       </div>`;
     }
-
     return `<div class="plan-day ${cls}">
       <div class="plan-header">
-        <div><span class="plan-date">${dateLabel}</span>${isToday ? '<span class="today-badge">TODAY</span>' : ''}</div>
+        <div class="plan-date">${dateLabel}${isToday ? '<span class="today-badge">TODAY</span>' : ''}</div>
         ${statusHtml}
       </div>
-      <div class="plan-subjects">${d.subjects.map(s => `<span class="plan-subj-tag">${s}</span>`).join('')}</div>
+      <div class="plan-subjects">${d.subjects.map(s => `<span class="plan-subj-tag">${getSubjectIcon(s)} ${s}</span>`).join('')}</div>
       ${actions}
     </div>`;
   }).join('');
 }
 
 function markPlanDay(date, status) {
-  const plan = getPlan();
-  if (!plan) return;
-  const day = plan.days.find(d => d.date === date);
-  if (!day) return;
+  const plan = getPlan(); if (!plan) return;
+  const day = plan.days.find(d => d.date === date); if (!day) return;
   day.status = status;
-
-  if (status === 'done') {
-    awardDayDone(day.subjects);
-  }
-
+  if (status === 'done') awardDayDone(day.subjects);
   if (status === 'missed') {
-    // Redistribute missed subjects
     const upcoming = plan.days.filter(d => d.status === 'upcoming' && d.date > date);
-    day.subjects.forEach((sub, i) => {
-      if (upcoming.length > 0) {
-        const target = upcoming[i % upcoming.length];
-        if (!target.subjects.includes(sub)) target.subjects.push(sub);
-      }
-    });
+    day.subjects.forEach((sub, i) => { if (upcoming.length > 0) { const target = upcoming[i % upcoming.length]; if (!target.subjects.includes(sub)) target.subjects.push(sub); } });
   }
-
   DB.set('plan_' + currentUser.id, plan);
   renderPlan();
 }
@@ -820,35 +833,27 @@ function markPlanDay(date, status) {
 // ─── RENDER: PROGRESS ───
 function renderProgress() {
   const progress = getProgress();
-  if (!progress) { document.getElementById('progress-list').innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div>No data</div>'; return; }
-
+  if (!progress) { document.getElementById('progress-list').innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div>No data yet</div>'; return; }
   const overall = Math.round(calcReadiness(progress));
-  document.getElementById('progress-overall').textContent = `Overall: ${overall}% ready`;
+  document.getElementById('progress-overall').textContent = `${overall}% exam readiness`;
 
-  // Alerts
   const allTopics = progress.subjects.flatMap(s => s.topics);
   const untouched = allTopics.filter(t => t.status === 'not_started').length;
   const untouchedPct = allTopics.length > 0 ? Math.round((untouched / allTopics.length) * 100) : 0;
-
   const now = new Date();
   const neglected = progress.subjects.filter(s => {
-    const latest = s.topics.reduce((max, t) => {
-      const d = new Date(t.lastUpdated);
-      return d > max ? d : max;
-    }, new Date(0));
+    const latest = s.topics.reduce((max, t) => { const d = new Date(t.lastUpdated); return d > max ? d : max; }, new Date(0));
     return Math.floor((now - latest) / 86400000) > 7;
   }).map(s => s.name);
 
   let alertsHtml = '';
   if (untouchedPct > 30) alertsHtml += `<div class="alert-banner alert-red">⚠️ ${untouchedPct}% syllabus untouched</div>`;
-  if (neglected.length > 0) alertsHtml += `<div class="alert-banner alert-orange">⚠️ Neglected: ${neglected.join(', ')}</div>`;
+  if (neglected.length > 0) alertsHtml += `<div class="alert-banner alert-orange">⏰ Neglected: ${neglected.join(', ')}</div>`;
   document.getElementById('progress-alerts').innerHTML = alertsHtml;
 
-  // Subjects
   document.getElementById('progress-list').innerHTML = progress.subjects.map((s, si) => {
     const pct = subjectProgress(s);
     const barClass = pct >= 70 ? 'green' : pct >= 40 ? 'yellow' : 'red';
-
     const topicRows = s.topics.map((t, ti) =>
       `<div class="topic-row">
         <span class="topic-name">${t.name}</span>
@@ -860,11 +865,10 @@ function renderProgress() {
         </select>
       </div>`
     ).join('');
-
     return `<div class="subject-card">
       <button class="subject-header" onclick="toggleSubject(this)">
         <div class="subject-bar-wrap">
-          <div class="subject-bar-name">${s.name}</div>
+          <div class="subject-bar-name">${getSubjectIcon(s.name)} ${s.name}</div>
           <div class="progress-bar"><div class="progress-fill ${barClass}" style="width:${pct}%"></div></div>
         </div>
         <span class="subject-pct">${pct}%</span>
@@ -874,45 +878,32 @@ function renderProgress() {
   }).join('');
 }
 
-function toggleSubject(btn) {
-  const topicList = btn.nextElementSibling;
-  topicList.style.display = topicList.style.display === 'none' ? 'block' : 'none';
-}
+function toggleSubject(btn) { const tl = btn.nextElementSibling; tl.style.display = tl.style.display === 'none' ? 'block' : 'none'; }
 
 function updateTopic(si, ti, status) {
   const progress = getProgress();
   progress.subjects[si].topics[ti].status = status;
   progress.subjects[si].topics[ti].lastUpdated = new Date().toISOString();
   DB.set('progress_' + currentUser.id, progress);
-
-  // Award XP
   currentUser.xp += 20;
   checkCoverageBadges();
   saveUser();
-
   renderProgress();
 }
 
 // ─── RENDER: LEADERBOARD ───
 function renderLeaderboard() {
-  document.getElementById('lb-subtitle').textContent = (currentUser.targetExam || '') + ' — Top 50';
-
+  document.getElementById('lb-subtitle').textContent = (currentUser.targetExam || '') + ' rankings';
   const users = DB.get('users') || {};
-  const sameExam = Object.values(users)
-    .filter(u => u.targetExam === currentUser.targetExam && u.onboarded)
-    .sort((a, b) => b.xp - a.xp)
-    .slice(0, 50);
-
+  const sameExam = Object.values(users).filter(u => u.targetExam === currentUser.targetExam && u.onboarded).sort((a, b) => b.xp - a.xp).slice(0, 50);
   if (sameExam.length === 0) {
-    document.getElementById('lb-list').innerHTML = '<div class="empty-state"><div class="empty-icon">🏆</div>No users yet. Be the first!</div>';
+    document.getElementById('lb-list').innerHTML = '<div class="empty-state"><div class="empty-icon">🏆</div>No competitors yet</div>';
     return;
   }
-
   document.getElementById('lb-list').innerHTML = sameExam.map((u, i) => {
     const rank = i + 1;
     const isMe = u.id === currentUser.id;
     const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
-
     return `<div class="lb-entry ${isMe ? 'me' : ''}">
       <div class="lb-rank">${medal || `<span class="lb-rank-num">#${rank}</span>`}</div>
       <div class="lb-info">
