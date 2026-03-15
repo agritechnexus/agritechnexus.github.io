@@ -717,4 +717,49 @@
       setTimeout(() => {
         const piece = document.createElement('div');
         piece.className = 'confetti';
-        piece.style.left = Math.random() * 100 + '
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.background = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+        piece.style.width = (6 + Math.random() * 10) + 'px';
+        piece.style.height = (6 + Math.random() * 10) + 'px';
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        piece.style.animationDuration = (2 + Math.random() * 3) + 's';
+        confettiContainer.appendChild(piece);
+        setTimeout(() => piece.remove(), 5000);
+      }, i * 30);
+    }
+  }
+
+  document.getElementById('wishBtn').addEventListener('click', function() {
+    launchConfetti();
+    this.textContent = '🎉 Happy Birthday Teja! 🎉';
+    this.style.background = 'var(--rose)';
+    this.style.color = 'var(--cream)';
+    this.style.boxShadow = '0 0 50px rgba(232,73,106,0.5)';
+  });
+
+  // ---- Click anywhere for mini hearts ----
+  document.addEventListener('click', (e) => {
+    for (let i = 0; i < 5; i++) {
+      const heart = document.createElement('span');
+      heart.textContent = '♥';
+      heart.style.position = 'fixed';
+      heart.style.left = (e.clientX + (Math.random() - 0.5) * 40) + 'px';
+      heart.style.top = (e.clientY + (Math.random() - 0.5) * 40) + 'px';
+      heart.style.color = heartColors[Math.floor(Math.random() * heartColors.length)];
+      heart.style.fontSize = (12 + Math.random() * 16) + 'px';
+      heart.style.pointerEvents = 'none';
+      heart.style.zIndex = '200';
+      heart.style.transition = 'all 1s ease';
+      heart.style.opacity = '1';
+      document.body.appendChild(heart);
+      setTimeout(() => {
+        heart.style.transform = `translateY(-${60 + Math.random() * 60}px) scale(0)`;
+        heart.style.opacity = '0';
+      }, 50);
+      setTimeout(() => heart.remove(), 1100);
+    }
+  });
+</script>
+
+</body>
+</html>
