@@ -400,6 +400,16 @@
     .fc-nav button:hover{border-color:var(--accent);color:var(--accent-light)}
     .fc-progress{text-align:center;font-size:11px;color:var(--text-muted);margin-top:10px}
 
+    /* ═══ AI LOADING OVERLAY ═══ */
+    .ai-overlay{display:none;position:fixed;inset:0;background:rgba(6,6,11,.85);backdrop-filter:blur(16px);z-index:300;flex-direction:column;align-items:center;justify-content:center;gap:16px;animation:fadeIn .3s}
+    .ai-overlay.active{display:flex}
+    .ai-spinner{width:48px;height:48px;border-radius:50%;border:3px solid var(--glass-border);border-top-color:var(--accent);animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .ai-text{font-size:15px;font-weight:600;color:var(--text);text-align:center}
+    .ai-sub{font-size:12px;color:var(--text-muted);text-align:center;max-width:280px}
+    .ai-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:9px;font-weight:700;background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(6,182,212,.08));border:1px solid rgba(124,58,237,.15);color:var(--accent-light);text-transform:uppercase;letter-spacing:.5px;margin-left:6px}
+    [data-theme="light"] .ai-overlay{background:rgba(248,250,252,.9)}
+
     @media(max-width:480px){.app{max-width:100%}.bottom-nav{max-width:calc(100% - 28px)}}
   </style>
 </head>
@@ -554,6 +564,8 @@
 
   <!-- MODIFY MODAL -->
   <div class="modal-overlay" id="modify-modal"><div class="modal-sheet"><div class="m-handle"></div><div id="modal-content"></div></div></div>
+  <!-- AI LOADING -->
+  <div class="ai-overlay" id="ai-overlay"><div class="ai-spinner"></div><div class="ai-text" id="ai-text">Generating AI Study Plan...</div><div class="ai-sub" id="ai-sub">Gemini is analyzing your exam, subjects & preferences</div></div>
 </div>
 <script>
 // ═══ EXAM DATA ═══
@@ -617,13 +629,117 @@ function updOnb(){document.getElementById('onb-step').textContent=`STEP ${onbSte
 function renderRatings(){document.getElementById('rating-list').innerHTML=EXAMS[selExam].map(s=>`<div class="r-card"><div class="sn">${gIcon(s.name)} ${s.name}</div><div class="r-btns">${['weak','medium','strong'].map(r=>`<button class="r-btn ${r} ${subRatings[s.name]===r?'sel':''}" onclick="setRating('${s.name}','${r}')">${r}</button>`).join('')}</div></div>`).join('')}
 function setRating(s,r){subRatings[s]=r;renderRatings()}
 function setStyle(s){studyStyle=s;document.querySelectorAll('#onb-5 .exam-opt').forEach(b=>b.style.borderColor='var(--glass-border)');event.target.closest('.exam-opt').style.borderColor='var(--accent)'}
-function completeOnboarding(){const ed=document.getElementById('exam-date-input').value,hrs=parseInt(document.getElementById('hours-slider').value);U.targetExam=selExam;U.examDate=ed;U.dailyHours=hrs;U.studyStyle=studyStyle;U.subjects=Object.entries(subRatings).map(([n,r])=>({name:n,selfRating:r,weight:r==='weak'?3:r==='medium'?2:1}));U.onboarded=true;U.studyLog={};if(Math.ceil((new Date(ed)-new Date())/864e5)>=180&&!U.badges.includes('Early Bird'))U.badges.push('Early Bird');saveU();genPlan();initProgress();showScreen('home');renderHome()}
+async function completeOnboarding(){const ed=document.getElementById('exam-date-input').value,hrs=parseInt(document.getElementById('hours-slider').value);U.targetExam=selExam;U.examDate=ed;U.dailyHours=hrs;U.studyStyle=studyStyle;U.subjects=Object.entries(subRatings).map(([n,r])=>({name:n,selfRating:r,weight:r==='weak'?3:r==='medium'?2:1}));U.onboarded=true;U.studyLog={};if(Math.ceil((new Date(ed)-new Date())/864e5)>=180&&!U.badges.includes('Early Bird'))U.badges.push('Early Bird');saveU();initProgress();await genPlan();showScreen('home');renderHome()}
 
 // ═══ SAVE ═══
 function saveU(){const us=DB.get('users')||{};us[U.id]=U;DB.set('users',us)}
 
-// ═══ PLAN GENERATOR ═══
-function genPlan(){const today=new Date();today.setHours(0,0,0,0);const ed=new Date(U.examDate);ed.setHours(0,0,0,0);const total=Math.max(1,Math.ceil((ed-today)/864e5));const pool=[];const weights=U.studyStyle==='weakness'?{weak:5,medium:2,strong:1}:U.studyStyle==='revision'?{weak:3,medium:3,strong:2}:{weak:3,medium:2,strong:1};U.subjects.forEach(s=>{const w=s.weight||(weights[s.selfRating]||2);for(let i=0;i<w;i++)pool.push(s.name)});const intensity=DB.get('intensity_'+U.id)||Math.min(U.subjects.length,Math.ceil(U.dailyHours/2));const days=[];let pi=0;for(let d=0;d<total;d++){const dt=new Date(today);dt.setDate(today.getDate()+d);const cnt=d%3===0?intensity:Math.max(1,intensity-1);const subs=new Set();for(let s=0;s<cnt;s++){subs.add(pool[pi%pool.length]);pi++}const subTopics={};subs.forEach(sub=>{const es=EXAMS[U.targetExam].find(e=>e.name===sub);if(es){const tc=Math.min(3,es.topics.length),si=(d*3)%es.topics.length,topics=[];for(let t=0;t<tc;t++)topics.push({name:es.topics[(si+t)%es.topics.length],done:false});subTopics[sub]=topics}});days.push({date:dt.toISOString().split('T')[0],subjects:Array.from(subs),topics:subTopics,status:'upcoming'})}DB.set('plan_'+U.id,{days,generatedAt:new Date().toISOString()})}
+// ═══ GEMINI AI CONFIG ═══
+const GEMINI_KEY='AIzaSyDS_pia_TCWlcq4lwYoeqJ0tA9P3JP9BgU';
+const GEMINI_URL='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GEMINI_KEY;
+
+function showAIOverlay(title,sub){document.getElementById('ai-text').textContent=title||'Generating AI Study Plan...';document.getElementById('ai-sub').textContent=sub||'Gemini is analyzing your exam, subjects & preferences';document.getElementById('ai-overlay').classList.add('active')}
+function hideAIOverlay(){document.getElementById('ai-overlay').classList.remove('active')}
+
+// ═══ PLAN GENERATOR (LOCAL FALLBACK) ═══
+function genPlanLocal(){const today=new Date();today.setHours(0,0,0,0);const ed=new Date(U.examDate);ed.setHours(0,0,0,0);const total=Math.max(1,Math.ceil((ed-today)/864e5));const pool=[];const weights=U.studyStyle==='weakness'?{weak:5,medium:2,strong:1}:U.studyStyle==='revision'?{weak:3,medium:3,strong:2}:{weak:3,medium:2,strong:1};U.subjects.forEach(s=>{const w=s.weight||(weights[s.selfRating]||2);for(let i=0;i<w;i++)pool.push(s.name)});const intensity=DB.get('intensity_'+U.id)||Math.min(U.subjects.length,Math.ceil(U.dailyHours/2));const days=[];let pi=0;for(let d=0;d<total;d++){const dt=new Date(today);dt.setDate(today.getDate()+d);const cnt=d%3===0?intensity:Math.max(1,intensity-1);const subs=new Set();for(let s=0;s<cnt;s++){subs.add(pool[pi%pool.length]);pi++}const subTopics={};subs.forEach(sub=>{const es=EXAMS[U.targetExam].find(e=>e.name===sub);if(es){const tc=Math.min(3,es.topics.length),si=(d*3)%es.topics.length,topics=[];for(let t=0;t<tc;t++)topics.push({name:es.topics[(si+t)%es.topics.length],done:false});subTopics[sub]=topics}});days.push({date:dt.toISOString().split('T')[0],subjects:Array.from(subs),topics:subTopics,status:'upcoming'})}DB.set('plan_'+U.id,{days,generatedAt:new Date().toISOString(),aiGenerated:false})}
+
+// ═══ AI PLAN GENERATOR (GEMINI) ═══
+async function genPlanAI(){
+  const today=new Date();today.setHours(0,0,0,0);
+  const ed=new Date(U.examDate);ed.setHours(0,0,0,0);
+  const totalDays=Math.max(1,Math.ceil((ed-today)/864e5));
+  const planDays=Math.min(totalDays,30); // AI generates first 30 days, rest filled locally
+  const subjectsInfo=EXAMS[U.targetExam].map(s=>{
+    const rating=U.subjects.find(us=>us.name===s.name);
+    return{name:s.name,topics:s.topics,confidence:rating?.selfRating||'medium',weight:rating?.weight||2}
+  });
+  const prompt=`You are an expert Indian government exam preparation coach. Generate a ${planDays}-day study plan for the ${U.targetExam} exam.
+
+Student profile:
+- Daily study hours: ${U.dailyHours}
+- Study style: ${U.studyStyle} (${U.studyStyle==='weakness'?'focus more on weak subjects':U.studyStyle==='revision'?'include more revision cycles':'balanced across all'})
+- Exam date: ${U.examDate} (${totalDays} days away)
+
+Subjects & confidence:
+${subjectsInfo.map(s=>`- ${s.name} (${s.confidence}) — Topics: ${s.topics.join(', ')}`).join('\n')}
+
+Rules:
+1. Each day should have 1-${Math.min(subjectsInfo.length,Math.ceil(U.dailyHours/2))} subjects
+2. Weak subjects should appear more frequently
+3. Rotate topics intelligently — don't repeat same topics on consecutive days
+4. Include revision days every 5-7 days for previously covered topics
+5. Vary intensity — some days lighter, some heavier
+6. Every 7th day should be a lighter "review day" with fewer topics
+
+Return ONLY valid JSON array (no markdown, no explanation). Each element:
+{"day":1,"subjects":["Subject Name"],"topics":{"Subject Name":["Topic1","Topic2"]}}
+
+IMPORTANT: Only use exact subject names and topic names from the list I provided. Return ONLY the JSON array, nothing else.`;
+
+  try{
+    showAIOverlay();
+    const resp=await fetch(GEMINI_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.7,maxOutputTokens:8192}})
+    });
+    if(!resp.ok)throw new Error('API error: '+resp.status);
+    const data=await resp.json();
+    const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    // Extract JSON from response (handle markdown code blocks)
+    let jsonStr=text;
+    const jsonMatch=text.match(/\[[\s\S]*\]/);
+    if(jsonMatch)jsonStr=jsonMatch[0];
+    const aiDays=JSON.parse(jsonStr);
+    if(!Array.isArray(aiDays)||!aiDays.length)throw new Error('Invalid AI response');
+
+    // Convert AI response to our plan format
+    const days=[];
+    const validSubjects=EXAMS[U.targetExam].map(s=>s.name);
+    for(let d=0;d<totalDays;d++){
+      const dt=new Date(today);dt.setDate(today.getDate()+d);
+      const dateStr=dt.toISOString().split('T')[0];
+      if(d<aiDays.length){
+        const ai=aiDays[d];
+        const subs=(ai.subjects||[]).filter(s=>validSubjects.includes(s));
+        if(!subs.length)subs.push(validSubjects[d%validSubjects.length]);
+        const subTopics={};
+        subs.forEach(sub=>{
+          const es=EXAMS[U.targetExam].find(e=>e.name===sub);
+          if(!es)return;
+          const aiTopics=(ai.topics?.[sub]||[]).filter(t=>es.topics.includes(t));
+          if(aiTopics.length){subTopics[sub]=aiTopics.map(t=>({name:t,done:false}))}
+          else{const tc=Math.min(3,es.topics.length),si=(d*3)%es.topics.length;subTopics[sub]=[];for(let t=0;t<tc;t++)subTopics[sub].push({name:es.topics[(si+t)%es.topics.length],done:false})}
+        });
+        days.push({date:dateStr,subjects:subs,topics:subTopics,status:'upcoming'});
+      }else{
+        // Beyond AI-generated days: fill with local algorithm
+        const pool=[];const weights=U.studyStyle==='weakness'?{weak:5,medium:2,strong:1}:U.studyStyle==='revision'?{weak:3,medium:3,strong:2}:{weak:3,medium:2,strong:1};
+        U.subjects.forEach(s=>{const w=s.weight||(weights[s.selfRating]||2);for(let i=0;i<w;i++)pool.push(s.name)});
+        const intensity=DB.get('intensity_'+U.id)||Math.min(U.subjects.length,Math.ceil(U.dailyHours/2));
+        const cnt=d%3===0?intensity:Math.max(1,intensity-1);
+        const subs=new Set();for(let s=0;s<cnt;s++)subs.add(pool[(d*cnt+s)%pool.length]);
+        const subTopics={};subs.forEach(sub=>{const es=EXAMS[U.targetExam].find(e=>e.name===sub);if(es){const tc=Math.min(3,es.topics.length),si=(d*3)%es.topics.length,topics=[];for(let t=0;t<tc;t++)topics.push({name:es.topics[(si+t)%es.topics.length],done:false});subTopics[sub]=topics}});
+        days.push({date:dateStr,subjects:Array.from(subs),topics:subTopics,status:'upcoming'});
+      }
+    }
+    DB.set('plan_'+U.id,{days,generatedAt:new Date().toISOString(),aiGenerated:true});
+    hideAIOverlay();
+    return true;
+  }catch(err){
+    console.warn('Gemini AI plan generation failed, using local:',err);
+    hideAIOverlay();
+    genPlanLocal();
+    return false;
+  }
+}
+
+// Main genPlan: tries AI first, falls back to local
+async function genPlan(useAI=true){
+  if(useAI){return await genPlanAI()}
+  else{genPlanLocal();return false}
+}
 function getPlan(){const p=DB.get('plan_'+U.id);if(!p)return null;const today=todayStr();let ch=false;p.days.forEach(d=>{if(d.date<today&&d.status==='upcoming'){d.status='missed';ch=true}});if(ch)DB.set('plan_'+U.id,p);return p}
 function todayStr(){return new Date().toISOString().split('T')[0]}
 
@@ -717,7 +833,7 @@ function renderHeatmap(){
 function renderPlan(){
   const plan=getPlan();if(!plan){document.getElementById('plan-schedule').innerHTML='<div class="empty-s"><div class="empty-i">📅</div>No plan yet</div>';return}
   const done=plan.days.filter(d=>d.status==='done').length,missed=plan.days.filter(d=>d.status==='missed').length,upcoming=plan.days.filter(d=>d.status==='upcoming').length,pct=plan.days.length>0?Math.round((done/plan.days.length)*100):0;
-  document.getElementById('plan-total').textContent=`${done}/${plan.days.length} days (${pct}%)`;
+  document.getElementById('plan-total').innerHTML=`${done}/${plan.days.length} days (${pct}%)${plan.aiGenerated?'<span class="ai-badge">✨ AI</span>':''}`;
   document.getElementById('plan-stats').innerHTML=`<div class="ps-item"><div class="ps-num green">${done}</div><div class="ps-label">Done</div></div><div class="ps-item"><div class="ps-num red">${missed}</div><div class="ps-label">Missed</div></div><div class="ps-item"><div class="ps-num blue">${upcoming}</div><div class="ps-label">Left</div></div><div class="ps-item"><div class="ps-num orange">${pct}%</div><div class="ps-label">Progress</div></div>`;
   const allSubs=[...new Set(plan.days.flatMap(d=>d.subjects))];
   document.getElementById('plan-filters').innerHTML=`<button class="pf ${planFilter==='all'?'active':''}" onclick="setPF('all')">All</button><button class="pf ${planFilter==='today'?'active':''}" onclick="setPF('today')">Today</button><button class="pf ${planFilter==='upcoming'?'active':''}" onclick="setPF('upcoming')">Upcoming</button><button class="pf ${planFilter==='done'?'active':''}" onclick="setPF('done')">Done</button><button class="pf ${planFilter==='missed'?'active':''}" onclick="setPF('missed')">Missed</button>${allSubs.map(s=>`<button class="pf ${planFilter===s?'active':''}" onclick="setPF('${s}')">${gIcon(s)} ${s.split(' ')[0]}</button>`).join('')}`;
@@ -782,13 +898,15 @@ function closeModal(){document.getElementById('modify-modal').classList.remove('
 document.getElementById('modify-modal').addEventListener('click',function(e){if(e.target===this)closeModal()});
 function renderModalMenu(){document.getElementById('modal-content').innerHTML=`<div class="m-title">Modify Plan</div><div class="m-sub">Customize your study plan</div><button class="mod-opt" onclick="showIntEditor()"><div class="mod-icon">⚡</div><div class="mod-text"><strong>Study Intensity</strong><span>Adjust subjects per day</span></div></button><button class="mod-opt" onclick="showPriEditor()"><div class="mod-icon">📊</div><div class="mod-text"><strong>Subject Priority</strong><span>Change weight per subject</span></div></button><button class="mod-opt" onclick="showDateEditor()"><div class="mod-icon">📅</div><div class="mod-text"><strong>Change Exam Date</strong><span>Update target date</span></div></button><button class="mod-opt" onclick="confirmRegen()"><div class="mod-icon">🔄</div><div class="mod-text"><strong>Regenerate Plan</strong><span>Fresh plan from scratch</span></div></button><button class="btn-out" style="width:100%;margin-top:10px" onclick="closeModal()">Cancel</button>`}
 function showIntEditor(){const cur=DB.get('intensity_'+U.id)||3;document.getElementById('modal-content').innerHTML=`<div class="m-title">Study Intensity</div><div class="m-sub">Subjects per day</div><div class="slider-section"><div class="slider-label"><span>Subjects/day</span><span class="slider-val" id="int-val">${cur}</span></div><input type="range" min="1" max="5" value="${cur}" id="int-slider" oninput="document.getElementById('int-val').textContent=this.value"><div class="slider-marks"><span>Light</span><span>Balanced</span><span>Intense</span></div></div><div class="btn-row"><button class="btn-out" onclick="renderModalMenu()">Back</button><button class="btn-glow" onclick="saveInt()">Apply</button></div>`}
-function saveInt(){DB.set('intensity_'+U.id,parseInt(document.getElementById('int-slider').value));genPlan();closeModal();renderPlan()}
+async function saveInt(){DB.set('intensity_'+U.id,parseInt(document.getElementById('int-slider').value));closeModal();await genPlan();renderPlan()}
 function showPriEditor(){document.getElementById('modal-content').innerHTML=`<div class="m-title">Subject Priority</div><div class="m-sub">Higher = more study days</div><div>${U.subjects.map((s,i)=>`<div class="pri-item"><span style="font-size:15px">${gIcon(s.name)}</span><span class="pri-name">${s.name}</span><div class="pri-wt"><button onclick="chgWt(${i},-1)">−</button><span class="wv" id="wt-${i}">${s.weight||2}</span><button onclick="chgWt(${i},1)">+</button></div></div>`).join('')}</div><div class="btn-row"><button class="btn-out" onclick="renderModalMenu()">Back</button><button class="btn-glow" onclick="savePri()">Apply</button></div>`}
 function chgWt(i,d){const e=document.getElementById('wt-'+i);e.textContent=Math.max(1,Math.min(5,parseInt(e.textContent)+d))}
-function savePri(){U.subjects.forEach((s,i)=>{s.weight=parseInt(document.getElementById('wt-'+i).textContent)});saveU();genPlan();closeModal();renderPlan()}
+async function savePri(){U.subjects.forEach((s,i)=>{s.weight=parseInt(document.getElementById('wt-'+i).textContent)});saveU();closeModal();await genPlan();renderPlan()}
 function showDateEditor(){document.getElementById('modal-content').innerHTML=`<div class="m-title">Change Exam Date</div><div class="m-sub">Current: ${new Date(U.examDate).toLocaleDateString('en-IN',{year:'numeric',month:'long',day:'numeric'})}</div><div class="iw"><input type="date" id="new-ed" value="${U.examDate}" min="${new Date().toISOString().split('T')[0]}"/></div><div class="btn-row"><button class="btn-out" onclick="renderModalMenu()">Back</button><button class="btn-glow" onclick="saveDate()">Apply</button></div>`}
-function saveDate(){const d=document.getElementById('new-ed').value;if(!d)return;U.examDate=d;saveU();genPlan();closeModal();renderPlan()}
-function confirmRegen(){document.getElementById('modal-content').innerHTML=`<div class="m-title">Regenerate Plan?</div><div class="m-sub">New schedule, progress kept.</div><div class="btn-row"><button class="btn-out" onclick="renderModalMenu()">Cancel</button><button class="btn-glow" style="background:linear-gradient(135deg,#ef4444,#dc2626)" onclick="genPlan();closeModal();renderPlan()">Regenerate</button></div>`}
+async function saveDate(){const d=document.getElementById('new-ed').value;if(!d)return;U.examDate=d;saveU();closeModal();await genPlan();renderPlan()}
+function confirmRegen(){document.getElementById('modal-content').innerHTML=`<div class="m-title">Regenerate Plan?</div><div class="m-sub">New schedule, progress kept.</div><button class="mod-opt" onclick="regenAI()"><div class="mod-icon">🤖</div><div class="mod-text"><strong>AI-Powered Plan</strong><span>Gemini generates an optimized schedule</span></div></button><button class="mod-opt" onclick="regenLocal()"><div class="mod-icon">⚙️</div><div class="mod-text"><strong>Quick Generate</strong><span>Instant algorithmic plan (offline)</span></div></button><button class="btn-out" style="width:100%;margin-top:8px" onclick="renderModalMenu()">Cancel</button>`}
+async function regenAI(){closeModal();await genPlan(true);renderPlan()}
+function regenLocal(){closeModal();genPlanLocal();renderPlan()}
 
 // ═══ RENDER: PROGRESS + RADAR ═══
 function renderProgress(){
