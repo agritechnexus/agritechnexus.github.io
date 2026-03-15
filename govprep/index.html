@@ -1,360 +1,374 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GovPrep - Exam Preparation Tracker</title>
-  <meta name="description" content="Your personal exam GPS for Indian government exam preparation." />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+  <title>GovPrep - Smart Exam Preparation</title>
+  <meta name="description" content="AI-driven exam preparation tracker for Indian government exams."/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 
-    /* ── THEME VARIABLES ── */
-    :root, [data-theme="dark"] {
-      --bg: #0a0a0f; --bg-card: rgba(255,255,255,0.04); --bg-card-hover: rgba(255,255,255,0.07);
-      --glass: rgba(255,255,255,0.06); --glass-border: rgba(255,255,255,0.08);
-      --accent: #6366f1; --accent-light: #818cf8; --accent-glow: rgba(99,102,241,0.3);
-      --green: #22c55e; --green-glow: rgba(34,197,94,0.25); --green-bg: rgba(34,197,94,0.1);
-      --red: #ef4444; --red-glow: rgba(239,68,68,0.2); --red-bg: rgba(239,68,68,0.1);
-      --orange: #f59e0b; --orange-glow: rgba(245,158,11,0.25); --orange-bg: rgba(245,158,11,0.1);
-      --cyan: #06b6d4; --cyan-glow: rgba(6,182,212,0.25);
-      --text: #f1f5f9; --text-secondary: #94a3b8; --text-muted: #64748b;
-      --border: rgba(255,255,255,0.06);
-      --gradient-1: linear-gradient(135deg, #6366f1, #8b5cf6, #a78bfa);
-      --gradient-2: linear-gradient(135deg, #06b6d4, #22d3ee);
-      --gradient-3: linear-gradient(135deg, #f59e0b, #fbbf24);
-      --radius: 16px; --radius-sm: 10px; --radius-xs: 6px;
-      --ambient-opacity: 0.15;
-      --input-bg: var(--glass);
+    /* ═══ THEME SYSTEM ═══ */
+    :root,[data-theme="dark"]{
+      --bg:#06060b;--bg-raised:#0e0e18;--bg-card:rgba(255,255,255,0.03);
+      --glass:rgba(255,255,255,0.05);--glass-border:rgba(255,255,255,0.07);--glass-hover:rgba(255,255,255,0.08);
+      --accent:#7c3aed;--accent-light:#a78bfa;--accent-glow:rgba(124,58,237,0.25);--accent-surface:rgba(124,58,237,0.08);
+      --blue:#3b82f6;--blue-glow:rgba(59,130,246,0.2);--blue-surface:rgba(59,130,246,0.08);
+      --green:#22c55e;--green-glow:rgba(34,197,94,0.2);--green-surface:rgba(34,197,94,0.08);
+      --red:#ef4444;--red-glow:rgba(239,68,68,0.15);--red-surface:rgba(239,68,68,0.06);
+      --orange:#f59e0b;--orange-glow:rgba(245,158,11,0.2);--orange-surface:rgba(245,158,11,0.08);
+      --cyan:#06b6d4;--cyan-glow:rgba(6,182,212,0.2);--cyan-surface:rgba(6,182,212,0.08);
+      --pink:#ec4899;--pink-surface:rgba(236,72,153,0.08);
+      --text:#f1f5f9;--text-secondary:#94a3b8;--text-muted:#64748b;--text-dim:#334155;
+      --border:rgba(255,255,255,0.06);--shadow:rgba(0,0,0,0.4);
+      --gradient-hero:linear-gradient(135deg,#7c3aed,#3b82f6,#06b6d4);
+      --gradient-accent:linear-gradient(135deg,#7c3aed,#a78bfa);
+      --gradient-warm:linear-gradient(135deg,#f59e0b,#ef4444);
+      --gradient-cool:linear-gradient(135deg,#06b6d4,#3b82f6);
+      --radius:16px;--radius-sm:10px;--radius-xs:6px;
+      --ambient-opacity:0.12;--nav-bg:rgba(6,6,11,0.88);
     }
-    [data-theme="light"] {
-      --bg: #f8fafc; --bg-card: rgba(0,0,0,0.02); --bg-card-hover: rgba(0,0,0,0.04);
-      --glass: rgba(255,255,255,0.85); --glass-border: rgba(0,0,0,0.08);
-      --accent: #4f46e5; --accent-light: #6366f1; --accent-glow: rgba(79,70,229,0.2);
-      --green: #16a34a; --green-glow: rgba(22,163,74,0.15); --green-bg: rgba(22,163,74,0.08);
-      --red: #dc2626; --red-glow: rgba(220,38,38,0.15); --red-bg: rgba(220,38,38,0.06);
-      --orange: #d97706; --orange-glow: rgba(217,119,6,0.15); --orange-bg: rgba(217,119,6,0.06);
-      --cyan: #0891b2; --cyan-glow: rgba(8,145,178,0.15);
-      --text: #0f172a; --text-secondary: #475569; --text-muted: #94a3b8;
-      --border: rgba(0,0,0,0.06);
-      --ambient-opacity: 0.08;
-      --input-bg: rgba(0,0,0,0.03);
+    [data-theme="light"]{
+      --bg:#f8fafc;--bg-raised:#ffffff;--bg-card:rgba(0,0,0,0.02);
+      --glass:rgba(255,255,255,0.9);--glass-border:rgba(0,0,0,0.06);--glass-hover:rgba(0,0,0,0.03);
+      --accent:#6d28d9;--accent-light:#7c3aed;--accent-glow:rgba(109,40,217,0.15);--accent-surface:rgba(109,40,217,0.06);
+      --blue:#2563eb;--blue-glow:rgba(37,99,235,0.12);--blue-surface:rgba(37,99,235,0.06);
+      --green:#16a34a;--green-glow:rgba(22,163,74,0.12);--green-surface:rgba(22,163,74,0.06);
+      --red:#dc2626;--red-glow:rgba(220,38,38,0.1);--red-surface:rgba(220,38,38,0.04);
+      --orange:#d97706;--orange-glow:rgba(217,119,6,0.12);--orange-surface:rgba(217,119,6,0.06);
+      --cyan:#0891b2;--cyan-glow:rgba(8,145,178,0.12);--cyan-surface:rgba(8,145,178,0.06);
+      --pink:#db2777;--pink-surface:rgba(219,39,119,0.06);
+      --text:#0f172a;--text-secondary:#475569;--text-muted:#94a3b8;--text-dim:#cbd5e1;
+      --border:rgba(0,0,0,0.06);--shadow:rgba(0,0,0,0.06);
+      --ambient-opacity:0.06;--nav-bg:rgba(255,255,255,0.92);
     }
 
-    body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; transition: background 0.4s, color 0.4s; }
-    button { cursor: pointer; border: none; font-family: inherit; background: none; color: inherit; }
-    input, select { font-family: inherit; color: inherit; }
-    .app { max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; overflow: hidden; }
+    body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background .4s,color .4s}
+    button{cursor:pointer;border:none;font-family:inherit;background:none;color:inherit}
+    input,select,textarea{font-family:inherit;color:inherit}
+    .app{max-width:480px;margin:0 auto;min-height:100vh;position:relative;overflow:hidden}
 
     /* Ambient */
-    .ambient { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; transition: opacity 0.4s; }
-    .ambient-orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: var(--ambient-opacity); }
-    .ambient-orb.o1 { width: 300px; height: 300px; background: #6366f1; top: -10%; left: -10%; animation: orbFloat 12s ease-in-out infinite; }
-    .ambient-orb.o2 { width: 250px; height: 250px; background: #06b6d4; bottom: 20%; right: -15%; animation: orbFloat 15s ease-in-out infinite reverse; }
-    .ambient-orb.o3 { width: 200px; height: 200px; background: #f59e0b; top: 40%; left: 50%; animation: orbFloat 18s ease-in-out infinite 3s; }
-    @keyframes orbFloat { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(40px,-30px) scale(1.1); } 66% { transform: translate(-20px,40px) scale(0.9); } }
+    .ambient{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+    .ambient-orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:var(--ambient-opacity)}
+    .ambient-orb.o1{width:300px;height:300px;background:#7c3aed;top:-10%;left:-15%;animation:orbF 14s ease-in-out infinite}
+    .ambient-orb.o2{width:250px;height:250px;background:#3b82f6;bottom:15%;right:-20%;animation:orbF 18s ease-in-out infinite reverse}
+    .ambient-orb.o3{width:180px;height:180px;background:#06b6d4;top:45%;left:60%;animation:orbF 20s ease-in-out infinite 4s}
+    @keyframes orbF{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-30px) scale(1.1)}66%{transform:translate(-25px,35px) scale(.9)}}
 
     /* Screens */
-    .screen { display: none; padding: 20px 20px 100px; min-height: 100vh; position: relative; z-index: 1; }
-    .screen.active { display: block; animation: screenIn 0.4s ease; }
-    .auth-screen { flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; }
-    .auth-screen.active { display: flex; }
-    @keyframes screenIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .screen{display:none;padding:20px 16px 110px;min-height:100vh;position:relative;z-index:1}
+    .screen.active{display:block;animation:sIn .35s ease}
+    .auth-screen{flex-direction:column;align-items:center;justify-content:center;padding:40px 24px}
+    .auth-screen.active{display:flex}
+    @keyframes sIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-    /* Bottom Nav */
-    .bottom-nav { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 440px; background: rgba(15,15,25,0.85); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border: 1px solid var(--glass-border); border-radius: 20px; display: flex; z-index: 100; padding: 4px; }
-    [data-theme="light"] .bottom-nav { background: rgba(255,255,255,0.9); }
-    .bottom-nav button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 56px; border-radius: 16px; color: var(--text-muted); font-size: 10px; font-weight: 500; gap: 2px; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); position: relative; }
-    .bottom-nav button.active { color: #fff; background: var(--accent); box-shadow: 0 4px 20px var(--accent-glow); }
-    .bottom-nav .nav-icon { font-size: 20px; transition: transform 0.3s; }
-    .bottom-nav button.active .nav-icon { transform: scale(1.15); }
+    /* Bottom Nav - Floating pill */
+    .bottom-nav{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:448px;background:var(--nav-bg);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border:1px solid var(--glass-border);border-radius:22px;display:flex;z-index:100;padding:4px;box-shadow:0 8px 32px var(--shadow)}
+    .bottom-nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:54px;border-radius:18px;color:var(--text-muted);font-size:10px;font-weight:500;gap:1px;transition:all .3s cubic-bezier(.4,0,.2,1);position:relative}
+    .bottom-nav button.active{color:#fff;background:var(--accent);box-shadow:0 4px 20px var(--accent-glow)}
+    .bottom-nav .ni{font-size:19px;transition:transform .3s}
+    .bottom-nav button.active .ni{transform:scale(1.15)}
 
     /* Auth */
-    .auth-logo { font-size: 48px; margin-bottom: 8px; }
-    .auth-title { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .auth-sub { color: var(--text-muted); margin-top: 4px; margin-bottom: 36px; font-size: 14px; }
-    .auth-form { width: 100%; max-width: 360px; }
-    .input-wrap { position: relative; margin-bottom: 14px; }
-    .input-wrap input { width: 100%; padding: 16px 18px; background: var(--input-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); font-size: 15px; color: var(--text); outline: none; transition: all 0.3s; }
-    .input-wrap input::placeholder { color: var(--text-muted); }
-    .input-wrap input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow), inset 0 0 0 1px var(--accent); }
-    .btn-glow { width: 100%; padding: 16px; background: var(--gradient-1); color: #fff; border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; letter-spacing: 0.3px; transition: all 0.3s; position: relative; overflow: hidden; }
-    .btn-glow::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent, rgba(255,255,255,0.15), transparent); transform: translateX(-100%); transition: transform 0.5s; }
-    .btn-glow:hover::after { transform: translateX(100%); }
-    .btn-glow:hover { box-shadow: 0 8px 30px var(--accent-glow); transform: translateY(-1px); }
-    .auth-switch { margin-top: 28px; color: var(--text-muted); font-size: 14px; }
-    .auth-switch a { color: var(--accent-light); font-weight: 600; cursor: pointer; text-decoration: none; }
-    .error-msg { background: var(--red-bg); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 16px; font-size: 13px; animation: shake 0.4s ease; }
-    [data-theme="light"] .error-msg { color: var(--red); }
-    @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+    .auth-logo{font-size:52px;margin-bottom:8px}
+    .auth-title{font-size:30px;font-weight:800;letter-spacing:-.5px;background:var(--gradient-hero);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .auth-sub{color:var(--text-muted);margin-top:4px;margin-bottom:36px;font-size:14px}
+    .auth-form{width:100%;max-width:360px}
+    .iw{position:relative;margin-bottom:14px}
+    .iw input{width:100%;padding:15px 18px;background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius-sm);font-size:15px;outline:none;transition:all .3s}
+    .iw input::placeholder{color:var(--text-muted)}
+    .iw input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+    .btn-glow{width:100%;padding:15px;background:var(--gradient-accent);color:#fff;border-radius:var(--radius-sm);font-size:15px;font-weight:700;transition:all .3s;position:relative;overflow:hidden}
+    .btn-glow::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,.12),transparent);transform:translateX(-100%);transition:transform .5s}
+    .btn-glow:hover::after{transform:translateX(100%)}
+    .btn-glow:hover{box-shadow:0 8px 30px var(--accent-glow);transform:translateY(-1px)}
+    .auth-switch{margin-top:28px;color:var(--text-muted);font-size:14px}
+    .auth-switch a{color:var(--accent-light);font-weight:600;cursor:pointer;text-decoration:none}
+    .err-msg{background:var(--red-surface);border:1px solid rgba(239,68,68,.15);color:var(--red);padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:16px;font-size:13px;animation:shake .4s ease}
+    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 
     /* Onboarding */
-    .onb-progress { width: 100%; height: 4px; background: rgba(255,255,255,0.06); border-radius: 99px; margin-bottom: 28px; overflow: hidden; }
-    [data-theme="light"] .onb-progress { background: rgba(0,0,0,0.06); }
-    .onb-progress-fill { height: 100%; background: var(--gradient-1); border-radius: 99px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
-    .onb-step-label { color: var(--text-muted); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
-    .onb-title { font-size: 22px; font-weight: 700; margin-bottom: 24px; letter-spacing: -0.3px; }
-    .exam-option { width: 100%; text-align: left; padding: 18px 20px; border: 1px solid var(--glass-border); border-radius: var(--radius); background: var(--glass); font-size: 15px; font-weight: 500; margin-bottom: 10px; transition: all 0.3s; display: flex; align-items: center; gap: 14px; }
-    .exam-option::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); opacity: 0.4; flex-shrink: 0; transition: all 0.3s; }
-    .exam-option:hover { background: var(--bg-card-hover); border-color: var(--accent); transform: translateX(4px); }
-    .exam-option:hover::before { opacity: 1; box-shadow: 0 0 10px var(--accent-glow); }
-    .rating-card { border: 1px solid var(--glass-border); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; background: var(--glass); }
-    .rating-card .subject-name { font-weight: 600; margin-bottom: 12px; font-size: 14px; }
-    .rating-btns { display: flex; gap: 8px; }
-    .rating-btn { flex: 1; padding: 10px; border-radius: var(--radius-xs); font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.04); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.3s; border: 1px solid transparent; }
-    [data-theme="light"] .rating-btn { background: rgba(0,0,0,0.03); }
-    .rating-btn.weak.selected { background: var(--red-bg); color: #fca5a5; border-color: rgba(239,68,68,0.3); box-shadow: 0 0 15px var(--red-glow); }
-    .rating-btn.medium.selected { background: var(--orange-bg); color: #fcd34d; border-color: rgba(245,158,11,0.3); box-shadow: 0 0 15px var(--orange-glow); }
-    .rating-btn.strong.selected { background: var(--green-bg); color: #86efac; border-color: rgba(34,197,94,0.3); box-shadow: 0 0 15px var(--green-glow); }
-    [data-theme="light"] .rating-btn.weak.selected { color: var(--red); }
-    [data-theme="light"] .rating-btn.medium.selected { color: var(--orange); }
-    [data-theme="light"] .rating-btn.strong.selected { color: var(--green); }
-    .btn-row { display: flex; gap: 12px; margin-top: 28px; }
-    .btn-row button { flex: 1; }
-    .btn-outline { padding: 16px; border: 1px solid var(--glass-border); border-radius: var(--radius-sm); background: var(--glass); font-size: 15px; font-weight: 600; color: var(--text-secondary); transition: all 0.3s; }
-    .btn-outline:hover { border-color: var(--accent); color: var(--text); }
+    .onb-progress{width:100%;height:4px;background:var(--glass);border-radius:99px;margin-bottom:28px;overflow:hidden}
+    .onb-fill{height:100%;background:var(--gradient-accent);border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+    .onb-step{color:var(--text-muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px}
+    .onb-title{font-size:21px;font-weight:700;margin-bottom:20px;letter-spacing:-.3px}
+    .exam-opt{width:100%;text-align:left;padding:16px 18px;border:1px solid var(--glass-border);border-radius:var(--radius);background:var(--glass);font-size:14px;font-weight:500;margin-bottom:8px;transition:all .3s;display:flex;align-items:center;gap:12px}
+    .exam-opt::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--accent);opacity:.3;flex-shrink:0;transition:all .3s}
+    .exam-opt:hover{border-color:var(--accent);transform:translateX(4px)}
+    .exam-opt:hover::before{opacity:1;box-shadow:0 0 10px var(--accent-glow)}
+    .r-card{border:1px solid var(--glass-border);border-radius:var(--radius);padding:16px;margin-bottom:10px;background:var(--glass)}
+    .r-card .sn{font-weight:600;margin-bottom:10px;font-size:13px}
+    .r-btns{display:flex;gap:6px}
+    .r-btn{flex:1;padding:9px;border-radius:var(--radius-xs);font-size:11px;font-weight:600;background:var(--glass);color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;transition:all .3s;border:1px solid transparent}
+    .r-btn.weak.sel{background:var(--red-surface);color:var(--red);border-color:rgba(239,68,68,.2)}
+    .r-btn.medium.sel{background:var(--orange-surface);color:var(--orange);border-color:rgba(245,158,11,.2)}
+    .r-btn.strong.sel{background:var(--green-surface);color:var(--green);border-color:rgba(34,197,94,.2)}
+    .btn-row{display:flex;gap:12px;margin-top:24px}
+    .btn-row button{flex:1}
+    .btn-out{padding:15px;border:1px solid var(--glass-border);border-radius:var(--radius-sm);background:var(--glass);font-size:14px;font-weight:600;color:var(--text-secondary);transition:all .3s}
+    .btn-out:hover{border-color:var(--accent);color:var(--text)}
 
-    /* ── THEME TOGGLE ── */
-    .theme-toggle { width: 44px; height: 24px; border-radius: 99px; background: var(--glass); border: 1px solid var(--glass-border); position: relative; cursor: pointer; transition: all 0.3s; flex-shrink: 0; }
-    .theme-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 2px 8px var(--accent-glow); }
-    [data-theme="light"] .theme-toggle::after { transform: translateX(20px); }
-    .theme-row { display: flex; align-items: center; gap: 10px; }
-    .theme-icon { font-size: 16px; transition: opacity 0.3s; }
-    [data-theme="dark"] .theme-icon.sun { opacity: 0.3; }
-    [data-theme="light"] .theme-icon.moon { opacity: 0.3; }
+    /* Slider input for onboarding */
+    .slider-section{margin-bottom:20px}
+    .slider-label{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:8px}
+    .slider-val{color:var(--accent-light)}
+    input[type="range"]{width:100%;-webkit-appearance:none;height:6px;border-radius:99px;background:var(--glass);outline:none}
+    input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 2px 10px var(--accent-glow)}
+    .slider-marks{display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-top:4px}
 
-    /* Home */
-    .home-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; }
-    .home-greeting { font-size: 14px; color: var(--text-muted); font-weight: 400; }
-    .home-name { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-top: 2px; }
-    .home-exam { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; padding: 4px 12px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 99px; font-size: 12px; color: var(--accent-light); font-weight: 500; }
-    .home-exam::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s ease infinite; }
-    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
-    .home-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
-    .logout-btn { font-size: 12px; color: var(--text-muted); background: var(--glass); padding: 8px 14px; border-radius: var(--radius-xs); border: 1px solid var(--glass-border); transition: all 0.3s; }
-    .logout-btn:hover { border-color: var(--red); color: var(--red); }
+    /* ═══ THEME TOGGLE ═══ */
+    .theme-toggle{width:44px;height:24px;border-radius:99px;background:var(--glass);border:1px solid var(--glass-border);position:relative;cursor:pointer;transition:all .3s;flex-shrink:0}
+    .theme-toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--accent);transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:0 2px 8px var(--accent-glow)}
+    [data-theme="light"] .theme-toggle::after{transform:translateX(20px)}
+    .theme-row{display:flex;align-items:center;gap:8px}
+    .ti{font-size:14px;transition:opacity .3s}
+    [data-theme="dark"] .ti.sun{opacity:.3}
+    [data-theme="light"] .ti.moon{opacity:.3}
 
-    /* Countdown */
-    .countdown-hero { position: relative; border-radius: 24px; padding: 32px 24px; margin-bottom: 20px; overflow: hidden; background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.1), rgba(6,182,212,0.08)); border: 1px solid rgba(99,102,241,0.15); }
-    [data-theme="light"] .countdown-hero { background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.05), rgba(6,182,212,0.04)); }
-    .countdown-hero::before { content: ''; position: absolute; top: -50%; right: -20%; width: 200px; height: 200px; background: radial-gradient(circle, var(--accent-glow), transparent 70%); border-radius: 50%; }
-    .countdown-content { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; }
-    .countdown-left .countdown-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 500; }
-    .countdown-num { font-size: 64px; font-weight: 800; letter-spacing: -2px; line-height: 1; background: linear-gradient(135deg, var(--text), var(--accent-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .countdown-unit { font-size: 16px; font-weight: 600; color: var(--accent-light); margin-top: -4px; }
-    .countdown-ring { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
+    /* ═══ BENTO DASHBOARD ═══ */
+    .home-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+    .greeting{font-size:13px;color:var(--text-muted)}
+    .user-name{font-size:22px;font-weight:800;letter-spacing:-.5px}
+    .exam-pill{display:inline-flex;align-items:center;gap:6px;margin-top:4px;padding:3px 10px;background:var(--accent-surface);border:1px solid rgba(124,58,237,.12);border-radius:99px;font-size:11px;color:var(--accent-light);font-weight:500}
+    .exam-pill::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent);animation:pulse 2s ease infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    .home-actions{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+    .logout-btn{font-size:11px;color:var(--text-muted);background:var(--glass);padding:6px 12px;border-radius:var(--radius-xs);border:1px solid var(--glass-border);transition:all .3s}
 
-    /* Stats */
-    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
-    .stat-card { padding: 16px 12px; border-radius: var(--radius); background: var(--glass); border: 1px solid var(--glass-border); text-align: center; transition: all 0.3s; position: relative; overflow: hidden; }
-    .stat-card:hover { transform: translateY(-2px); }
-    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
-    .stat-card.streak::before { background: var(--gradient-3); }
-    .stat-card.xp::before { background: var(--gradient-1); }
-    .stat-card.ready::before { background: var(--gradient-2); }
-    .stat-icon { font-size: 20px; margin-bottom: 6px; }
-    .stat-val { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-    .stat-card.streak .stat-val { color: var(--orange); }
-    .stat-card.xp .stat-val { color: var(--accent-light); }
-    .stat-card.ready .stat-val { color: var(--cyan); }
-    .stat-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-top: 2px; }
+    /* Bento grid */
+    .bento{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+    .bento-card{padding:16px;border-radius:var(--radius);background:var(--glass);border:1px solid var(--glass-border);transition:all .3s;position:relative;overflow:hidden}
+    .bento-card:hover{border-color:rgba(255,255,255,.1);transform:translateY(-1px)}
+    .bento-card.full{grid-column:1/-1}
+    .bento-card.hero-card{grid-column:1/-1;background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(59,130,246,.08),rgba(6,182,212,.06));border-color:rgba(124,58,237,.12);padding:24px 20px}
+    .bento-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0}
+    .bc-streak::before{background:var(--gradient-warm)}
+    .bc-xp::before{background:var(--gradient-accent)}
+    .bc-ready::before{background:var(--gradient-cool)}
+    .bc-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:4px}
+    .bc-val{font-size:24px;font-weight:800;letter-spacing:-.5px}
+    .bc-icon{font-size:18px;margin-bottom:4px}
+    .bc-streak .bc-val{color:var(--orange)}
+    .bc-xp .bc-val{color:var(--accent-light)}
+    .bc-ready .bc-val{color:var(--cyan)}
 
-    /* Readiness */
-    .readiness-section { margin-bottom: 28px; }
-    .readiness-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .readiness-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
-    .readiness-pct { font-size: 14px; font-weight: 700; }
-    .readiness-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.06); border-radius: 99px; overflow: hidden; }
-    [data-theme="light"] .readiness-bar { background: rgba(0,0,0,0.06); }
-    .readiness-fill { height: 100%; border-radius: 99px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); position: relative; }
-    .readiness-fill::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 40px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3)); border-radius: 99px; animation: shimmer 2s ease infinite; }
-    @keyframes shimmer { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+    /* Countdown hero */
+    .cd-content{display:flex;align-items:center;justify-content:space-between}
+    .cd-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);font-weight:500}
+    .cd-num{font-size:56px;font-weight:900;letter-spacing:-2px;line-height:1;background:linear-gradient(135deg,var(--text),var(--accent-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .cd-unit{font-size:14px;font-weight:600;color:var(--accent-light);margin-top:-4px}
+    .cd-ring{width:72px;height:72px;flex-shrink:0}
 
-    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-    .section-title { font-size: 16px; font-weight: 700; }
-    .section-link { font-size: 12px; color: var(--accent-light); font-weight: 500; cursor: pointer; }
+    /* Readiness bar */
+    .readiness{margin-bottom:20px}
+    .r-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .r-title{font-size:12px;font-weight:600;color:var(--text-secondary)}
+    .r-pct{font-size:13px;font-weight:700}
+    .r-bar{width:100%;height:6px;background:var(--glass);border-radius:99px;overflow:hidden}
+    .r-fill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.4,0,.2,1);position:relative}
+    .r-fill::after{content:'';position:absolute;top:0;right:0;bottom:0;width:30px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25));border-radius:99px;animation:shim 2s ease infinite}
+    @keyframes shim{0%{opacity:0}50%{opacity:1}100%{opacity:0}}
 
-    /* Tasks */
-    .task-item { display: flex; align-items: center; gap: 14px; padding: 16px; border: 1px solid var(--glass-border); border-radius: var(--radius); margin-bottom: 8px; background: var(--glass); transition: all 0.3s; position: relative; overflow: hidden; }
-    .task-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); opacity: 0.5; }
-    .task-item.done { border-color: rgba(34,197,94,0.2); background: var(--green-bg); }
-    .task-item.done::before { background: var(--green); opacity: 1; }
-    .task-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; background: rgba(99,102,241,0.1); flex-shrink: 0; }
-    .task-name { font-size: 14px; font-weight: 500; flex: 1; }
-    .task-done-mark { color: var(--green); font-weight: 700; }
-    .btn-complete { width: 100%; padding: 16px; background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; margin-top: 8px; transition: all 0.3s; }
-    .btn-complete:hover { box-shadow: 0 8px 25px var(--green-glow); transform: translateY(-1px); }
-    .done-msg { text-align: center; padding: 20px; color: var(--green); font-weight: 600; font-size: 14px; background: var(--green-bg); border-radius: var(--radius); border: 1px solid rgba(34,197,94,0.15); margin-top: 8px; }
+    /* Section */
+    .sec-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .sec-title{font-size:15px;font-weight:700;letter-spacing:-.2px}
+    .sec-link{font-size:11px;color:var(--accent-light);font-weight:500;cursor:pointer}
 
-    .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
-    .badge-item { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(251,191,36,0.05)); border: 1px solid rgba(245,158,11,0.15); border-radius: 99px; font-size: 12px; font-weight: 600; color: #fcd34d; }
-    [data-theme="light"] .badge-item { color: #92400e; }
+    /* Today tasks */
+    .task{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--glass-border);border-radius:var(--radius);margin-bottom:6px;background:var(--glass);transition:all .3s;position:relative;overflow:hidden}
+    .task::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);opacity:.4}
+    .task.done{border-color:rgba(34,197,94,.15);background:var(--green-surface)}
+    .task.done::before{background:var(--green);opacity:1}
+    .task-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;background:var(--accent-surface);flex-shrink:0}
+    .task-name{font-size:13px;font-weight:500;flex:1}
+    .task-check{color:var(--green);font-weight:700;font-size:15px}
+    .btn-done{width:100%;padding:14px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border-radius:var(--radius-sm);font-size:13px;font-weight:700;margin-top:6px;transition:all .3s}
+    .btn-done:hover{box-shadow:0 8px 25px var(--green-glow);transform:translateY(-1px)}
+    .done-msg{text-align:center;padding:16px;color:var(--green);font-weight:600;font-size:13px;background:var(--green-surface);border-radius:var(--radius);border:1px solid rgba(34,197,94,.12);margin-top:6px}
 
-    .quote-card { padding: 20px; border-radius: var(--radius); background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(6,182,212,0.05)); border: 1px solid rgba(99,102,241,0.1); margin-top: 24px; }
-    .quote-text { font-size: 14px; font-style: italic; color: var(--text-secondary); line-height: 1.6; }
-    .quote-author { font-size: 12px; color: var(--text-muted); margin-top: 8px; font-weight: 500; }
-    .page-subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
+    /* ═══ HEATMAP ═══ */
+    .heatmap-wrap{margin-bottom:20px}
+    .heatmap-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+    .hm-cell{aspect-ratio:1;border-radius:3px;background:var(--glass);transition:all .2s;position:relative}
+    .hm-cell.l1{background:rgba(124,58,237,.15)}
+    .hm-cell.l2{background:rgba(124,58,237,.3)}
+    .hm-cell.l3{background:rgba(124,58,237,.5)}
+    .hm-cell.l4{background:var(--accent)}
+    .hm-cell.today{outline:2px solid var(--accent);outline-offset:1px}
+    .hm-legend{display:flex;align-items:center;gap:6px;margin-top:8px;justify-content:flex-end;font-size:10px;color:var(--text-muted)}
+    .hm-legend-cell{width:10px;height:10px;border-radius:2px}
+    .hm-days{display:flex;justify-content:space-between;margin-bottom:4px;font-size:9px;color:var(--text-muted);font-weight:500}
 
-    /* ══════════════════════════════════════════════
-       PLAN PAGE - ADVANCED INTERACTIVE
-    ══════════════════════════════════════════════ */
+    /* ═══ POMODORO TIMER ═══ */
+    .pomo-card{padding:20px;border-radius:var(--radius);background:var(--glass);border:1px solid var(--glass-border);text-align:center;margin-bottom:20px}
+    .pomo-time{font-size:48px;font-weight:800;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+    .pomo-label{font-size:12px;color:var(--text-muted);margin-bottom:12px;font-weight:500}
+    .pomo-btns{display:flex;gap:8px;justify-content:center}
+    .pomo-btn{padding:10px 20px;border-radius:var(--radius-xs);font-size:13px;font-weight:600;border:1px solid var(--glass-border);background:var(--glass);transition:all .3s}
+    .pomo-btn.start{background:var(--green-surface);color:var(--green);border-color:rgba(34,197,94,.15)}
+    .pomo-btn.pause{background:var(--orange-surface);color:var(--orange);border-color:rgba(245,158,11,.15)}
+    .pomo-btn.reset{background:var(--red-surface);color:var(--red);border-color:rgba(239,68,68,.12)}
+    .pomo-session{font-size:11px;color:var(--text-muted);margin-top:10px}
 
-    /* Plan toolbar */
-    .plan-toolbar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-    .plan-tool-btn { padding: 8px 16px; border-radius: 99px; font-size: 12px; font-weight: 600; background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-secondary); transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
-    .plan-tool-btn:hover { border-color: var(--accent); color: var(--text); }
-    .plan-tool-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    /* Badges */
+    .badge-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:16px}
+    .badge-item{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:var(--orange-surface);border:1px solid rgba(245,158,11,.12);border-radius:99px;font-size:11px;font-weight:600;color:var(--orange)}
+    [data-theme="light"] .badge-item{color:#92400e}
 
-    /* Plan stats bar */
-    .plan-stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
-    .plan-stat { text-align: center; padding: 12px 8px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); }
-    .plan-stat-num { font-size: 18px; font-weight: 800; }
-    .plan-stat-num.green { color: var(--green); }
-    .plan-stat-num.red { color: var(--red); }
-    .plan-stat-num.blue { color: var(--accent-light); }
-    .plan-stat-num.orange { color: var(--orange); }
-    .plan-stat-label { font-size: 10px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
+    .quote-card{padding:16px;border-radius:var(--radius);background:linear-gradient(135deg,rgba(124,58,237,.06),rgba(6,182,212,.04));border:1px solid rgba(124,58,237,.08);margin-top:20px}
+    .quote-text{font-size:13px;font-style:italic;color:var(--text-secondary);line-height:1.6}
+    .quote-author{font-size:11px;color:var(--text-muted);margin-top:6px;font-weight:500}
 
-    /* Plan filter tabs */
-    .plan-filters { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
-    .plan-filter { padding: 8px 16px; border-radius: 99px; font-size: 12px; font-weight: 600; background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-muted); transition: all 0.3s; white-space: nowrap; flex-shrink: 0; }
-    .plan-filter.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    /* ═══ PLAN PAGE ═══ */
+    .plan-toolbar{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+    .pt-btn{padding:7px 14px;border-radius:99px;font-size:11px;font-weight:600;background:var(--glass);border:1px solid var(--glass-border);color:var(--text-muted);transition:all .3s;display:flex;align-items:center;gap:5px}
+    .pt-btn:hover{border-color:var(--accent);color:var(--text)}
+    .pt-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .plan-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px}
+    .ps-item{text-align:center;padding:10px 6px;background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius-sm)}
+    .ps-num{font-size:17px;font-weight:800}
+    .ps-num.green{color:var(--green)}.ps-num.red{color:var(--red)}.ps-num.blue{color:var(--blue)}.ps-num.orange{color:var(--orange)}
+    .ps-label{font-size:9px;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:.3px}
+    .plan-filters{display:flex;gap:5px;margin-bottom:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+    .pf{padding:6px 14px;border-radius:99px;font-size:11px;font-weight:600;background:var(--glass);border:1px solid var(--glass-border);color:var(--text-muted);transition:all .3s;white-space:nowrap;flex-shrink:0}
+    .pf.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-    /* Plan day card - enhanced */
-    .plan-day { padding: 18px; border: 1px solid var(--glass-border); border-radius: var(--radius); margin-bottom: 10px; background: var(--glass); transition: all 0.3s; position: relative; overflow: hidden; }
-    .plan-day::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--text-muted); opacity: 0.2; }
-    .plan-day.done::before { background: var(--green); opacity: 1; }
-    .plan-day.missed::before { background: var(--red); opacity: 1; }
-    .plan-day.today { border-color: var(--accent); }
-    .plan-day.today::before { background: var(--accent); opacity: 1; }
-    .plan-day.expanded { border-color: var(--accent); }
-    .plan-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; cursor: pointer; }
-    .plan-date { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-    .today-badge { font-size: 10px; background: var(--accent); color: #fff; padding: 2px 8px; border-radius: 99px; font-weight: 700; }
-    .plan-status { font-size: 12px; font-weight: 600; }
-    .plan-status.done { color: var(--green); }
-    .plan-status.missed { color: var(--red); }
-    .plan-status.upcoming { color: var(--text-muted); }
-    .plan-subjects { display: flex; flex-wrap: wrap; gap: 6px; }
-    .plan-subj-tag { font-size: 12px; padding: 5px 12px; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: 99px; font-weight: 500; color: var(--text-secondary); }
-    [data-theme="light"] .plan-subj-tag { background: rgba(0,0,0,0.03); }
-    .plan-actions { display: flex; gap: 8px; margin-top: 12px; }
-    .plan-actions button { flex: 1; padding: 10px; border-radius: var(--radius-xs); font-size: 13px; font-weight: 600; transition: all 0.3s; }
-    .btn-mark-done { background: var(--green-bg); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
-    .btn-skip { background: var(--red-bg); color: var(--red); border: 1px solid rgba(239,68,68,0.15); }
+    /* Plan day card */
+    .pd{padding:16px;border:1px solid var(--glass-border);border-radius:var(--radius);margin-bottom:8px;background:var(--glass);transition:all .3s;position:relative;overflow:hidden}
+    .pd::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--text-muted);opacity:.15}
+    .pd.done::before{background:var(--green);opacity:1}.pd.missed::before{background:var(--red);opacity:1}.pd.today{border-color:var(--accent)}.pd.today::before{background:var(--accent);opacity:1}
+    .pd-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer}
+    .pd-date{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+    .td-badge{font-size:9px;background:var(--accent);color:#fff;padding:2px 7px;border-radius:99px;font-weight:700}
+    .pd-status{font-size:11px;font-weight:600}
+    .pd-status.done{color:var(--green)}.pd-status.missed{color:var(--red)}.pd-status.upcoming{color:var(--text-muted)}
+    .pd-subs{display:flex;flex-wrap:wrap;gap:5px}
+    .pd-tag{font-size:11px;padding:4px 10px;background:var(--glass);border:1px solid var(--glass-border);border-radius:99px;font-weight:500;color:var(--text-secondary)}
+    .pd-actions{display:flex;gap:6px;margin-top:10px}
+    .pd-actions button{flex:1;padding:9px;border-radius:var(--radius-xs);font-size:12px;font-weight:600;transition:all .3s}
+    .btn-md{background:var(--green-surface);color:var(--green);border:1px solid rgba(34,197,94,.15)}
+    .btn-sk{background:var(--red-surface);color:var(--red);border:1px solid rgba(239,68,68,.12)}
+    .pd-detail{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:none;animation:expIn .3s ease}
+    .pd.expanded .pd-detail{display:block}
+    @keyframes expIn{from{opacity:0}to{opacity:1}}
+    .pd-topic{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
+    .pd-topic:last-child{border-bottom:none}
+    .pd-tn{color:var(--text-secondary);flex:1}
+    .pd-tc{width:20px;height:20px;border-radius:5px;border:2px solid var(--glass-border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;font-size:11px;flex-shrink:0;margin-left:6px}
+    .pd-tc.checked{background:var(--green);border-color:var(--green);color:#fff}
 
-    /* Plan day detail (expandable) */
-    .plan-detail { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); display: none; animation: expandIn 0.3s ease; }
-    .plan-day.expanded .plan-detail { display: block; }
-    @keyframes expandIn { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 500px; } }
-    .plan-topic-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
-    .plan-topic-row:last-child { border-bottom: none; }
-    .plan-topic-name { color: var(--text-secondary); flex: 1; }
-    .plan-topic-check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--glass-border); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; font-size: 12px; flex-shrink: 0; margin-left: 8px; }
-    .plan-topic-check.checked { background: var(--green); border-color: var(--green); color: #fff; }
+    /* Syllabus view */
+    .syl-card{border:1px solid var(--glass-border);border-radius:var(--radius);background:var(--glass);overflow:hidden;margin-bottom:8px}
+    .syl-header{display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;width:100%;text-align:left;transition:all .2s}
+    .syl-header:hover{background:var(--glass-hover)}
+    .syl-name{font-weight:600;font-size:13px;display:flex;align-items:center;gap:8px;flex:1}
+    .syl-cnt{font-size:11px;color:var(--text-muted);background:var(--glass);padding:2px 8px;border-radius:99px;border:1px solid var(--glass-border)}
+    .syl-arrow{color:var(--text-muted);transition:transform .3s;font-size:11px}
+    .syl-card.open .syl-arrow{transform:rotate(180deg)}
+    .syl-body{display:none;padding:0 14px 14px}
+    .syl-card.open .syl-body{display:block}
+    .syl-topic{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;margin-bottom:3px;border-radius:var(--radius-xs);background:var(--bg-card);transition:all .2s}
+    .syl-topic:hover{background:var(--glass-hover)}
+    .syl-tn{font-size:12px;color:var(--text-secondary)}
+    .syl-sel{font-size:10px;padding:4px 8px;border-radius:var(--radius-xs);border:1px solid var(--glass-border);font-weight:600;cursor:pointer;outline:none;background:var(--glass);color:var(--text-secondary);appearance:none;-webkit-appearance:none}
+    .syl-sel.not_started{background:var(--glass)}.syl-sel.in_progress{background:var(--blue-surface);color:var(--blue);border-color:rgba(59,130,246,.15)}
+    .syl-sel.revised{background:var(--orange-surface);color:var(--orange);border-color:rgba(245,158,11,.15)}
+    .syl-sel.confident{background:var(--green-surface);color:var(--green);border-color:rgba(34,197,94,.15)}
 
-    /* Syllabus viewer */
-    .syllabus-section { margin-bottom: 20px; }
-    .syllabus-card { border: 1px solid var(--glass-border); border-radius: var(--radius); background: var(--glass); overflow: hidden; margin-bottom: 10px; }
-    .syllabus-header { display: flex; align-items: center; justify-content: space-between; padding: 16px; cursor: pointer; width: 100%; text-align: left; transition: all 0.2s; }
-    .syllabus-header:hover { background: var(--bg-card-hover); }
-    .syllabus-name { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px; flex: 1; }
-    .syllabus-count { font-size: 12px; color: var(--text-muted); background: var(--glass); padding: 2px 10px; border-radius: 99px; border: 1px solid var(--glass-border); }
-    .syllabus-arrow { color: var(--text-muted); transition: transform 0.3s; font-size: 12px; }
-    .syllabus-card.open .syllabus-arrow { transform: rotate(180deg); }
-    .syllabus-body { display: none; padding: 0 16px 16px; }
-    .syllabus-card.open .syllabus-body { display: block; }
-    .syllabus-topic { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; margin-bottom: 4px; border-radius: var(--radius-xs); background: rgba(255,255,255,0.02); transition: all 0.2s; }
-    [data-theme="light"] .syllabus-topic { background: rgba(0,0,0,0.02); }
-    .syllabus-topic:hover { background: var(--bg-card-hover); }
-    .syllabus-topic-name { font-size: 13px; color: var(--text-secondary); }
-    .syllabus-topic-badge { font-size: 10px; padding: 3px 8px; border-radius: 99px; font-weight: 600; }
-    .stb-not { background: rgba(255,255,255,0.04); color: var(--text-muted); }
-    .stb-prog { background: rgba(99,102,241,0.1); color: var(--accent-light); }
-    .stb-rev { background: var(--orange-bg); color: var(--orange); }
-    .stb-conf { background: var(--green-bg); color: var(--green); }
-    [data-theme="light"] .stb-not { background: rgba(0,0,0,0.04); }
+    /* Modal */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);z-index:200;align-items:flex-end;justify-content:center;animation:fadeIn .2s}
+    .modal-overlay.open{display:flex}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .modal-sheet{width:100%;max-width:480px;max-height:85vh;background:var(--bg-raised);border-radius:24px 24px 0 0;padding:20px;overflow-y:auto;animation:sheetUp .3s cubic-bezier(.4,0,.2,1);border:1px solid var(--glass-border);border-bottom:none}
+    @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .m-handle{width:40px;height:4px;background:var(--glass-border);border-radius:99px;margin:0 auto 16px}
+    .m-title{font-size:17px;font-weight:700;margin-bottom:4px}
+    .m-sub{font-size:12px;color:var(--text-muted);margin-bottom:18px}
+    .mod-opt{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--glass-border);border-radius:var(--radius);background:var(--glass);margin-bottom:8px;transition:all .3s;cursor:pointer;width:100%;text-align:left}
+    .mod-opt:hover{border-color:var(--accent);transform:translateX(3px)}
+    .mod-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--accent-surface);flex-shrink:0}
+    .mod-text{flex:1}
+    .mod-text strong{display:block;font-size:13px;font-weight:600}
+    .mod-text span{font-size:11px;color:var(--text-muted)}
+    .pri-item{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--glass-border);border-radius:var(--radius-sm);background:var(--glass);margin-bottom:6px}
+    .pri-name{flex:1;font-size:13px;font-weight:500}
+    .pri-wt{display:flex;align-items:center;gap:4px}
+    .pri-wt button{width:26px;height:26px;border-radius:5px;background:var(--glass);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--text-secondary);transition:all .2s}
+    .pri-wt button:hover{border-color:var(--accent);color:var(--accent-light)}
+    .pri-wt .wv{width:20px;text-align:center;font-size:13px;font-weight:700;color:var(--accent-light)}
 
-    /* Plan modify modal */
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 200; align-items: flex-end; justify-content: center; animation: fadeIn 0.2s; }
-    .modal-overlay.open { display: flex; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .modal-sheet { width: 100%; max-width: 480px; max-height: 85vh; background: var(--bg); border-radius: 24px 24px 0 0; padding: 20px; overflow-y: auto; animation: sheetUp 0.3s cubic-bezier(0.4,0,0.2,1); border: 1px solid var(--glass-border); border-bottom: none; }
-    @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    .modal-handle { width: 40px; height: 4px; background: var(--glass-border); border-radius: 99px; margin: 0 auto 16px; }
-    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-    .modal-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
-    .modify-option { display: flex; align-items: center; gap: 14px; padding: 16px; border: 1px solid var(--glass-border); border-radius: var(--radius); background: var(--glass); margin-bottom: 10px; transition: all 0.3s; cursor: pointer; width: 100%; text-align: left; }
-    .modify-option:hover { border-color: var(--accent); transform: translateX(4px); }
-    .modify-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; background: rgba(99,102,241,0.1); flex-shrink: 0; }
-    .modify-text { flex: 1; }
-    .modify-text strong { display: block; font-size: 14px; font-weight: 600; }
-    .modify-text span { font-size: 12px; color: var(--text-muted); }
+    /* ═══ PROGRESS PAGE ═══ */
+    .alert-b{padding:12px 14px;border-radius:var(--radius-sm);margin-bottom:10px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px;animation:slideIn .3s ease}
+    @keyframes slideIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+    .alert-r{background:var(--red-surface);border:1px solid rgba(239,68,68,.1);color:var(--red)}
+    .alert-o{background:var(--orange-surface);border:1px solid rgba(245,158,11,.1);color:var(--orange)}
+    .subj-card{border:1px solid var(--glass-border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden;background:var(--glass)}
+    .subj-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;width:100%;text-align:left}
+    .subj-bw{flex:1;margin-right:14px}
+    .subj-bn{font-weight:600;font-size:13px;margin-bottom:6px}
+    .p-bar{width:100%;height:4px;background:var(--glass);border-radius:99px;overflow:hidden}
+    .p-fill{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+    .p-fill.green{background:var(--green)}.p-fill.yellow{background:var(--orange)}.p-fill.red{background:var(--red)}
+    .subj-pct{font-size:13px;font-weight:700;color:var(--text-secondary);min-width:36px;text-align:right}
+    .top-list{border-top:1px solid var(--border);padding:12px 16px}
+    .top-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)}
+    .top-row:last-child{border-bottom:none}
+    .top-name{font-size:12px;flex:1;color:var(--text-secondary)}
+    .top-sel{font-size:10px;padding:4px 8px;border-radius:var(--radius-xs);border:1px solid var(--glass-border);font-weight:600;cursor:pointer;outline:none;background:var(--glass);color:var(--text-secondary);appearance:none;-webkit-appearance:none;transition:all .3s}
+    .top-sel.not_started{background:var(--glass)}.top-sel.in_progress{background:var(--blue-surface);color:var(--blue)}.top-sel.revised{background:var(--orange-surface);color:var(--orange)}.top-sel.confident{background:var(--green-surface);color:var(--green)}
 
-    /* Intensity slider */
-    .intensity-section { padding: 16px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: var(--radius); margin-bottom: 16px; }
-    .intensity-label { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; justify-content: space-between; }
-    .intensity-val { color: var(--accent-light); }
-    input[type="range"] { width: 100%; -webkit-appearance: none; height: 6px; border-radius: 99px; background: rgba(255,255,255,0.06); outline: none; }
-    [data-theme="light"] input[type="range"] { background: rgba(0,0,0,0.06); }
-    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 2px 10px var(--accent-glow); }
-    .intensity-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+    /* Radar chart container */
+    .radar-wrap{margin-bottom:20px;padding:16px;border-radius:var(--radius);background:var(--glass);border:1px solid var(--glass-border)}
+    .radar-wrap canvas{max-height:220px}
 
-    /* Subject priority list */
-    .priority-list { margin-bottom: 16px; }
-    .priority-item { display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid var(--glass-border); border-radius: var(--radius-sm); background: var(--glass); margin-bottom: 8px; transition: all 0.2s; }
-    .priority-item:hover { border-color: rgba(255,255,255,0.12); }
-    .priority-handle { color: var(--text-muted); cursor: grab; font-size: 16px; user-select: none; }
-    .priority-name { flex: 1; font-size: 14px; font-weight: 500; }
-    .priority-weight { display: flex; align-items: center; gap: 4px; }
-    .priority-weight button { width: 28px; height: 28px; border-radius: 6px; background: var(--glass); border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--text-secondary); transition: all 0.2s; }
-    .priority-weight button:hover { border-color: var(--accent); color: var(--accent-light); }
-    .priority-weight .weight-val { width: 24px; text-align: center; font-size: 14px; font-weight: 700; color: var(--accent-light); }
+    /* ═══ LEADERBOARD ═══ */
+    .league-tabs{display:flex;gap:6px;margin-bottom:14px}
+    .league-tab{padding:8px 16px;border-radius:99px;font-size:11px;font-weight:600;background:var(--glass);border:1px solid var(--glass-border);color:var(--text-muted);transition:all .3s}
+    .league-tab.active{color:#fff}
+    .league-tab.bronze.active{background:#cd7f32;border-color:#cd7f32}
+    .league-tab.silver.active{background:#a8a9ad;border-color:#a8a9ad;color:#1e293b}
+    .league-tab.gold.active{background:#ffd700;border-color:#ffd700;color:#1e293b}
+    .league-tab.diamond.active{background:linear-gradient(135deg,#7c3aed,#06b6d4);border-color:#7c3aed}
+    .lb-e{display:flex;align-items:center;padding:12px 14px;border:1px solid var(--glass-border);border-radius:var(--radius);margin-bottom:6px;background:var(--glass);transition:all .3s}
+    .lb-e:hover{transform:translateX(2px)}
+    .lb-e.me{border-color:rgba(124,58,237,.25);background:var(--accent-surface)}
+    .lb-r{width:32px;text-align:center;font-size:16px;flex-shrink:0}
+    .lb-rn{font-weight:800;color:var(--text-muted);font-size:13px}
+    .lb-i{flex:1;margin-left:10px}
+    .lb-n{font-size:13px;font-weight:600}
+    .lb-n .you{color:var(--accent-light)}
+    .lb-bg{display:flex;gap:3px;margin-top:3px}
+    .lb-bd{font-size:9px;padding:2px 5px;background:var(--orange-surface);color:var(--orange);border-radius:3px;font-weight:600}
+    .lb-s{text-align:right}
+    .lb-xp{font-weight:800;color:var(--accent-light);font-size:13px}
+    .lb-st{font-size:11px;color:var(--orange)}
+    .league-info{text-align:center;padding:16px;background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);margin-bottom:14px}
+    .league-icon{font-size:36px;margin-bottom:4px}
+    .league-name{font-size:16px;font-weight:700}
+    .league-range{font-size:11px;color:var(--text-muted)}
+    .empty-s{text-align:center;padding:50px 20px;color:var(--text-muted)}
+    .empty-i{font-size:40px;margin-bottom:8px;opacity:.5}
+    .page-sub{color:var(--text-muted);font-size:12px;margin-bottom:16px}
 
-    /* Progress page */
-    .alert-banner { padding: 14px 16px; border-radius: var(--radius-sm); margin-bottom: 12px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease; }
-    @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-    .alert-red { background: var(--red-bg); border: 1px solid rgba(239,68,68,0.15); color: var(--red); }
-    .alert-orange { background: var(--orange-bg); border: 1px solid rgba(245,158,11,0.15); color: var(--orange); }
-    .subject-card { border: 1px solid var(--glass-border); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; background: var(--glass); transition: all 0.3s; }
-    .subject-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; cursor: pointer; width: 100%; text-align: left; }
-    .subject-bar-wrap { flex: 1; margin-right: 16px; }
-    .subject-bar-name { font-weight: 600; font-size: 14px; margin-bottom: 8px; }
-    .progress-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.06); border-radius: 99px; overflow: hidden; }
-    [data-theme="light"] .progress-bar { background: rgba(0,0,0,0.06); }
-    .progress-fill { height: 100%; border-radius: 99px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
-    .progress-fill.green { background: var(--green); }
-    .progress-fill.yellow { background: var(--orange); }
-    .progress-fill.red { background: var(--red); }
-    .subject-pct { font-size: 14px; font-weight: 700; color: var(--text-secondary); min-width: 40px; text-align: right; }
-    .topic-list { border-top: 1px solid var(--border); padding: 14px 18px; }
-    .topic-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
-    .topic-row:last-child { border-bottom: none; }
-    .topic-name { font-size: 13px; flex: 1; color: var(--text-secondary); }
-    .topic-select { font-size: 11px; padding: 5px 10px; border-radius: var(--radius-xs); border: 1px solid var(--glass-border); font-weight: 600; cursor: pointer; outline: none; background: var(--glass); color: var(--text-secondary); transition: all 0.3s; appearance: none; -webkit-appearance: none; }
-    .topic-select.not_started { background: rgba(255,255,255,0.04); }
-    .topic-select.in_progress { background: rgba(99,102,241,0.1); color: var(--accent-light); border-color: rgba(99,102,241,0.2); }
-    .topic-select.revised { background: var(--orange-bg); color: var(--orange); border-color: rgba(245,158,11,0.2); }
-    .topic-select.confident { background: var(--green-bg); color: var(--green); border-color: rgba(34,197,94,0.2); }
+    /* ═══ FLASHCARDS ═══ */
+    .fc-card{perspective:1000px;height:200px;margin-bottom:16px;cursor:pointer}
+    .fc-inner{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+    .fc-card.flipped .fc-inner{transform:rotateY(180deg)}
+    .fc-front,.fc-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:var(--radius);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+    .fc-front{background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(59,130,246,.08));border:1px solid rgba(124,58,237,.12)}
+    .fc-back{background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(6,182,212,.08));border:1px solid rgba(34,197,94,.12);transform:rotateY(180deg)}
+    .fc-q{font-size:15px;font-weight:600;line-height:1.5}
+    .fc-a{font-size:14px;color:var(--text-secondary);line-height:1.5}
+    .fc-hint{font-size:11px;color:var(--text-muted);margin-top:8px}
+    .fc-nav{display:flex;gap:8px;justify-content:center}
+    .fc-nav button{padding:10px 20px;border-radius:var(--radius-xs);font-size:12px;font-weight:600;background:var(--glass);border:1px solid var(--glass-border);transition:all .3s}
+    .fc-nav button:hover{border-color:var(--accent);color:var(--accent-light)}
+    .fc-progress{text-align:center;font-size:11px;color:var(--text-muted);margin-top:10px}
 
-    /* Leaderboard */
-    .lb-entry { display: flex; align-items: center; padding: 14px 16px; border: 1px solid var(--glass-border); border-radius: var(--radius); margin-bottom: 8px; background: var(--glass); transition: all 0.3s; }
-    .lb-entry:hover { transform: translateX(2px); }
-    .lb-entry.me { border-color: rgba(99,102,241,0.3); background: rgba(99,102,241,0.08); }
-    .lb-rank { width: 36px; text-align: center; font-size: 18px; flex-shrink: 0; }
-    .lb-rank-num { font-weight: 800; color: var(--text-muted); font-size: 14px; }
-    .lb-info { flex: 1; margin-left: 12px; }
-    .lb-name { font-size: 14px; font-weight: 600; }
-    .lb-name .you { color: var(--accent-light); }
-    .lb-badges { display: flex; gap: 4px; margin-top: 4px; }
-    .lb-badge { font-size: 10px; padding: 2px 6px; background: var(--orange-bg); color: var(--orange); border-radius: 4px; font-weight: 600; }
-    .lb-stats { text-align: right; }
-    .lb-xp { font-weight: 800; color: var(--accent-light); font-size: 14px; }
-    .lb-streak { font-size: 12px; color: var(--orange); }
-    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
-    .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
-
-    @media (max-width: 480px) { .app { max-width: 100%; } .bottom-nav { max-width: calc(100% - 32px); } }
+    @media(max-width:480px){.app{max-width:100%}.bottom-nav{max-width:calc(100% - 28px)}}
   </style>
 </head>
 <body>
@@ -366,12 +380,12 @@
     <div class="auth-form">
       <div class="auth-logo">🎯</div>
       <h1 class="auth-title">GovPrep</h1>
-      <p class="auth-sub">Your exam preparation GPS</p>
-      <div id="login-error" class="error-msg" style="display:none;"></div>
-      <div class="input-wrap"><input type="email" id="login-email" placeholder="Email address" /></div>
-      <div class="input-wrap"><input type="password" id="login-password" placeholder="Password" /></div>
+      <p class="auth-sub">Smart exam preparation GPS</p>
+      <div id="login-error" class="err-msg" style="display:none"></div>
+      <div class="iw"><input type="email" id="login-email" placeholder="Email address"/></div>
+      <div class="iw"><input type="password" id="login-password" placeholder="Password"/></div>
       <button class="btn-glow" onclick="handleLogin()">Log In</button>
-      <p class="auth-switch" style="text-align:center;">New here? <a onclick="showScreen('register')">Create Account</a></p>
+      <p class="auth-switch" style="text-align:center">New here? <a onclick="showScreen('register')">Create Account</a></p>
     </div>
   </div>
 
@@ -381,735 +395,407 @@
       <div class="auth-logo">🚀</div>
       <h1 class="auth-title">Join GovPrep</h1>
       <p class="auth-sub">Start your preparation journey</p>
-      <div id="register-error" class="error-msg" style="display:none;"></div>
-      <div class="input-wrap"><input type="text" id="reg-name" placeholder="Full Name" /></div>
-      <div class="input-wrap"><input type="email" id="reg-email" placeholder="Email address" /></div>
-      <div class="input-wrap"><input type="password" id="reg-password" placeholder="Password (min 6 chars)" /></div>
+      <div id="register-error" class="err-msg" style="display:none"></div>
+      <div class="iw"><input type="text" id="reg-name" placeholder="Full Name"/></div>
+      <div class="iw"><input type="email" id="reg-email" placeholder="Email address"/></div>
+      <div class="iw"><input type="password" id="reg-password" placeholder="Password (min 6 chars)"/></div>
       <button class="btn-glow" onclick="handleRegister()">Create Account</button>
-      <p class="auth-switch" style="text-align:center;">Already a member? <a onclick="showScreen('login')">Log In</a></p>
+      <p class="auth-switch" style="text-align:center">Already a member? <a onclick="showScreen('login')">Log In</a></p>
     </div>
   </div>
 
-  <!-- ONBOARDING -->
-  <div class="screen" id="screen-onboarding" style="padding-bottom:40px;">
-    <p class="onb-step-label" id="onb-step-label">STEP 1 OF 3</p>
-    <h1 style="font-size:22px;font-weight:800;margin-bottom:4px;">Setup Your Prep</h1>
-    <div class="onb-progress"><div class="onb-progress-fill" id="onb-progress-fill" style="width:33%"></div></div>
-    <div id="onb-step-1"><h2 class="onb-title">Which exam are you targeting?</h2><div id="exam-list"></div></div>
-    <div id="onb-step-2" style="display:none;">
-      <h2 class="onb-title">When is your exam?</h2>
-      <div class="input-wrap"><input type="date" id="exam-date-input" /></div>
-      <div class="btn-row"><button class="btn-outline" onclick="onbBack(1)">Back</button><button class="btn-glow" onclick="onbNext(3)">Continue</button></div>
+  <!-- ONBOARDING (5 steps now) -->
+  <div class="screen" id="screen-onboarding" style="padding-bottom:40px">
+    <p class="onb-step" id="onb-step">STEP 1 OF 5</p>
+    <h1 style="font-size:20px;font-weight:800;margin-bottom:4px">Setup Your Prep</h1>
+    <div class="onb-progress"><div class="onb-fill" id="onb-fill" style="width:20%"></div></div>
+    <div id="onb-1"><h2 class="onb-title">Which exam are you targeting?</h2><div id="exam-list"></div></div>
+    <div id="onb-2" style="display:none"><h2 class="onb-title">When is your exam?</h2><div class="iw"><input type="date" id="exam-date-input"/></div><div class="btn-row"><button class="btn-out" onclick="onbBack(1)">Back</button><button class="btn-glow" onclick="onbNext(3)">Continue</button></div></div>
+    <div id="onb-3" style="display:none">
+      <h2 class="onb-title">How many hours can you study daily?</h2>
+      <div class="slider-section">
+        <div class="slider-label"><span>Daily study hours</span><span class="slider-val" id="hours-val">4</span></div>
+        <input type="range" min="1" max="12" value="4" id="hours-slider" oninput="document.getElementById('hours-val').textContent=this.value">
+        <div class="slider-marks"><span>1hr</span><span>6hrs</span><span>12hrs</span></div>
+      </div>
+      <div class="btn-row"><button class="btn-out" onclick="onbBack(2)">Back</button><button class="btn-glow" onclick="onbNext(4)">Continue</button></div>
     </div>
-    <div id="onb-step-3" style="display:none;">
-      <h2 class="onb-title">How confident are you?</h2>
-      <div id="rating-list"></div>
-      <div class="btn-row"><button class="btn-outline" onclick="onbBack(2)">Back</button><button class="btn-glow" onclick="completeOnboarding()">Launch Prep 🚀</button></div>
+    <div id="onb-4" style="display:none"><h2 class="onb-title">Rate your confidence</h2><div id="rating-list"></div><div class="btn-row"><button class="btn-out" onclick="onbBack(3)">Back</button><button class="btn-glow" onclick="onbNext(5)">Continue</button></div></div>
+    <div id="onb-5" style="display:none">
+      <h2 class="onb-title">Preferred study style?</h2>
+      <button class="exam-opt" onclick="setStyle('balanced')">⚖️ Balanced — Equal focus on all subjects</button>
+      <button class="exam-opt" onclick="setStyle('weakness')">🎯 Weakness-First — Prioritize weak areas</button>
+      <button class="exam-opt" onclick="setStyle('revision')">🔄 Revision-Heavy — More revision cycles</button>
+      <div class="btn-row" style="margin-top:20px"><button class="btn-out" onclick="onbBack(4)">Back</button><button class="btn-glow" onclick="completeOnboarding()">Launch Prep 🚀</button></div>
     </div>
   </div>
 
   <!-- HOME -->
   <div class="screen" id="screen-home">
-    <div class="home-header">
+    <div class="home-top">
       <div>
-        <div class="home-greeting" id="home-greeting">Good morning</div>
-        <div class="home-name" id="home-name">Hi!</div>
-        <div class="home-exam" id="home-exam"></div>
+        <div class="greeting" id="home-greeting">Good morning</div>
+        <div class="user-name" id="home-name">Hi!</div>
+        <div class="exam-pill" id="home-exam"></div>
       </div>
       <div class="home-actions">
-        <div class="theme-row">
-          <span class="theme-icon moon">🌙</span>
-          <div class="theme-toggle" onclick="toggleTheme()"></div>
-          <span class="theme-icon sun">☀️</span>
-        </div>
+        <div class="theme-row"><span class="ti moon">🌙</span><div class="theme-toggle" onclick="toggleTheme()"></div><span class="ti sun">☀️</span></div>
         <button class="logout-btn" onclick="handleLogout()">Sign Out</button>
       </div>
     </div>
-    <div class="countdown-hero">
-      <div class="countdown-content">
-        <div class="countdown-left">
-          <div class="countdown-label">Exam Countdown</div>
-          <div class="countdown-num" id="days-left">0</div>
-          <div class="countdown-unit">days remaining</div>
-        </div>
-        <div class="countdown-ring"><svg id="ring-svg" width="80" height="80"></svg></div>
+    <!-- Bento grid -->
+    <div class="bento">
+      <div class="bento-card hero-card full">
+        <div class="cd-content"><div class="countdown-left"><div class="cd-label">Exam Countdown</div><div class="cd-num" id="days-left">0</div><div class="cd-unit">days remaining</div></div><div class="cd-ring"><svg id="ring-svg" width="72" height="72"></svg></div></div>
+      </div>
+      <div class="bento-card bc-streak"><div class="bc-icon">🔥</div><div class="bc-val" id="home-streak">0</div><div class="bc-label">Day Streak</div></div>
+      <div class="bento-card bc-xp"><div class="bc-icon">⚡</div><div class="bc-val" id="home-xp">0</div><div class="bc-label">XP Points</div></div>
+      <div class="bento-card bc-ready full">
+        <div class="r-header"><span class="r-title">Exam Readiness</span><span class="r-pct" id="r-pct" style="color:var(--accent-light)">0%</span></div>
+        <div class="r-bar"><div class="r-fill" id="r-fill" style="width:0;background:var(--gradient-accent)"></div></div>
       </div>
     </div>
-    <div class="stats-grid">
-      <div class="stat-card streak"><div class="stat-icon">🔥</div><div class="stat-val" id="home-streak">0</div><div class="stat-label">Streak</div></div>
-      <div class="stat-card xp"><div class="stat-icon">⚡</div><div class="stat-val" id="home-xp">0</div><div class="stat-label">XP Points</div></div>
-      <div class="stat-card ready"><div class="stat-icon">📊</div><div class="stat-val" id="home-ready">0%</div><div class="stat-label">Readiness</div></div>
+    <!-- Pomodoro -->
+    <div class="pomo-card">
+      <div class="pomo-label">POMODORO TIMER</div>
+      <div class="pomo-time" id="pomo-time">25:00</div>
+      <div class="pomo-btns">
+        <button class="pomo-btn start" id="pomo-start" onclick="pomoToggle()">Start</button>
+        <button class="pomo-btn reset" onclick="pomoReset()">Reset</button>
+      </div>
+      <div class="pomo-session" id="pomo-session">Session 1 of 4</div>
     </div>
-    <div class="readiness-section">
-      <div class="readiness-header"><span class="readiness-title">Overall Progress</span><span class="readiness-pct" id="readiness-pct" style="color:var(--accent-light)">0%</span></div>
-      <div class="readiness-bar"><div class="readiness-fill" id="readiness-fill" style="width:0;background:var(--gradient-1);"></div></div>
-    </div>
-    <div class="section-header"><span class="section-title">Today's Focus</span></div>
+    <!-- Today's focus -->
+    <div class="sec-header"><span class="sec-title">Today's Focus</span></div>
     <div id="today-tasks"></div>
+    <!-- Heatmap -->
+    <div class="heatmap-wrap">
+      <div class="sec-header"><span class="sec-title">Study Consistency</span><span class="sec-link" id="hm-month"></span></div>
+      <div class="hm-days"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+      <div class="heatmap-grid" id="heatmap"></div>
+      <div class="hm-legend"><span>Less</span><div class="hm-legend-cell" style="background:var(--glass)"></div><div class="hm-legend-cell" style="background:rgba(124,58,237,.15)"></div><div class="hm-legend-cell" style="background:rgba(124,58,237,.3)"></div><div class="hm-legend-cell" style="background:rgba(124,58,237,.5)"></div><div class="hm-legend-cell" style="background:var(--accent)"></div><span>More</span></div>
+    </div>
     <div id="home-badges"></div>
     <div class="quote-card"><div class="quote-text" id="quote-text"></div><div class="quote-author" id="quote-author"></div></div>
   </div>
 
   <!-- PLAN -->
   <div class="screen" id="screen-plan">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-      <h1 style="font-size:22px;font-weight:800;">Study Plan</h1>
-      <button class="plan-tool-btn" onclick="openModifyModal()">⚙️ Modify</button>
-    </div>
-    <p class="page-subtitle" id="plan-total"></p>
-
-    <div class="plan-stats-bar" id="plan-stats-bar"></div>
-
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><h1 style="font-size:20px;font-weight:800">Study Plan</h1><button class="pt-btn" onclick="openModifyModal()">⚙️ Modify</button></div>
+    <p class="page-sub" id="plan-total"></p>
+    <div class="plan-stats" id="plan-stats"></div>
     <div class="plan-filters" id="plan-filters"></div>
-
-    <!-- Plan view selector -->
-    <div class="plan-toolbar" id="plan-view-tabs">
-      <button class="plan-tool-btn active" onclick="setPlanView('schedule')" id="tab-schedule">📅 Schedule</button>
-      <button class="plan-tool-btn" onclick="setPlanView('syllabus')" id="tab-syllabus">📚 Syllabus</button>
-    </div>
-
-    <div id="plan-schedule-view"></div>
-    <div id="plan-syllabus-view" style="display:none;"></div>
+    <div class="plan-toolbar" id="plan-tabs"><button class="pt-btn active" onclick="setPlanView('schedule')" id="tab-sched">📅 Schedule</button><button class="pt-btn" onclick="setPlanView('syllabus')" id="tab-syl">📚 Syllabus</button><button class="pt-btn" onclick="setPlanView('flash')" id="tab-flash">🃏 Flashcards</button></div>
+    <div id="plan-schedule"></div>
+    <div id="plan-syllabus" style="display:none"></div>
+    <div id="plan-flash" style="display:none"></div>
   </div>
 
   <!-- PROGRESS -->
   <div class="screen" id="screen-progress">
-    <h1 style="font-size:22px;font-weight:800;">Progress</h1>
-    <p class="page-subtitle" id="progress-overall"></p>
+    <h1 style="font-size:20px;font-weight:800">Progress</h1>
+    <p class="page-sub" id="progress-overall"></p>
+    <div class="radar-wrap"><canvas id="radar-chart"></canvas></div>
     <div id="progress-alerts"></div>
     <div id="progress-list"></div>
   </div>
 
   <!-- LEADERBOARD -->
   <div class="screen" id="screen-leaderboard">
-    <h1 style="font-size:22px;font-weight:800;">Leaderboard</h1>
-    <p class="page-subtitle" id="lb-subtitle"></p>
+    <h1 style="font-size:20px;font-weight:800">Leaderboard</h1>
+    <p class="page-sub" id="lb-subtitle"></p>
+    <div class="league-info" id="league-info"></div>
+    <div class="league-tabs" id="league-tabs"></div>
     <div id="lb-list"></div>
   </div>
 
   <!-- BOTTOM NAV -->
-  <nav class="bottom-nav" id="bottom-nav" style="display:none;">
-    <button class="active" onclick="navigate('home')"><span class="nav-icon">🏠</span>Home</button>
-    <button onclick="navigate('plan')"><span class="nav-icon">📅</span>Plan</button>
-    <button onclick="navigate('progress')"><span class="nav-icon">📊</span>Progress</button>
-    <button onclick="navigate('leaderboard')"><span class="nav-icon">🏆</span>Rank</button>
+  <nav class="bottom-nav" id="bottom-nav" style="display:none">
+    <button class="active" onclick="navigate('home')"><span class="ni">🏠</span>Home</button>
+    <button onclick="navigate('plan')"><span class="ni">📅</span>Plan</button>
+    <button onclick="navigate('progress')"><span class="ni">📊</span>Progress</button>
+    <button onclick="navigate('leaderboard')"><span class="ni">🏆</span>Rank</button>
   </nav>
 
-  <!-- MODIFY PLAN MODAL -->
-  <div class="modal-overlay" id="modify-modal">
-    <div class="modal-sheet" id="modal-sheet">
-      <div class="modal-handle"></div>
-      <div id="modal-content"></div>
-    </div>
-  </div>
+  <!-- MODIFY MODAL -->
+  <div class="modal-overlay" id="modify-modal"><div class="modal-sheet"><div class="m-handle"></div><div id="modal-content"></div></div></div>
 </div>
-
 <script>
-// ─── EXAM DATA ───
-const EXAMS = {
-  "SSC CGL": [
-    { name: "Quantitative Aptitude", topics: ["Number System","Algebra","Geometry","Trigonometry","Mensuration","Data Interpretation","Percentage","Ratio & Proportion","Profit & Loss","Time & Work","Time & Distance","SI & CI","Average","Mixture & Alligation"] },
-    { name: "General Awareness", topics: ["Indian History","Indian Polity","Geography","Economics","General Science","Current Affairs","Static GK"] },
-    { name: "English Language", topics: ["Reading Comprehension","Cloze Test","Error Spotting","Sentence Improvement","Synonyms & Antonyms","Idioms & Phrases","One Word Substitution","Spelling Correction"] },
-    { name: "Reasoning", topics: ["Analogy","Classification","Series","Coding-Decoding","Blood Relations","Direction Sense","Syllogism","Venn Diagram","Matrix","Paper Folding","Mirror Image","Non-Verbal Reasoning"] }
-  ],
-  "SSC CHSL": [
-    { name: "Quantitative Aptitude", topics: ["Number System","Algebra","Geometry","Trigonometry","Percentage","Ratio & Proportion","Profit & Loss","Time & Work","Time & Distance","SI & CI","Average","Data Interpretation"] },
-    { name: "General Awareness", topics: ["Indian History","Indian Polity","Geography","Economics","General Science","Current Affairs"] },
-    { name: "English Language", topics: ["Reading Comprehension","Error Spotting","Sentence Improvement","Synonyms & Antonyms","Idioms & Phrases","One Word Substitution","Fill in the Blanks"] },
-    { name: "Reasoning", topics: ["Analogy","Classification","Series","Coding-Decoding","Blood Relations","Direction Sense","Syllogism","Venn Diagram","Non-Verbal Reasoning"] }
-  ],
-  "IBPS PO": [
-    { name: "Quantitative Aptitude", topics: ["Number Series","Data Interpretation","Quadratic Equations","Simplification","Percentage","Ratio & Proportion","Profit & Loss","Time & Work","Time & Distance","SI & CI","Average","Probability"] },
-    { name: "Reasoning Ability", topics: ["Seating Arrangement","Puzzles","Syllogism","Coding-Decoding","Blood Relations","Direction Sense","Inequality","Data Sufficiency","Input-Output","Order & Ranking"] },
-    { name: "English Language", topics: ["Reading Comprehension","Cloze Test","Error Spotting","Sentence Rearrangement","Fill in the Blanks","Vocabulary"] },
-    { name: "General Awareness", topics: ["Banking Awareness","Financial Awareness","Current Affairs","Static GK","Indian Economy"] },
-    { name: "Computer Knowledge", topics: ["Computer Fundamentals","Networking","Database","MS Office","Internet","Computer Security"] }
-  ],
-  "SBI PO": [
-    { name: "Quantitative Aptitude", topics: ["Number Series","Data Interpretation","Quadratic Equations","Simplification","Percentage","Ratio & Proportion","Profit & Loss","Time & Work","Time & Distance","Probability","Permutation & Combination"] },
-    { name: "Reasoning Ability", topics: ["Seating Arrangement","Puzzles","Syllogism","Coding-Decoding","Blood Relations","Direction Sense","Inequality","Data Sufficiency","Critical Reasoning","Input-Output"] },
-    { name: "English Language", topics: ["Reading Comprehension","Cloze Test","Error Spotting","Sentence Rearrangement","Para Jumbles","Vocabulary","Grammar"] },
-    { name: "General Awareness", topics: ["Banking Awareness","Financial Awareness","Current Affairs","Static GK","Indian Economy","Budget & Policy"] }
-  ],
-  "UPSC Prelims": [
-    { name: "Indian History", topics: ["Ancient India","Medieval India","Modern India","Art & Culture","Indian National Movement"] },
-    { name: "Indian Polity", topics: ["Constitution","Fundamental Rights","DPSP","Parliament","Judiciary","Federalism","Local Government","Constitutional Bodies","Amendments"] },
-    { name: "Geography", topics: ["Physical Geography","Indian Geography","World Geography","Climatology","Oceanography","Environmental Geography"] },
-    { name: "Economics", topics: ["Indian Economy","Economic Planning","Monetary Policy","Fiscal Policy","International Trade","Banking & Finance","Budget"] },
-    { name: "General Science", topics: ["Physics","Chemistry","Biology","Environment & Ecology","Science & Technology"] },
-    { name: "Current Affairs", topics: ["National Events","International Events","Awards & Honours","Sports","Government Schemes","Summits & Conferences"] },
-    { name: "CSAT", topics: ["Comprehension","Logical Reasoning","Analytical Ability","Data Interpretation","Decision Making","Basic Numeracy"] }
-  ],
-  "TSPSC Group-2": [
-    { name: "General Studies Paper-1", topics: ["Indian History","Indian Polity","Indian Economy","Geography","General Science","Disaster Management"] },
-    { name: "General Studies Paper-2", topics: ["Telangana History","Telangana Movement","Telangana Economy","Telangana Geography","Telangana Culture","Telangana Governance"] },
-    { name: "General Studies Paper-3", topics: ["Indian Constitution","Public Administration","Good Governance","Social Issues","Current Affairs","Science & Technology"] }
-  ],
-  "RRB NTPC": [
-    { name: "Mathematics", topics: ["Number System","Algebra","Percentage","Ratio & Proportion","Profit & Loss","Time & Work","Time & Distance","SI & CI","Mensuration","Geometry","Trigonometry","Data Interpretation"] },
-    { name: "General Intelligence & Reasoning", topics: ["Analogy","Classification","Series","Coding-Decoding","Blood Relations","Direction Sense","Syllogism","Venn Diagram","Statement & Conclusion","Calendar & Clock"] },
-    { name: "General Awareness", topics: ["Indian History","Indian Polity","Geography","Economics","General Science","Current Affairs","Static GK","Computer Awareness"] }
-  ]
+// ═══ EXAM DATA ═══
+const EXAMS={
+  "SSC CGL":[{name:"Quantitative Aptitude",topics:["Number System","Algebra","Geometry","Trigonometry","Mensuration","Data Interpretation","Percentage","Ratio & Proportion","Profit & Loss","Time & Work","Time & Distance","SI & CI","Average","Mixture & Alligation"]},{name:"General Awareness",topics:["Indian History","Indian Polity","Geography","Economics","General Science","Current Affairs","Static GK"]},{name:"English Language",topics:["Reading Comprehension","Cloze Test","Error Spotting","Sentence Improvement","Synonyms & Antonyms","Idioms & Phrases","One Word Substitution","Spelling Correction"]},{name:"Reasoning",topics:["Analogy","Classification","Series","Coding-Decoding","Blood Relations","Direction Sense","Syllogism","Venn Diagram","Matrix","Paper Folding","Mirror Image","Non-Verbal Reasoning"]}],
+  "SSC CHSL":[{name:"Quantitative Aptitude",topics:["Number System","Algebra","Geometry","Trigonometry","Percentage","Ratio & Proportion","Profit & Loss","Time & Work","Time & Distance","SI & CI","Average","Data Interpretation"]},{name:"General Awareness",topics:["Indian History","Indian Polity","Geography","Economics","General Science","Current Affairs"]},{name:"English Language",topics:["Reading Comprehension","Error Spotting","Sentence Improvement","Synonyms & Antonyms","Idioms & Phrases","One Word Substitution","Fill in the Blanks"]},{name:"Reasoning",topics:["Analogy","Classification","Series","Coding-Decoding","Blood Relations","Direction Sense","Syllogism","Venn Diagram","Non-Verbal Reasoning"]}],
+  "IBPS PO":[{name:"Quantitative Aptitude",topics:["Number Series","Data Interpretation","Quadratic Equations","Simplification","Percentage","Ratio & Proportion","Profit & Loss","Time & Work","Time & Distance","SI & CI","Average","Probability"]},{name:"Reasoning Ability",topics:["Seating Arrangement","Puzzles","Syllogism","Coding-Decoding","Blood Relations","Direction Sense","Inequality","Data Sufficiency","Input-Output","Order & Ranking"]},{name:"English Language",topics:["Reading Comprehension","Cloze Test","Error Spotting","Sentence Rearrangement","Fill in the Blanks","Vocabulary"]},{name:"General Awareness",topics:["Banking Awareness","Financial Awareness","Current Affairs","Static GK","Indian Economy"]},{name:"Computer Knowledge",topics:["Computer Fundamentals","Networking","Database","MS Office","Internet","Computer Security"]}],
+  "SBI PO":[{name:"Quantitative Aptitude",topics:["Number Series","Data Interpretation","Quadratic Equations","Simplification","Percentage","Ratio & Proportion","Profit & Loss","Time & Work","Time & Distance","Probability","Permutation & Combination"]},{name:"Reasoning Ability",topics:["Seating Arrangement","Puzzles","Syllogism","Coding-Decoding","Blood Relations","Direction Sense","Inequality","Data Sufficiency","Critical Reasoning","Input-Output"]},{name:"English Language",topics:["Reading Comprehension","Cloze Test","Error Spotting","Sentence Rearrangement","Para Jumbles","Vocabulary","Grammar"]},{name:"General Awareness",topics:["Banking Awareness","Financial Awareness","Current Affairs","Static GK","Indian Economy","Budget & Policy"]}],
+  "UPSC Prelims":[{name:"Indian History",topics:["Ancient India","Medieval India","Modern India","Art & Culture","Indian National Movement"]},{name:"Indian Polity",topics:["Constitution","Fundamental Rights","DPSP","Parliament","Judiciary","Federalism","Local Government","Constitutional Bodies","Amendments"]},{name:"Geography",topics:["Physical Geography","Indian Geography","World Geography","Climatology","Oceanography","Environmental Geography"]},{name:"Economics",topics:["Indian Economy","Economic Planning","Monetary Policy","Fiscal Policy","International Trade","Banking & Finance","Budget"]},{name:"General Science",topics:["Physics","Chemistry","Biology","Environment & Ecology","Science & Technology"]},{name:"Current Affairs",topics:["National Events","International Events","Awards & Honours","Sports","Government Schemes","Summits & Conferences"]},{name:"CSAT",topics:["Comprehension","Logical Reasoning","Analytical Ability","Data Interpretation","Decision Making","Basic Numeracy"]}],
+  "TSPSC Group-2":[{name:"General Studies Paper-1",topics:["Indian History","Indian Polity","Indian Economy","Geography","General Science","Disaster Management"]},{name:"General Studies Paper-2",topics:["Telangana History","Telangana Movement","Telangana Economy","Telangana Geography","Telangana Culture","Telangana Governance"]},{name:"General Studies Paper-3",topics:["Indian Constitution","Public Administration","Good Governance","Social Issues","Current Affairs","Science & Technology"]}],
+  "RRB NTPC":[{name:"Mathematics",topics:["Number System","Algebra","Percentage","Ratio & Proportion","Profit & Loss","Time & Work","Time & Distance","SI & CI","Mensuration","Geometry","Trigonometry","Data Interpretation"]},{name:"General Intelligence & Reasoning",topics:["Analogy","Classification","Series","Coding-Decoding","Blood Relations","Direction Sense","Syllogism","Venn Diagram","Statement & Conclusion","Calendar & Clock"]},{name:"General Awareness",topics:["Indian History","Indian Polity","Geography","Economics","General Science","Current Affairs","Static GK","Computer Awareness"]}]
 };
 
-const QUOTES = [
-  { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" },
-  { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
-  { text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius" },
-  { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
-  { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
-  { text: "Hard work beats talent when talent doesn't work hard.", author: "Tim Notke" },
-  { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
-  { text: "Discipline is the bridge between goals and accomplishment.", author: "Jim Rohn" },
-  { text: "Education is the most powerful weapon which you can use to change the world.", author: "Nelson Mandela" }
+const QUOTES=[{text:"Success is not final, failure is not fatal: it is the courage to continue that counts.",author:"Winston Churchill"},{text:"The secret of getting ahead is getting started.",author:"Mark Twain"},{text:"It does not matter how slowly you go as long as you do not stop.",author:"Confucius"},{text:"Hard work beats talent when talent doesn't work hard.",author:"Tim Notke"},{text:"Discipline is the bridge between goals and accomplishment.",author:"Jim Rohn"},{text:"Education is the most powerful weapon which you can use to change the world.",author:"Nelson Mandela"},{text:"Don't watch the clock; do what it does. Keep going.",author:"Sam Levenson"},{text:"Believe you can and you're halfway there.",author:"Theodore Roosevelt"}];
+
+const FLASHCARDS={
+  "Quantitative Aptitude":[{q:"What is the formula for Compound Interest?",a:"A = P(1 + r/n)^(nt), where P=principal, r=rate, n=compounding frequency, t=time"},{q:"If the ratio of A:B is 3:5 and B:C is 2:3, what is A:C?",a:"A:B:C = 6:10:15, so A:C = 6:15 = 2:5"},{q:"What is the formula for Time and Work?",a:"If A can do work in x days, A's 1 day work = 1/x. Total work = LCM of individual days."}],
+  "General Awareness":[{q:"Who is known as the Father of the Indian Constitution?",a:"Dr. B.R. Ambedkar"},{q:"Which article of the Indian Constitution abolishes untouchability?",a:"Article 17"},{q:"What is the full form of GDP?",a:"Gross Domestic Product - total value of goods and services produced in a country"}],
+  "English Language":[{q:"What is a synonym for 'Ubiquitous'?",a:"Omnipresent, found everywhere"},{q:"Identify the error: 'Each of the boys have their own book.'",a:"'have' should be 'has' — 'Each' takes a singular verb"},{q:"What does the idiom 'Burn the midnight oil' mean?",a:"To work or study late into the night"}],
+  "Reasoning":[{q:"In a coding scheme, COMPUTER is written as RFUVQNPC. How is MEDICINE written?",a:"FOJDJEFN (each letter shifted by a pattern)"},{q:"Pointing to a man, a woman says 'His mother is the only daughter of my mother.' How is the woman related to the man?",a:"The woman is the man's mother"},{q:"Complete: 2, 6, 12, 20, 30, ?",a:"42 (differences are 4,6,8,10,12 — pattern of +2)"}],
+  "Indian History":[{q:"When did the Battle of Plassey take place?",a:"1757 — Robert Clive defeated Siraj ud-Daulah"},{q:"Who started the Bhakti Movement in South India?",a:"Alvars and Nayanars (7th-12th century)"},{q:"What was the Rowlatt Act of 1919?",a:"Allowed detention without trial; led to Jallianwala Bagh massacre"}],
+  "Indian Polity":[{q:"How many Fundamental Rights are there in the Indian Constitution?",a:"6 Fundamental Rights (originally 7, Right to Property removed by 44th Amendment)"},{q:"What is Article 370?",a:"Granted special autonomous status to Jammu & Kashmir (abrogated in 2019)"},{q:"Who appoints the Chief Justice of India?",a:"The President of India"}],
+  "Geography":[{q:"What is the longest river in India?",a:"Ganga (2,525 km within India)"},{q:"Which is the largest state of India by area?",a:"Rajasthan (342,239 sq km)"},{q:"What causes Monsoon in India?",a:"Differential heating of land and sea, ITCZ shift, and Somali Jet Stream"}],
+  "Economics":[{q:"What is Fiscal Deficit?",a:"Total expenditure minus total receipts excluding borrowings. It indicates government borrowing."},{q:"What is Repo Rate?",a:"Rate at which RBI lends money to commercial banks for short term"},{q:"What is GST?",a:"Goods and Services Tax — unified indirect tax replacing multiple state and central taxes"}],
+  "Mathematics":[{q:"What is the formula for the area of a circle?",a:"A = πr², where r is the radius"},{q:"If a train 200m long crosses a pole in 10 seconds, what is its speed?",a:"Speed = 200/10 = 20 m/s = 72 km/h"},{q:"What is the LCM of 12, 15, and 20?",a:"60"}]
+};
+
+const ICONS={"Quantitative":"🔢","Mathematics":"🔢","General Awareness":"🌍","English":"📝","Reasoning":"🧩","Indian History":"🏛️","Indian Polity":"⚖️","Geography":"🗺️","Economics":"📈","General Science":"🔬","Current Affairs":"📰","CSAT":"🧠","Computer":"💻","Banking":"🏦","General Studies":"📚","General Intelligence":"🧩"};
+function gIcon(n){for(const[k,v]of Object.entries(ICONS))if(n.includes(k))return v;return"📘"}
+
+// ═══ DB ═══
+const DB={get(k){try{return JSON.parse(localStorage.getItem('gp_'+k))}catch{return null}},set(k,v){localStorage.setItem('gp_'+k,JSON.stringify(v))},rm(k){localStorage.removeItem('gp_'+k)}};
+
+let U=null,curScreen='login',onbStep=1,selExam='',subRatings={},studyStyle='balanced';
+let planView='schedule',planFilter='all',curLeague='all';
+let pomoInterval=null,pomoTime=25*60,pomoRunning=false,pomoSession=1;
+let radarChart=null,fcIndex=0,fcFlipped=false;
+
+// ═══ THEME ═══
+function toggleTheme(){const h=document.documentElement,n=h.getAttribute('data-theme')==='dark'?'light':'dark';h.setAttribute('data-theme',n);DB.set('theme',n);if(radarChart)renderRadar()}
+(function(){const t=DB.get('theme');if(t)document.documentElement.setAttribute('data-theme',t)})();
+
+// ═══ INIT ═══
+function init(){const id=DB.get('currentUser');if(id){const us=DB.get('users')||{};if(us[id]){U=us[id];if(!U.onboarded){showScreen('onboarding');renderOnb()}else{showScreen('home');renderHome()}return}}showScreen('login')}
+
+function showScreen(n){curScreen=n;document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const e=document.getElementById('screen-'+n);if(e)e.classList.add('active');const nav=document.getElementById('bottom-nav'),ms=['home','plan','progress','leaderboard'];nav.style.display=(U&&U.onboarded&&ms.includes(n))?'flex':'none';if(ms.includes(n))nav.querySelectorAll('button').forEach((b,i)=>b.classList.toggle('active',ms[i]===n))}
+
+function navigate(n){showScreen(n);if(n==='home')renderHome();else if(n==='plan')renderPlan();else if(n==='progress')renderProgress();else if(n==='leaderboard')renderLeaderboard()}
+
+// ═══ AUTH ═══
+function handleLogin(){const em=document.getElementById('login-email').value.trim(),pw=document.getElementById('login-password').value,e=document.getElementById('login-error');e.style.display='none';if(!em||!pw){e.textContent='Please fill all fields';e.style.display='block';return}const us=DB.get('users')||{},u=Object.values(us).find(u=>u.email===em);if(!u||u.password!==pw){e.textContent='Invalid credentials';e.style.display='block';return}U=u;DB.set('currentUser',u.id);if(!u.onboarded){showScreen('onboarding');renderOnb()}else{showScreen('home');renderHome()}}
+function handleRegister(){const nm=document.getElementById('reg-name').value.trim(),em=document.getElementById('reg-email').value.trim(),pw=document.getElementById('reg-password').value,e=document.getElementById('register-error');e.style.display='none';if(!nm||!em||!pw){e.textContent='Please fill all fields';e.style.display='block';return}if(pw.length<6){e.textContent='Password min 6 characters';e.style.display='block';return}const us=DB.get('users')||{};if(Object.values(us).find(u=>u.email===em)){e.textContent='Email already registered';e.style.display='block';return}const id='u_'+Date.now(),u={id,name:nm,email:em,password:pw,targetExam:'',examDate:'',subjects:[],streak:{count:0,lastActiveDate:null},xp:0,badges:[],onboarded:false,dailyHours:4,studyStyle:'balanced',studyLog:{},pomoSessions:0,createdAt:new Date().toISOString()};us[id]=u;DB.set('users',us);U=u;DB.set('currentUser',id);showScreen('onboarding');renderOnb()}
+function handleLogout(){U=null;DB.rm('currentUser');document.getElementById('login-email').value='';document.getElementById('login-password').value='';showScreen('login')}
+
+// ═══ ONBOARDING (5 steps) ═══
+function renderOnb(){document.getElementById('exam-list').innerHTML=Object.keys(EXAMS).map(n=>`<button class="exam-opt" onclick="selectExam('${n}')">${n}</button>`).join('');onbStep=1;updOnb()}
+function selectExam(n){selExam=n;subRatings={};EXAMS[n].forEach(s=>{subRatings[s.name]='medium'});onbNext(2)}
+function onbNext(s){if(s===3&&!document.getElementById('exam-date-input').value)return;onbStep=s;updOnb();if(s===4)renderRatings()}
+function onbBack(s){onbStep=s;updOnb()}
+function updOnb(){document.getElementById('onb-step').textContent=`STEP ${onbStep} OF 5`;document.getElementById('onb-fill').style.width=`${(onbStep/5)*100}%`;for(let i=1;i<=5;i++)document.getElementById('onb-'+i).style.display=i===onbStep?'block':'none';if(onbStep===2)document.getElementById('exam-date-input').min=new Date().toISOString().split('T')[0]}
+function renderRatings(){document.getElementById('rating-list').innerHTML=EXAMS[selExam].map(s=>`<div class="r-card"><div class="sn">${gIcon(s.name)} ${s.name}</div><div class="r-btns">${['weak','medium','strong'].map(r=>`<button class="r-btn ${r} ${subRatings[s.name]===r?'sel':''}" onclick="setRating('${s.name}','${r}')">${r}</button>`).join('')}</div></div>`).join('')}
+function setRating(s,r){subRatings[s]=r;renderRatings()}
+function setStyle(s){studyStyle=s;document.querySelectorAll('#onb-5 .exam-opt').forEach(b=>b.style.borderColor='var(--glass-border)');event.target.closest('.exam-opt').style.borderColor='var(--accent)'}
+function completeOnboarding(){const ed=document.getElementById('exam-date-input').value,hrs=parseInt(document.getElementById('hours-slider').value);U.targetExam=selExam;U.examDate=ed;U.dailyHours=hrs;U.studyStyle=studyStyle;U.subjects=Object.entries(subRatings).map(([n,r])=>({name:n,selfRating:r,weight:r==='weak'?3:r==='medium'?2:1}));U.onboarded=true;U.studyLog={};if(Math.ceil((new Date(ed)-new Date())/864e5)>=180&&!U.badges.includes('Early Bird'))U.badges.push('Early Bird');saveU();genPlan();initProgress();showScreen('home');renderHome()}
+
+// ═══ SAVE ═══
+function saveU(){const us=DB.get('users')||{};us[U.id]=U;DB.set('users',us)}
+
+// ═══ PLAN GENERATOR ═══
+function genPlan(){const today=new Date();today.setHours(0,0,0,0);const ed=new Date(U.examDate);ed.setHours(0,0,0,0);const total=Math.max(1,Math.ceil((ed-today)/864e5));const pool=[];const weights=U.studyStyle==='weakness'?{weak:5,medium:2,strong:1}:U.studyStyle==='revision'?{weak:3,medium:3,strong:2}:{weak:3,medium:2,strong:1};U.subjects.forEach(s=>{const w=s.weight||(weights[s.selfRating]||2);for(let i=0;i<w;i++)pool.push(s.name)});const intensity=DB.get('intensity_'+U.id)||Math.min(U.subjects.length,Math.ceil(U.dailyHours/2));const days=[];let pi=0;for(let d=0;d<total;d++){const dt=new Date(today);dt.setDate(today.getDate()+d);const cnt=d%3===0?intensity:Math.max(1,intensity-1);const subs=new Set();for(let s=0;s<cnt;s++){subs.add(pool[pi%pool.length]);pi++}const subTopics={};subs.forEach(sub=>{const es=EXAMS[U.targetExam].find(e=>e.name===sub);if(es){const tc=Math.min(3,es.topics.length),si=(d*3)%es.topics.length,topics=[];for(let t=0;t<tc;t++)topics.push({name:es.topics[(si+t)%es.topics.length],done:false});subTopics[sub]=topics}});days.push({date:dt.toISOString().split('T')[0],subjects:Array.from(subs),topics:subTopics,status:'upcoming'})}DB.set('plan_'+U.id,{days,generatedAt:new Date().toISOString()})}
+function getPlan(){const p=DB.get('plan_'+U.id);if(!p)return null;const today=todayStr();let ch=false;p.days.forEach(d=>{if(d.date<today&&d.status==='upcoming'){d.status='missed';ch=true}});if(ch)DB.set('plan_'+U.id,p);return p}
+function todayStr(){return new Date().toISOString().split('T')[0]}
+
+// ═══ PROGRESS ═══
+function initProgress(){const subs=EXAMS[U.targetExam].map(s=>({name:s.name,topics:s.topics.map(t=>({name:t,status:'not_started',lastUpdated:new Date().toISOString()}))}));DB.set('progress_'+U.id,{subjects:subs})}
+function getProgress(){return DB.get('progress_'+U.id)}
+function calcReady(p){if(!p)return 0;const a=p.subjects.flatMap(s=>s.topics);if(!a.length)return 0;const w={not_started:0,in_progress:.25,revised:.7,confident:1};return(a.reduce((s,t)=>s+(w[t.status]||0),0)/a.length)*100}
+function subjProg(s){const t=s.topics.length;if(!t)return 0;const w={not_started:0,in_progress:.25,revised:.7,confident:1};return Math.round((s.topics.reduce((a,tp)=>a+(w[tp.status]||0),0)/t)*100)}
+
+// ═══ GAMIFICATION ═══
+const DYNAMIC_BADGES=[
+  {id:'Night Owl',check:()=>{const h=new Date().getHours();return h>=22||h<5},desc:'Study after 10 PM'},
+  {id:'Early Riser',check:()=>new Date().getHours()<7,desc:'Study before 7 AM'},
+  {id:'Math Wizard',check:()=>{const p=getProgress();if(!p)return false;const m=p.subjects.find(s=>s.name.includes('Quant')||s.name.includes('Math'));return m&&subjProg(m)>=80},desc:'80%+ in Math/Quant'},
+  {id:'Pomo Master',check:()=>(U.pomoSessions||0)>=20,desc:'Complete 20 pomodoro sessions'},
+  {id:'Streak King',check:()=>(U.streak?.count||0)>=14,desc:'14-day streak'}
 ];
 
-const SUBJECT_ICONS = { "Quantitative": "🔢", "Mathematics": "🔢", "General Awareness": "🌍", "English": "📝", "Reasoning": "🧩", "Indian History": "🏛️", "Indian Polity": "⚖️", "Geography": "🗺️", "Economics": "📈", "General Science": "🔬", "Current Affairs": "📰", "CSAT": "🧠", "Computer": "💻", "Banking": "🏦", "General Studies": "📚", "General Intelligence": "🧩" };
-function getSubjectIcon(name) { for (const [k,v] of Object.entries(SUBJECT_ICONS)) { if (name.includes(k)) return v; } return "📘"; }
+function awardDay(subs){U.xp+=subs.length*10+50;const today=todayStr(),last=U.streak.lastActiveDate;if(last){const d=Math.floor((new Date(today)-new Date(last))/864e5);U.streak.count=d===1?U.streak.count+1:d>1?1:U.streak.count}else U.streak.count=1;U.streak.lastActiveDate=today;
+  // Log study day for heatmap
+  if(!U.studyLog)U.studyLog={};U.studyLog[today]=(U.studyLog[today]||0)+subs.length;
+  // Check badges
+  if(U.streak.count>=7&&!U.badges.includes('7-Day Streak')){U.badges.push('7-Day Streak');U.xp+=100}
+  if(U.streak.count>=30&&!U.badges.includes('30-Day Streak')){U.badges.push('30-Day Streak');U.xp+=100}
+  DYNAMIC_BADGES.forEach(b=>{if(!U.badges.includes(b.id)&&b.check()){U.badges.push(b.id);U.xp+=75}});
+  checkCovBadges();saveU()}
 
-// ─── DB ───
-const DB = {
-  get(key) { try { return JSON.parse(localStorage.getItem('gp_' + key)); } catch { return null; } },
-  set(key, val) { localStorage.setItem('gp_' + key, JSON.stringify(val)); },
-  remove(key) { localStorage.removeItem('gp_' + key); }
-};
+function checkCovBadges(){const p=getProgress();if(!p)return;const a=p.subjects.flatMap(s=>s.topics),t=a.length,c=a.filter(t=>t.status==='revised'||t.status==='confident').length,pct=t>0?(c/t)*100:0;if(pct>=50&&!U.badges.includes('50% Covered'))U.badges.push('50% Covered');if(pct>=100&&!U.badges.includes('100% Covered'))U.badges.push('100% Covered');saveU()}
 
-let currentUser = null, currentScreen = 'login', onbStep = 1, selectedExam = '', subjectRatings = {};
-let planView = 'schedule', planFilter = 'all';
+// ═══ POMODORO ═══
+function pomoToggle(){if(pomoRunning){clearInterval(pomoInterval);pomoRunning=false;document.getElementById('pomo-start').textContent='Resume';document.getElementById('pomo-start').className='pomo-btn start'}else{pomoRunning=true;document.getElementById('pomo-start').textContent='Pause';document.getElementById('pomo-start').className='pomo-btn pause';pomoInterval=setInterval(()=>{pomoTime--;if(pomoTime<=0){clearInterval(pomoInterval);pomoRunning=false;pomoSession++;U.pomoSessions=(U.pomoSessions||0)+1;if(!U.studyLog)U.studyLog={};U.studyLog[todayStr()]=(U.studyLog[todayStr()]||0)+1;U.xp+=25;DYNAMIC_BADGES.forEach(b=>{if(!U.badges.includes(b.id)&&b.check()){U.badges.push(b.id);U.xp+=75}});saveU();if(pomoSession%4===0){pomoTime=15*60;document.getElementById('pomo-start').textContent='Long Break'}else{pomoTime=5*60;document.getElementById('pomo-start').textContent='Short Break'}document.getElementById('pomo-start').className='pomo-btn start'}updPomo()},1000)}}
+function pomoReset(){clearInterval(pomoInterval);pomoRunning=false;pomoTime=25*60;pomoSession=1;document.getElementById('pomo-start').textContent='Start';document.getElementById('pomo-start').className='pomo-btn start';updPomo()}
+function updPomo(){const m=Math.floor(pomoTime/60),s=pomoTime%60;document.getElementById('pomo-time').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;document.getElementById('pomo-session').textContent=`Session ${pomoSession} of 4 · ${U?.pomoSessions||0} total completed`}
 
-// ─── THEME ───
-function toggleTheme() {
-  const html = document.documentElement;
-  const current = html.getAttribute('data-theme');
-  const next = current === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  DB.set('theme', next);
-}
-function loadTheme() {
-  const saved = DB.get('theme');
-  if (saved) document.documentElement.setAttribute('data-theme', saved);
-}
-loadTheme();
-
-// ─── INIT ───
-function init() {
-  const userId = DB.get('currentUser');
-  if (userId) {
-    const users = DB.get('users') || {};
-    if (users[userId]) {
-      currentUser = users[userId];
-      if (!currentUser.onboarded) { showScreen('onboarding'); renderOnboarding(); }
-      else { showScreen('home'); renderHome(); }
-      return;
-    }
-  }
-  showScreen('login');
-}
-
-function showScreen(name) {
-  currentScreen = name;
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const el = document.getElementById('screen-' + name);
-  if (el) el.classList.add('active');
-  const nav = document.getElementById('bottom-nav');
-  const ms = ['home','plan','progress','leaderboard'];
-  nav.style.display = (currentUser && currentUser.onboarded && ms.includes(name)) ? 'flex' : 'none';
-  if (ms.includes(name)) nav.querySelectorAll('button').forEach((b,i) => b.classList.toggle('active', ms[i]===name));
-}
-
-function navigate(name) {
-  showScreen(name);
-  if (name==='home') renderHome(); else if (name==='plan') renderPlan(); else if (name==='progress') renderProgress(); else if (name==='leaderboard') renderLeaderboard();
-}
-
-// ─── AUTH ───
-function handleLogin() {
-  const email = document.getElementById('login-email').value.trim(), password = document.getElementById('login-password').value;
-  const e = document.getElementById('login-error'); e.style.display='none';
-  if (!email||!password) { e.textContent='Please fill all fields'; e.style.display='block'; return; }
-  const users = DB.get('users')||{};
-  const user = Object.values(users).find(u=>u.email===email);
-  if (!user||user.password!==password) { e.textContent='Invalid credentials'; e.style.display='block'; return; }
-  currentUser=user; DB.set('currentUser',user.id);
-  if (!user.onboarded) { showScreen('onboarding'); renderOnboarding(); } else { showScreen('home'); renderHome(); }
-}
-function handleRegister() {
-  const name=document.getElementById('reg-name').value.trim(), email=document.getElementById('reg-email').value.trim(), password=document.getElementById('reg-password').value;
-  const e=document.getElementById('register-error'); e.style.display='none';
-  if (!name||!email||!password) { e.textContent='Please fill all fields'; e.style.display='block'; return; }
-  if (password.length<6) { e.textContent='Password must be at least 6 characters'; e.style.display='block'; return; }
-  const users=DB.get('users')||{};
-  if (Object.values(users).find(u=>u.email===email)) { e.textContent='Email already registered'; e.style.display='block'; return; }
-  const id='u_'+Date.now();
-  const user={id,name,email,password,targetExam:'',examDate:'',subjects:[],streak:{count:0,lastActiveDate:null},xp:0,badges:[],onboarded:false,createdAt:new Date().toISOString()};
-  users[id]=user; DB.set('users',users); currentUser=user; DB.set('currentUser',id);
-  showScreen('onboarding'); renderOnboarding();
-}
-function handleLogout() { currentUser=null; DB.remove('currentUser'); document.getElementById('login-email').value=''; document.getElementById('login-password').value=''; showScreen('login'); }
-
-// ─── ONBOARDING ───
-function renderOnboarding() {
-  document.getElementById('exam-list').innerHTML=Object.keys(EXAMS).map(n=>`<button class="exam-option" onclick="selectExam('${n}')">${n}</button>`).join('');
-  onbStep=1; updateOnbUI();
-}
-function selectExam(n) { selectedExam=n; subjectRatings={}; EXAMS[n].forEach(s=>{subjectRatings[s.name]='medium';}); onbNext(2); }
-function onbNext(s) { if(s===3&&!document.getElementById('exam-date-input').value) return; onbStep=s; updateOnbUI(); if(s===3) renderRatings(); }
-function onbBack(s) { onbStep=s; updateOnbUI(); }
-function updateOnbUI() {
-  document.getElementById('onb-step-label').textContent=`STEP ${onbStep} OF 3`;
-  document.getElementById('onb-progress-fill').style.width=`${(onbStep/3)*100}%`;
-  document.getElementById('onb-step-1').style.display=onbStep===1?'block':'none';
-  document.getElementById('onb-step-2').style.display=onbStep===2?'block':'none';
-  document.getElementById('onb-step-3').style.display=onbStep===3?'block':'none';
-  document.getElementById('exam-date-input').min=new Date().toISOString().split('T')[0];
-}
-function renderRatings() {
-  document.getElementById('rating-list').innerHTML=EXAMS[selectedExam].map(s=>`
-    <div class="rating-card"><div class="subject-name">${getSubjectIcon(s.name)} ${s.name}</div>
-    <div class="rating-btns">${['weak','medium','strong'].map(r=>`<button class="rating-btn ${r} ${subjectRatings[s.name]===r?'selected':''}" onclick="setRating('${s.name}','${r}')">${r}</button>`).join('')}</div></div>`).join('');
-}
-function setRating(s,r) { subjectRatings[s]=r; renderRatings(); }
-function completeOnboarding() {
-  const ed=document.getElementById('exam-date-input').value;
-  currentUser.targetExam=selectedExam; currentUser.examDate=ed;
-  currentUser.subjects=Object.entries(subjectRatings).map(([n,r])=>({name:n,selfRating:r,weight:r==='weak'?3:r==='medium'?2:1}));
-  currentUser.onboarded=true;
-  if (Math.ceil((new Date(ed)-new Date())/86400000)>=180&&!currentUser.badges.includes('Early Bird')) currentUser.badges.push('Early Bird');
-  saveUser(); generatePlan(); initProgress();
-  showScreen('home'); renderHome();
-}
-
-// ─── PLAN GENERATOR ───
-function generatePlan() {
-  const today=new Date(); today.setHours(0,0,0,0);
-  const examDate=new Date(currentUser.examDate); examDate.setHours(0,0,0,0);
-  const totalDays=Math.max(1,Math.ceil((examDate-today)/86400000));
-  const pool=[];
-  currentUser.subjects.forEach(s=>{ const w=s.weight||({weak:3,medium:2,strong:1}[s.selfRating]||2); for(let i=0;i<w;i++) pool.push(s.name); });
-  const days=[]; let pi=0;
-  // Get intensity (default 2-3 subjects/day)
-  const intensity = DB.get('intensity_'+currentUser.id) || 3;
-  for (let d=0;d<totalDays;d++) {
-    const date=new Date(today); date.setDate(today.getDate()+d);
-    const count = d%3===0 ? intensity : Math.max(1, intensity-1);
-    const subs=new Set();
-    for(let s=0;s<count;s++) { subs.add(pool[pi%pool.length]); pi++; }
-    // Assign topics for each subject
-    const subTopics = {};
-    subs.forEach(sub => {
-      const examSubject = EXAMS[currentUser.targetExam].find(e=>e.name===sub);
-      if (examSubject) {
-        const topicCount = Math.min(3, examSubject.topics.length);
-        const startIdx = (d * 3) % examSubject.topics.length;
-        const topics = [];
-        for (let t=0;t<topicCount;t++) topics.push({ name: examSubject.topics[(startIdx+t)%examSubject.topics.length], done: false });
-        subTopics[sub] = topics;
-      }
-    });
-    days.push({ date: date.toISOString().split('T')[0], subjects: Array.from(subs), topics: subTopics, status: 'upcoming' });
-  }
-  DB.set('plan_'+currentUser.id, { days, generatedAt: new Date().toISOString() });
-}
-
-function getPlan() {
-  const plan=DB.get('plan_'+currentUser.id); if(!plan) return null;
-  const today=todayStr(); let changed=false;
-  plan.days.forEach(d=>{ if(d.date<today&&d.status==='upcoming'){d.status='missed';changed=true;} });
-  if(changed) DB.set('plan_'+currentUser.id,plan);
-  return plan;
-}
-function todayStr() { return new Date().toISOString().split('T')[0]; }
-
-// ─── PROGRESS ───
-function initProgress() {
-  const subjects=EXAMS[currentUser.targetExam].map(s=>({name:s.name,topics:s.topics.map(t=>({name:t,status:'not_started',lastUpdated:new Date().toISOString()}))}));
-  DB.set('progress_'+currentUser.id,{subjects});
-}
-function getProgress() { return DB.get('progress_'+currentUser.id); }
-function calcReadiness(p) { if(!p) return 0; const a=p.subjects.flatMap(s=>s.topics); if(!a.length) return 0; const w={not_started:0,in_progress:0.25,revised:0.7,confident:1}; return (a.reduce((s,t)=>s+(w[t.status]||0),0)/a.length)*100; }
-function subjectProgress(s) { const t=s.topics.length; if(!t) return 0; const w={not_started:0,in_progress:0.25,revised:0.7,confident:1}; return Math.round((s.topics.reduce((a,tp)=>a+(w[tp.status]||0),0)/t)*100); }
-function saveUser() { const u=DB.get('users')||{}; u[currentUser.id]=currentUser; DB.set('users',u); }
-
-// ─── GAMIFICATION ───
-function awardDayDone(subs) {
-  currentUser.xp+=subs.length*10+50;
-  const today=todayStr(), last=currentUser.streak.lastActiveDate;
-  if(last){const d=Math.floor((new Date(today)-new Date(last))/86400000);currentUser.streak.count=d===1?currentUser.streak.count+1:d>1?1:currentUser.streak.count;}
-  else currentUser.streak.count=1;
-  currentUser.streak.lastActiveDate=today;
-  if(currentUser.streak.count>=7&&!currentUser.badges.includes('7-Day Streak')){currentUser.badges.push('7-Day Streak');currentUser.xp+=100;}
-  if(currentUser.streak.count>=30&&!currentUser.badges.includes('30-Day Streak')){currentUser.badges.push('30-Day Streak');currentUser.xp+=100;}
-  saveUser();
-}
-function checkCoverageBadges() {
-  const p=getProgress(); if(!p) return;
-  const a=p.subjects.flatMap(s=>s.topics), t=a.length, c=a.filter(t=>t.status==='revised'||t.status==='confident').length, pct=t>0?(c/t)*100:0;
-  if(pct>=50&&!currentUser.badges.includes('50% Covered')) currentUser.badges.push('50% Covered');
-  if(pct>=100&&!currentUser.badges.includes('100% Covered')) currentUser.badges.push('100% Covered');
-  saveUser();
-}
-
-// ─── RENDER: HOME ───
-function renderHome() {
-  const progress=getProgress(), plan=getPlan(), readiness=calcReadiness(progress);
-  const h=new Date().getHours();
+// ═══ RENDER: HOME ═══
+function renderHome(){
+  const p=getProgress(),plan=getPlan(),ready=calcReady(p),h=new Date().getHours();
   document.getElementById('home-greeting').textContent=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
-  document.getElementById('home-name').textContent=currentUser.name.split(' ')[0];
-  document.getElementById('home-exam').textContent=currentUser.targetExam;
-  document.getElementById('days-left').textContent=Math.max(0,Math.ceil((new Date(currentUser.examDate)-new Date())/86400000));
-  document.getElementById('home-streak').textContent=currentUser.streak.count||0;
-  document.getElementById('home-xp').textContent=currentUser.xp||0;
-  document.getElementById('home-ready').textContent=Math.round(readiness)+'%';
-  const rPct=Math.round(readiness);
-  document.getElementById('readiness-pct').textContent=rPct+'%';
-  const rFill=document.getElementById('readiness-fill');
-  rFill.style.background=rPct>=70?'linear-gradient(90deg,#22c55e,#4ade80)':rPct>=40?'linear-gradient(90deg,#f59e0b,#fbbf24)':'var(--gradient-1)';
-  setTimeout(()=>{rFill.style.width=rPct+'%';},100);
-  drawRing(readiness);
+  document.getElementById('home-name').textContent=U.name.split(' ')[0];
+  document.getElementById('home-exam').textContent=U.targetExam;
+  document.getElementById('days-left').textContent=Math.max(0,Math.ceil((new Date(U.examDate)-new Date())/864e5));
+  document.getElementById('home-streak').textContent=U.streak.count||0;
+  document.getElementById('home-xp').textContent=U.xp||0;
+  const rP=Math.round(ready);
+  document.getElementById('r-pct').textContent=rP+'%';
+  const rF=document.getElementById('r-fill');
+  rF.style.background=rP>=70?'linear-gradient(90deg,#22c55e,#4ade80)':rP>=40?'linear-gradient(90deg,#f59e0b,#fbbf24)':'var(--gradient-accent)';
+  setTimeout(()=>{rF.style.width=rP+'%'},100);
+  drawRing(ready);updPomo();
   // Tasks
-  const today=todayStr(), todayPlan=plan?.days.find(d=>d.date===today), tasksEl=document.getElementById('today-tasks');
-  if(todayPlan){
-    let html=todayPlan.subjects.map(s=>`<div class="task-item ${todayPlan.status==='done'?'done':''}"><div class="task-icon">${getSubjectIcon(s)}</div><span class="task-name">${s}</span>${todayPlan.status==='done'?'<span class="task-done-mark">✓</span>':''}</div>`).join('');
-    if(todayPlan.status!=='done') html+=`<button class="btn-complete" onclick="markTodayDone()">Complete Today's Study ✓</button>`;
+  const today=todayStr(),tp=plan?.days.find(d=>d.date===today),te=document.getElementById('today-tasks');
+  if(tp){let html=tp.subjects.map(s=>`<div class="task ${tp.status==='done'?'done':''}"><div class="task-icon">${gIcon(s)}</div><span class="task-name">${s}</span>${tp.status==='done'?'<span class="task-check">✓</span>':''}</div>`).join('');
+    if(tp.status!=='done')html+=`<button class="btn-done" onclick="markToday()">Complete Today ✓</button>`;
     else html+=`<div class="done-msg">🎉 Great work today!</div>`;
-    tasksEl.innerHTML=html;
-  } else tasksEl.innerHTML='<div class="empty-state" style="padding:24px;"><div class="empty-icon">✨</div>No tasks for today</div>';
+    te.innerHTML=html}else te.innerHTML='<div class="empty-s" style="padding:20px"><div class="empty-i">✨</div>No tasks today</div>';
+  // Heatmap
+  renderHeatmap();
   // Badges
   const be=document.getElementById('home-badges');
-  be.innerHTML=currentUser.badges.length>0?`<div class="section-header" style="margin-top:24px;"><span class="section-title">Achievements</span></div><div class="badge-row">${currentUser.badges.map(b=>`<span class="badge-item">🏅 ${b}</span>`).join('')}</div>`:'';
-  // Quote
+  be.innerHTML=U.badges.length>0?`<div class="sec-header" style="margin-top:16px"><span class="sec-title">Achievements</span><span class="sec-link">${U.badges.length} earned</span></div><div class="badge-row">${U.badges.map(b=>`<span class="badge-item">🏅 ${b}</span>`).join('')}</div>`:'';
   const q=QUOTES[Math.floor(Math.random()*QUOTES.length)];
-  document.getElementById('quote-text').textContent=`"${q.text}"`; document.getElementById('quote-author').textContent=`— ${q.author}`;
-}
+  document.getElementById('quote-text').textContent=`"${q.text}"`;document.getElementById('quote-author').textContent=`— ${q.author}`}
 
-function drawRing(pct) {
-  const size=80,sw=6,r=(size-sw)/2,circ=r*2*Math.PI,offset=circ-(pct/100)*circ;
-  const color=pct>=70?'#22c55e':pct>=40?'#f59e0b':'#6366f1';
-  document.getElementById('ring-svg').innerHTML=`<circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="var(--glass-border)" stroke-width="${sw}" fill="none"/><circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="${color}" stroke-width="${sw}" fill="none" stroke-dasharray="${circ}" stroke-dashoffset="${offset}" stroke-linecap="round" transform="rotate(-90 ${size/2} ${size/2})" style="transition:stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1)"/><text x="${size/2}" y="${size/2+4}" text-anchor="middle" fill="${color}" font-size="16" font-weight="800" font-family="Inter">${Math.round(pct)}%</text>`;
-}
+function drawRing(pct){const sz=72,sw=5,r=(sz-sw)/2,c=r*2*Math.PI,o=c-(pct/100)*c,col=pct>=70?'#22c55e':pct>=40?'#f59e0b':'#7c3aed';document.getElementById('ring-svg').innerHTML=`<circle cx="${sz/2}" cy="${sz/2}" r="${r}" stroke="var(--glass-border)" stroke-width="${sw}" fill="none"/><circle cx="${sz/2}" cy="${sz/2}" r="${r}" stroke="${col}" stroke-width="${sw}" fill="none" stroke-dasharray="${c}" stroke-dashoffset="${o}" stroke-linecap="round" transform="rotate(-90 ${sz/2} ${sz/2})" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/><text x="${sz/2}" y="${sz/2+4}" text-anchor="middle" fill="${col}" font-size="15" font-weight="800" font-family="Inter">${Math.round(pct)}%</text>`}
 
-function markTodayDone() {
-  const plan=getPlan(); if(!plan) return;
-  const day=plan.days.find(d=>d.date===todayStr()); if(!day) return;
-  day.status='done'; DB.set('plan_'+currentUser.id,plan); awardDayDone(day.subjects); renderHome();
-}
+function markToday(){const plan=getPlan();if(!plan)return;const day=plan.days.find(d=>d.date===todayStr());if(!day)return;day.status='done';DB.set('plan_'+U.id,plan);awardDay(day.subjects);renderHome()}
 
-// ═══════════════════════════════════════
-// RENDER: PLAN (ADVANCED)
-// ═══════════════════════════════════════
-function renderPlan() {
-  const plan=getPlan();
-  if(!plan){document.getElementById('plan-schedule-view').innerHTML='<div class="empty-state"><div class="empty-icon">📅</div>No plan yet</div>';return;}
+// ═══ HEATMAP ═══
+function renderHeatmap(){
+  const grid=document.getElementById('heatmap');
+  const today=new Date();today.setHours(0,0,0,0);
+  // Show 7 weeks (49 days)
+  const cells=[];
+  const startDay=new Date(today);startDay.setDate(startDay.getDate()-48);
+  // Align to Monday
+  while(startDay.getDay()!==1)startDay.setDate(startDay.getDate()-1);
+  const todayStr2=todayStr();
+  const log=U.studyLog||{};
+  const endDate=new Date(today);endDate.setDate(endDate.getDate()+6);
+  let html='';
+  const cur=new Date(startDay);
+  while(cur<=endDate){const ds=cur.toISOString().split('T')[0];const val=log[ds]||0;const isToday=ds===todayStr2;
+    let lvl='';if(val>=4)lvl='l4';else if(val>=3)lvl='l3';else if(val>=2)lvl='l2';else if(val>=1)lvl='l1';
+    html+=`<div class="hm-cell ${lvl} ${isToday?'today':''}" title="${ds}: ${val} activities"></div>`;
+    cur.setDate(cur.getDate()+1)}
+  grid.innerHTML=html;
+  const monthNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('hm-month').textContent=monthNames[today.getMonth()]+' '+today.getFullYear()}
 
-  const done=plan.days.filter(d=>d.status==='done').length;
-  const missed=plan.days.filter(d=>d.status==='missed').length;
-  const upcoming=plan.days.filter(d=>d.status==='upcoming').length;
-  const pct=plan.days.length>0?Math.round((done/plan.days.length)*100):0;
+// ═══ RENDER: PLAN ═══
+function renderPlan(){
+  const plan=getPlan();if(!plan){document.getElementById('plan-schedule').innerHTML='<div class="empty-s"><div class="empty-i">📅</div>No plan yet</div>';return}
+  const done=plan.days.filter(d=>d.status==='done').length,missed=plan.days.filter(d=>d.status==='missed').length,upcoming=plan.days.filter(d=>d.status==='upcoming').length,pct=plan.days.length>0?Math.round((done/plan.days.length)*100):0;
+  document.getElementById('plan-total').textContent=`${done}/${plan.days.length} days (${pct}%)`;
+  document.getElementById('plan-stats').innerHTML=`<div class="ps-item"><div class="ps-num green">${done}</div><div class="ps-label">Done</div></div><div class="ps-item"><div class="ps-num red">${missed}</div><div class="ps-label">Missed</div></div><div class="ps-item"><div class="ps-num blue">${upcoming}</div><div class="ps-label">Left</div></div><div class="ps-item"><div class="ps-num orange">${pct}%</div><div class="ps-label">Progress</div></div>`;
+  const allSubs=[...new Set(plan.days.flatMap(d=>d.subjects))];
+  document.getElementById('plan-filters').innerHTML=`<button class="pf ${planFilter==='all'?'active':''}" onclick="setPF('all')">All</button><button class="pf ${planFilter==='today'?'active':''}" onclick="setPF('today')">Today</button><button class="pf ${planFilter==='upcoming'?'active':''}" onclick="setPF('upcoming')">Upcoming</button><button class="pf ${planFilter==='done'?'active':''}" onclick="setPF('done')">Done</button><button class="pf ${planFilter==='missed'?'active':''}" onclick="setPF('missed')">Missed</button>${allSubs.map(s=>`<button class="pf ${planFilter===s?'active':''}" onclick="setPF('${s}')">${gIcon(s)} ${s.split(' ')[0]}</button>`).join('')}`;
+  ['tab-sched','tab-syl','tab-flash'].forEach(t=>document.getElementById(t).classList.toggle('active',t==='tab-'+planView.substring(0,5)));
+  document.getElementById('plan-schedule').style.display=planView==='schedule'?'block':'none';
+  document.getElementById('plan-syllabus').style.display=planView==='syllabus'?'block':'none';
+  document.getElementById('plan-flash').style.display=planView==='flash'?'block':'none';
+  if(planView==='schedule')renderSchedule(plan);else if(planView==='syllabus')renderSyllabus();else renderFlashcards()}
 
-  document.getElementById('plan-total').textContent=`${done} of ${plan.days.length} days completed (${pct}%)`;
+function renderSchedule(plan){
+  const today=todayStr(),cutoff=new Date();cutoff.setDate(cutoff.getDate()-7);const cs=cutoff.toISOString().split('T')[0];
+  let vis=plan.days.filter(d=>d.date>=cs);
+  if(planFilter==='today')vis=plan.days.filter(d=>d.date===today);
+  else if(planFilter==='upcoming')vis=plan.days.filter(d=>d.status==='upcoming');
+  else if(planFilter==='done')vis=plan.days.filter(d=>d.status==='done').slice(-20);
+  else if(planFilter==='missed')vis=plan.days.filter(d=>d.status==='missed');
+  else if(planFilter!=='all')vis=vis.filter(d=>d.subjects.includes(planFilter));
+  if(!vis.length){document.getElementById('plan-schedule').innerHTML='<div class="empty-s" style="padding:24px"><div class="empty-i">📋</div>No matching days</div>';return}
+  document.getElementById('plan-schedule').innerHTML=vis.map((d,i)=>{
+    const isT=d.date===today,cls=d.status==='done'?'done':d.status==='missed'?'missed':isT?'today':'';
+    const dl=new Date(d.date+'T00:00:00').toLocaleDateString('en-IN',{weekday:'short',month:'short',day:'numeric'});
+    let st=d.status==='done'?'<span class="pd-status done">✓ Done</span>':d.status==='missed'?'<span class="pd-status missed">✗ Missed</span>':'<span class="pd-status upcoming">○ Upcoming</span>';
+    let act='';if(isT&&d.status==='upcoming')act=`<div class="pd-actions"><button class="btn-md" onclick="event.stopPropagation();markPD('${d.date}','done')">Done ✓</button><button class="btn-sk" onclick="event.stopPropagation();markPD('${d.date}','missed')">Skip</button></div>`;
+    let det='';if(d.topics)det=`<div class="pd-detail">${Object.entries(d.topics).map(([sub,tops])=>`<div style="font-size:11px;font-weight:600;color:var(--accent-light);margin:6px 0 3px">${gIcon(sub)} ${sub}</div>${tops.map((t,ti)=>`<div class="pd-topic"><span class="pd-tn">${t.name}</span><div class="pd-tc ${t.done?'checked':''}" onclick="event.stopPropagation();togglePT('${d.date}','${sub}',${ti})">${t.done?'✓':''}</div></div>`).join('')}`).join('')}</div>`;
+    return `<div class="pd ${cls}" id="pd-${i}" onclick="document.getElementById('pd-${i}').classList.toggle('expanded')"><div class="pd-header"><div class="pd-date">${dl}${isT?'<span class="td-badge">TODAY</span>':''}</div>${st}</div><div class="pd-subs">${d.subjects.map(s=>`<span class="pd-tag">${gIcon(s)} ${s}</span>`).join('')}</div>${act}${det}</div>`}).join('')}
 
-  // Stats bar
-  document.getElementById('plan-stats-bar').innerHTML=`
-    <div class="plan-stat"><div class="plan-stat-num green">${done}</div><div class="plan-stat-label">Done</div></div>
-    <div class="plan-stat"><div class="plan-stat-num red">${missed}</div><div class="plan-stat-label">Missed</div></div>
-    <div class="plan-stat"><div class="plan-stat-num blue">${upcoming}</div><div class="plan-stat-label">Upcoming</div></div>
-    <div class="plan-stat"><div class="plan-stat-num orange">${pct}%</div><div class="plan-stat-label">Progress</div></div>`;
+function renderSyllabus(){
+  if(!U)return;const exam=EXAMS[U.targetExam],prog=getProgress();
+  if(!exam||!prog){document.getElementById('plan-syllabus').innerHTML='<div class="empty-s"><div class="empty-i">📚</div>No data</div>';return}
+  document.getElementById('plan-syllabus').innerHTML=exam.map((sub,si)=>{
+    const ps=prog.subjects.find(s=>s.name===sub.name),pct=ps?subjProg(ps):0,dc=ps?ps.topics.filter(t=>t.status==='revised'||t.status==='confident').length:0;
+    return `<div class="syl-card" id="syl-${si}"><button class="syl-header" onclick="document.getElementById('syl-${si}').classList.toggle('open')"><div class="syl-name">${gIcon(sub.name)} ${sub.name}</div><span class="syl-cnt">${dc}/${sub.topics.length}</span><span class="syl-arrow">▼</span></button><div class="syl-body">${sub.topics.map((t,ti)=>{const ts=ps?.topics[ti]?.status||'not_started';return`<div class="syl-topic"><span class="syl-tn">${t}</span><select class="syl-sel ${ts}" onchange="updSylTopic(${si},${ti},this.value)"><option value="not_started" ${ts==='not_started'?'selected':''}>Not Started</option><option value="in_progress" ${ts==='in_progress'?'selected':''}>In Progress</option><option value="revised" ${ts==='revised'?'selected':''}>Revised</option><option value="confident" ${ts==='confident'?'selected':''}>Confident</option></select></div>`}).join('')}</div></div>`}).join('')}
 
-  // Filters
-  const allSubjects = [...new Set(plan.days.flatMap(d=>d.subjects))];
-  document.getElementById('plan-filters').innerHTML=`
-    <button class="plan-filter ${planFilter==='all'?'active':''}" onclick="setPlanFilter('all')">All</button>
-    <button class="plan-filter ${planFilter==='today'?'active':''}" onclick="setPlanFilter('today')">Today</button>
-    <button class="plan-filter ${planFilter==='upcoming'?'active':''}" onclick="setPlanFilter('upcoming')">Upcoming</button>
-    <button class="plan-filter ${planFilter==='done'?'active':''}" onclick="setPlanFilter('done')">Done</button>
-    <button class="plan-filter ${planFilter==='missed'?'active':''}" onclick="setPlanFilter('missed')">Missed</button>
-    ${allSubjects.map(s=>`<button class="plan-filter ${planFilter===s?'active':''}" onclick="setPlanFilter('${s}')">${getSubjectIcon(s)} ${s.split(' ')[0]}</button>`).join('')}`;
-
-  // View tabs
-  document.getElementById('tab-schedule').classList.toggle('active',planView==='schedule');
-  document.getElementById('tab-syllabus').classList.toggle('active',planView==='syllabus');
-  document.getElementById('plan-schedule-view').style.display=planView==='schedule'?'block':'none';
-  document.getElementById('plan-syllabus-view').style.display=planView==='syllabus'?'block':'none';
-
-  if(planView==='schedule') renderScheduleView(plan);
-  else renderSyllabusView();
-}
-
-function renderScheduleView(plan) {
-  const today=todayStr();
-  const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-7);
-  const cutoffStr=cutoff.toISOString().split('T')[0];
-
-  let visible=plan.days.filter(d=>d.date>=cutoffStr);
-  // Apply filter
-  if(planFilter==='today') visible=plan.days.filter(d=>d.date===today);
-  else if(planFilter==='upcoming') visible=plan.days.filter(d=>d.status==='upcoming');
-  else if(planFilter==='done') visible=plan.days.filter(d=>d.status==='done').slice(-20);
-  else if(planFilter==='missed') visible=plan.days.filter(d=>d.status==='missed');
-  else if(planFilter!=='all') visible=visible.filter(d=>d.subjects.includes(planFilter));
-
-  if(visible.length===0){
-    document.getElementById('plan-schedule-view').innerHTML='<div class="empty-state" style="padding:30px;"><div class="empty-icon">📋</div>No days match this filter</div>';
-    return;
-  }
-
-  document.getElementById('plan-schedule-view').innerHTML=visible.map((d,idx)=>{
-    const isToday=d.date===today;
-    const cls=d.status==='done'?'done':d.status==='missed'?'missed':isToday?'today':'';
-    const dateObj=new Date(d.date+'T00:00:00');
-    const dateLabel=dateObj.toLocaleDateString('en-IN',{weekday:'short',month:'short',day:'numeric'});
-    let statusHtml=d.status==='done'?'<span class="plan-status done">✓ Done</span>':d.status==='missed'?'<span class="plan-status missed">✗ Missed</span>':'<span class="plan-status upcoming">○ Upcoming</span>';
-
-    let actions='';
-    if(isToday&&d.status==='upcoming'){
-      actions=`<div class="plan-actions"><button class="btn-mark-done" onclick="event.stopPropagation();markPlanDay('${d.date}','done')">Done ✓</button><button class="btn-skip" onclick="event.stopPropagation();markPlanDay('${d.date}','missed')">Skip</button></div>`;
-    }
-
-    // Topic detail (expandable)
-    let topicDetail = '';
-    if (d.topics) {
-      const allTopics = Object.entries(d.topics).flatMap(([sub,topics])=>topics.map(t=>({...t,subject:sub})));
-      topicDetail = `<div class="plan-detail">${Object.entries(d.topics).map(([sub,topics])=>`
-        <div style="font-size:12px;font-weight:600;color:var(--accent-light);margin:8px 0 4px;">${getSubjectIcon(sub)} ${sub}</div>
-        ${topics.map((t,ti)=>`<div class="plan-topic-row">
-          <span class="plan-topic-name">${t.name}</span>
-          <div class="plan-topic-check ${t.done?'checked':''}" onclick="event.stopPropagation();togglePlanTopic('${d.date}','${sub}',${ti})">
-            ${t.done?'✓':''}
-          </div>
-        </div>`).join('')}`).join('')}</div>`;
-    }
-
-    return `<div class="plan-day ${cls}" id="plan-day-${idx}" onclick="togglePlanExpand(${idx})">
-      <div class="plan-header"><div class="plan-date">${dateLabel}${isToday?'<span class="today-badge">TODAY</span>':''}</div>${statusHtml}</div>
-      <div class="plan-subjects">${d.subjects.map(s=>`<span class="plan-subj-tag">${getSubjectIcon(s)} ${s}</span>`).join('')}</div>
-      ${actions}${topicDetail}
-    </div>`;
-  }).join('');
-}
-
-function renderSyllabusView() {
-  if(!currentUser) return;
-  const exam = EXAMS[currentUser.targetExam];
-  const progress = getProgress();
-  if(!exam||!progress){document.getElementById('plan-syllabus-view').innerHTML='<div class="empty-state"><div class="empty-icon">📚</div>No syllabus data</div>';return;}
-
-  document.getElementById('plan-syllabus-view').innerHTML=exam.map((sub,si)=>{
-    const progSub = progress.subjects.find(s=>s.name===sub.name);
-    const pct = progSub ? subjectProgress(progSub) : 0;
-    const topicCount = sub.topics.length;
-    const doneCount = progSub ? progSub.topics.filter(t=>t.status==='revised'||t.status==='confident').length : 0;
-
-    return `<div class="syllabus-card" id="syl-${si}">
-      <button class="syllabus-header" onclick="toggleSyllabus(${si})">
-        <div class="syllabus-name">${getSubjectIcon(sub.name)} ${sub.name}</div>
-        <span class="syllabus-count">${doneCount}/${topicCount}</span>
-        <span class="syllabus-arrow">▼</span>
-      </button>
-      <div class="syllabus-body">
-        ${sub.topics.map((t,ti)=>{
-          const topicStatus = progSub?.topics[ti]?.status || 'not_started';
-          const badgeClass = topicStatus==='not_started'?'stb-not':topicStatus==='in_progress'?'stb-prog':topicStatus==='revised'?'stb-rev':'stb-conf';
-          const badgeLabel = topicStatus==='not_started'?'Not Started':topicStatus==='in_progress'?'In Progress':topicStatus==='revised'?'Revised':'Confident';
-          return `<div class="syllabus-topic">
-            <span class="syllabus-topic-name">${t}</span>
-            <select class="topic-select ${topicStatus}" onchange="updateSyllabusTopic(${si},${ti},this.value)" style="font-size:11px;padding:4px 8px;">
-              <option value="not_started" ${topicStatus==='not_started'?'selected':''}>Not Started</option>
-              <option value="in_progress" ${topicStatus==='in_progress'?'selected':''}>In Progress</option>
-              <option value="revised" ${topicStatus==='revised'?'selected':''}>Revised</option>
-              <option value="confident" ${topicStatus==='confident'?'selected':''}>Confident</option>
-            </select>
-          </div>`;
-        }).join('')}
+// ═══ FLASHCARDS ═══
+function renderFlashcards(){
+  const exam=EXAMS[U.targetExam];if(!exam){document.getElementById('plan-flash').innerHTML='<div class="empty-s"><div class="empty-i">🃏</div>No flashcards</div>';return}
+  const allCards=[];exam.forEach(s=>{const cards=FLASHCARDS[s.name]||FLASHCARDS[Object.keys(FLASHCARDS).find(k=>s.name.includes(k))]||[];cards.forEach(c=>allCards.push({...c,subject:s.name}))});
+  if(!allCards.length){document.getElementById('plan-flash').innerHTML='<div class="empty-s"><div class="empty-i">🃏</div>No flashcards for this exam</div>';return}
+  if(fcIndex>=allCards.length)fcIndex=0;
+  const card=allCards[fcIndex];fcFlipped=false;
+  document.getElementById('plan-flash').innerHTML=`
+    <div class="fc-card" id="fc-card" onclick="document.getElementById('fc-card').classList.toggle('flipped')">
+      <div class="fc-inner">
+        <div class="fc-front"><div style="font-size:11px;color:var(--accent-light);margin-bottom:8px">${gIcon(card.subject)} ${card.subject}</div><div class="fc-q">${card.q}</div><div class="fc-hint">Tap to reveal answer</div></div>
+        <div class="fc-back"><div class="fc-a">${card.a}</div><div class="fc-hint">Tap to see question</div></div>
       </div>
-    </div>`;
-  }).join('');
-}
-
-function toggleSyllabus(si) { document.getElementById('syl-'+si).classList.toggle('open'); }
-function updateSyllabusTopic(si,ti,status) {
-  const p=getProgress(); p.subjects[si].topics[ti].status=status; p.subjects[si].topics[ti].lastUpdated=new Date().toISOString();
-  DB.set('progress_'+currentUser.id,p); currentUser.xp+=20; checkCoverageBadges(); saveUser(); renderSyllabusView();
-}
-
-function togglePlanExpand(idx) { document.getElementById('plan-day-'+idx).classList.toggle('expanded'); }
-function togglePlanTopic(date,sub,ti) {
-  const plan=getPlan(); if(!plan) return;
-  const day=plan.days.find(d=>d.date===date); if(!day||!day.topics||!day.topics[sub]) return;
-  day.topics[sub][ti].done = !day.topics[sub][ti].done;
-  // Check if all topics done -> auto-complete day
-  const allDone = Object.values(day.topics).every(topics=>topics.every(t=>t.done));
-  if(allDone && day.status==='upcoming') { day.status='done'; awardDayDone(day.subjects); }
-  DB.set('plan_'+currentUser.id,plan); renderPlan();
-}
-
-function setPlanView(v) { planView=v; renderPlan(); }
-function setPlanFilter(f) { planFilter=f; renderPlan(); }
-
-function markPlanDay(date,status) {
-  const plan=getPlan(); if(!plan) return;
-  const day=plan.days.find(d=>d.date===date); if(!day) return;
-  day.status=status;
-  if(status==='done') awardDayDone(day.subjects);
-  if(status==='missed') {
-    const upcoming=plan.days.filter(d=>d.status==='upcoming'&&d.date>date);
-    day.subjects.forEach((sub,i)=>{if(upcoming.length>0){const t=upcoming[i%upcoming.length];if(!t.subjects.includes(sub))t.subjects.push(sub);}});
-  }
-  DB.set('plan_'+currentUser.id,plan); renderPlan();
-}
-
-// ─── MODIFY PLAN MODAL ───
-function openModifyModal() {
-  document.getElementById('modify-modal').classList.add('open');
-  renderModalMenu();
-}
-function closeModal() { document.getElementById('modify-modal').classList.remove('open'); }
-document.getElementById('modify-modal').addEventListener('click', function(e) { if(e.target===this) closeModal(); });
-
-function renderModalMenu() {
-  document.getElementById('modal-content').innerHTML=`
-    <div class="modal-title">Modify Plan</div>
-    <div class="modal-sub">Customize your study plan</div>
-    <button class="modify-option" onclick="showIntensityEditor()">
-      <div class="modify-icon">⚡</div>
-      <div class="modify-text"><strong>Study Intensity</strong><span>Adjust subjects per day</span></div>
-    </button>
-    <button class="modify-option" onclick="showPriorityEditor()">
-      <div class="modify-icon">📊</div>
-      <div class="modify-text"><strong>Subject Priority</strong><span>Change weight of each subject</span></div>
-    </button>
-    <button class="modify-option" onclick="showDateEditor()">
-      <div class="modify-icon">📅</div>
-      <div class="modify-text"><strong>Change Exam Date</strong><span>Update your target date</span></div>
-    </button>
-    <button class="modify-option" onclick="confirmRegenPlan()">
-      <div class="modify-icon">🔄</div>
-      <div class="modify-text"><strong>Regenerate Plan</strong><span>Create a fresh plan from scratch</span></div>
-    </button>
-    <button class="btn-outline" style="width:100%;margin-top:12px;" onclick="closeModal()">Cancel</button>`;
-}
-
-function showIntensityEditor() {
-  const current = DB.get('intensity_'+currentUser.id) || 3;
-  document.getElementById('modal-content').innerHTML=`
-    <div class="modal-title">Study Intensity</div>
-    <div class="modal-sub">How many subjects per day?</div>
-    <div class="intensity-section">
-      <div class="intensity-label"><span>Subjects per day</span><span class="intensity-val" id="intensity-val">${current}</span></div>
-      <input type="range" min="1" max="5" value="${current}" id="intensity-slider" oninput="document.getElementById('intensity-val').textContent=this.value">
-      <div class="intensity-labels"><span>Light (1)</span><span>Balanced (3)</span><span>Intense (5)</span></div>
     </div>
-    <div class="btn-row">
-      <button class="btn-outline" onclick="renderModalMenu()">Back</button>
-      <button class="btn-glow" onclick="saveIntensity()">Apply & Regenerate</button>
-    </div>`;
-}
+    <div class="fc-nav"><button onclick="fcPrev(${allCards.length})">← Prev</button><button onclick="fcNext(${allCards.length})">Next →</button></div>
+    <div class="fc-progress">${fcIndex+1} of ${allCards.length} cards</div>`}
+function fcNext(total){fcIndex=(fcIndex+1)%total;renderFlashcards()}
+function fcPrev(total){fcIndex=(fcIndex-1+total)%total;renderFlashcards()}
 
-function saveIntensity() {
-  const val=parseInt(document.getElementById('intensity-slider').value);
-  DB.set('intensity_'+currentUser.id,val);
-  generatePlan(); closeModal(); renderPlan();
-}
+function updSylTopic(si,ti,status){const p=getProgress();p.subjects[si].topics[ti].status=status;p.subjects[si].topics[ti].lastUpdated=new Date().toISOString();DB.set('progress_'+U.id,p);U.xp+=20;checkCovBadges();saveU();renderSyllabus()}
+function togglePT(date,sub,ti){const plan=getPlan();if(!plan)return;const day=plan.days.find(d=>d.date===date);if(!day||!day.topics||!day.topics[sub])return;day.topics[sub][ti].done=!day.topics[sub][ti].done;const allDone=Object.values(day.topics).every(tops=>tops.every(t=>t.done));if(allDone&&day.status==='upcoming'){day.status='done';awardDay(day.subjects)}DB.set('plan_'+U.id,plan);renderPlan()}
+function setPlanView(v){planView=v;renderPlan()}
+function setPF(f){planFilter=f;renderPlan()}
+function markPD(date,status){const plan=getPlan();if(!plan)return;const day=plan.days.find(d=>d.date===date);if(!day)return;day.status=status;if(status==='done')awardDay(day.subjects);if(status==='missed'){const up=plan.days.filter(d=>d.status==='upcoming'&&d.date>date);day.subjects.forEach((sub,i)=>{if(up.length>0){const t=up[i%up.length];if(!t.subjects.includes(sub))t.subjects.push(sub)}})}DB.set('plan_'+U.id,plan);renderPlan()}
 
-function showPriorityEditor() {
-  document.getElementById('modal-content').innerHTML=`
-    <div class="modal-title">Subject Priority</div>
-    <div class="modal-sub">Higher weight = more study days allocated</div>
-    <div class="priority-list">${currentUser.subjects.map((s,i)=>`
-      <div class="priority-item">
-        <span style="font-size:16px;">${getSubjectIcon(s.name)}</span>
-        <span class="priority-name">${s.name}</span>
-        <div class="priority-weight">
-          <button onclick="changeWeight(${i},-1)">−</button>
-          <span class="weight-val" id="weight-${i}">${s.weight||2}</span>
-          <button onclick="changeWeight(${i},1)">+</button>
-        </div>
-      </div>`).join('')}
-    </div>
-    <div class="btn-row">
-      <button class="btn-outline" onclick="renderModalMenu()">Back</button>
-      <button class="btn-glow" onclick="savePriorities()">Apply & Regenerate</button>
-    </div>`;
-}
+// ═══ MODIFY MODAL ═══
+function openModifyModal(){document.getElementById('modify-modal').classList.add('open');renderModalMenu()}
+function closeModal(){document.getElementById('modify-modal').classList.remove('open')}
+document.getElementById('modify-modal').addEventListener('click',function(e){if(e.target===this)closeModal()});
+function renderModalMenu(){document.getElementById('modal-content').innerHTML=`<div class="m-title">Modify Plan</div><div class="m-sub">Customize your study plan</div><button class="mod-opt" onclick="showIntEditor()"><div class="mod-icon">⚡</div><div class="mod-text"><strong>Study Intensity</strong><span>Adjust subjects per day</span></div></button><button class="mod-opt" onclick="showPriEditor()"><div class="mod-icon">📊</div><div class="mod-text"><strong>Subject Priority</strong><span>Change weight per subject</span></div></button><button class="mod-opt" onclick="showDateEditor()"><div class="mod-icon">📅</div><div class="mod-text"><strong>Change Exam Date</strong><span>Update target date</span></div></button><button class="mod-opt" onclick="confirmRegen()"><div class="mod-icon">🔄</div><div class="mod-text"><strong>Regenerate Plan</strong><span>Fresh plan from scratch</span></div></button><button class="btn-out" style="width:100%;margin-top:10px" onclick="closeModal()">Cancel</button>`}
+function showIntEditor(){const cur=DB.get('intensity_'+U.id)||3;document.getElementById('modal-content').innerHTML=`<div class="m-title">Study Intensity</div><div class="m-sub">Subjects per day</div><div class="slider-section"><div class="slider-label"><span>Subjects/day</span><span class="slider-val" id="int-val">${cur}</span></div><input type="range" min="1" max="5" value="${cur}" id="int-slider" oninput="document.getElementById('int-val').textContent=this.value"><div class="slider-marks"><span>Light</span><span>Balanced</span><span>Intense</span></div></div><div class="btn-row"><button class="btn-out" onclick="renderModalMenu()">Back</button><button class="btn-glow" onclick="saveInt()">Apply</button></div>`}
+function saveInt(){DB.set('intensity_'+U.id,parseInt(document.getElementById('int-slider').value));genPlan();closeModal();renderPlan()}
+function showPriEditor(){document.getElementById('modal-content').innerHTML=`<div class="m-title">Subject Priority</div><div class="m-sub">Higher = more study days</div><div>${U.subjects.map((s,i)=>`<div class="pri-item"><span style="font-size:15px">${gIcon(s.name)}</span><span class="pri-name">${s.name}</span><div class="pri-wt"><button onclick="chgWt(${i},-1)">−</button><span class="wv" id="wt-${i}">${s.weight||2}</span><button onclick="chgWt(${i},1)">+</button></div></div>`).join('')}</div><div class="btn-row"><button class="btn-out" onclick="renderModalMenu()">Back</button><button class="btn-glow" onclick="savePri()">Apply</button></div>`}
+function chgWt(i,d){const e=document.getElementById('wt-'+i);e.textContent=Math.max(1,Math.min(5,parseInt(e.textContent)+d))}
+function savePri(){U.subjects.forEach((s,i)=>{s.weight=parseInt(document.getElementById('wt-'+i).textContent)});saveU();genPlan();closeModal();renderPlan()}
+function showDateEditor(){document.getElementById('modal-content').innerHTML=`<div class="m-title">Change Exam Date</div><div class="m-sub">Current: ${new Date(U.examDate).toLocaleDateString('en-IN',{year:'numeric',month:'long',day:'numeric'})}</div><div class="iw"><input type="date" id="new-ed" value="${U.examDate}" min="${new Date().toISOString().split('T')[0]}"/></div><div class="btn-row"><button class="btn-out" onclick="renderModalMenu()">Back</button><button class="btn-glow" onclick="saveDate()">Apply</button></div>`}
+function saveDate(){const d=document.getElementById('new-ed').value;if(!d)return;U.examDate=d;saveU();genPlan();closeModal();renderPlan()}
+function confirmRegen(){document.getElementById('modal-content').innerHTML=`<div class="m-title">Regenerate Plan?</div><div class="m-sub">New schedule, progress kept.</div><div class="btn-row"><button class="btn-out" onclick="renderModalMenu()">Cancel</button><button class="btn-glow" style="background:linear-gradient(135deg,#ef4444,#dc2626)" onclick="genPlan();closeModal();renderPlan()">Regenerate</button></div>`}
 
-function changeWeight(i,delta) {
-  const el=document.getElementById('weight-'+i);
-  let v=parseInt(el.textContent)+delta;
-  v=Math.max(1,Math.min(5,v));
-  el.textContent=v;
-}
-
-function savePriorities() {
-  currentUser.subjects.forEach((s,i)=>{
-    s.weight=parseInt(document.getElementById('weight-'+i).textContent);
-  });
-  saveUser(); generatePlan(); closeModal(); renderPlan();
-}
-
-function showDateEditor() {
-  document.getElementById('modal-content').innerHTML=`
-    <div class="modal-title">Change Exam Date</div>
-    <div class="modal-sub">Current: ${new Date(currentUser.examDate).toLocaleDateString('en-IN',{year:'numeric',month:'long',day:'numeric'})}</div>
-    <div class="input-wrap"><input type="date" id="new-exam-date" value="${currentUser.examDate}" min="${new Date().toISOString().split('T')[0]}" /></div>
-    <div class="btn-row">
-      <button class="btn-outline" onclick="renderModalMenu()">Back</button>
-      <button class="btn-glow" onclick="saveNewDate()">Apply & Regenerate</button>
-    </div>`;
-}
-
-function saveNewDate() {
-  const d=document.getElementById('new-exam-date').value;
-  if(!d) return;
-  currentUser.examDate=d; saveUser(); generatePlan(); closeModal(); renderPlan();
-}
-
-function confirmRegenPlan() {
-  document.getElementById('modal-content').innerHTML=`
-    <div class="modal-title">Regenerate Plan?</div>
-    <div class="modal-sub">This will create a completely new plan. Your progress tracking will be kept, but the daily schedule resets.</div>
-    <div class="btn-row">
-      <button class="btn-outline" onclick="renderModalMenu()">Cancel</button>
-      <button class="btn-glow" style="background:linear-gradient(135deg,#ef4444,#dc2626);" onclick="doRegenPlan()">Regenerate</button>
-    </div>`;
-}
-
-function doRegenPlan() { generatePlan(); closeModal(); renderPlan(); }
-
-// ─── RENDER: PROGRESS ───
-function renderProgress() {
-  const p=getProgress();
-  if(!p){document.getElementById('progress-list').innerHTML='<div class="empty-state"><div class="empty-icon">📊</div>No data</div>';return;}
-  const overall=Math.round(calcReadiness(p));
-  document.getElementById('progress-overall').textContent=`${overall}% exam readiness`;
-  const allTopics=p.subjects.flatMap(s=>s.topics);
-  const untouched=allTopics.filter(t=>t.status==='not_started').length;
-  const untouchedPct=allTopics.length>0?Math.round((untouched/allTopics.length)*100):0;
-  const now=new Date();
-  const neglected=p.subjects.filter(s=>{const l=s.topics.reduce((m,t)=>{const d=new Date(t.lastUpdated);return d>m?d:m;},new Date(0));return Math.floor((now-l)/86400000)>7;}).map(s=>s.name);
-  let ah='';
-  if(untouchedPct>30) ah+=`<div class="alert-banner alert-red">⚠️ ${untouchedPct}% syllabus untouched</div>`;
-  if(neglected.length>0) ah+=`<div class="alert-banner alert-orange">⏰ Neglected: ${neglected.join(', ')}</div>`;
+// ═══ RENDER: PROGRESS + RADAR ═══
+function renderProgress(){
+  const p=getProgress();if(!p){document.getElementById('progress-list').innerHTML='<div class="empty-s"><div class="empty-i">📊</div>No data</div>';return}
+  const ov=Math.round(calcReady(p));document.getElementById('progress-overall').textContent=`${ov}% exam readiness`;
+  renderRadar();
+  const allT=p.subjects.flatMap(s=>s.topics),unt=allT.filter(t=>t.status==='not_started').length,untP=allT.length>0?Math.round((unt/allT.length)*100):0;
+  const now=new Date(),neg=p.subjects.filter(s=>{const l=s.topics.reduce((m,t)=>{const d=new Date(t.lastUpdated);return d>m?d:m},new Date(0));return Math.floor((now-l)/864e5)>7}).map(s=>s.name);
+  let ah='';if(untP>30)ah+=`<div class="alert-b alert-r">⚠️ ${untP}% syllabus untouched</div>`;if(neg.length)ah+=`<div class="alert-b alert-o">⏰ Neglected: ${neg.join(', ')}</div>`;
   document.getElementById('progress-alerts').innerHTML=ah;
-  document.getElementById('progress-list').innerHTML=p.subjects.map((s,si)=>{
-    const pct=subjectProgress(s); const bc=pct>=70?'green':pct>=40?'yellow':'red';
-    return `<div class="subject-card"><button class="subject-header" onclick="toggleSubject(this)"><div class="subject-bar-wrap"><div class="subject-bar-name">${getSubjectIcon(s.name)} ${s.name}</div><div class="progress-bar"><div class="progress-fill ${bc}" style="width:${pct}%"></div></div></div><span class="subject-pct">${pct}%</span></button>
-    <div class="topic-list" style="display:none;">${s.topics.map((t,ti)=>`<div class="topic-row"><span class="topic-name">${t.name}</span><select class="topic-select ${t.status}" onchange="updateTopic(${si},${ti},this.value)"><option value="not_started" ${t.status==='not_started'?'selected':''}>Not Started</option><option value="in_progress" ${t.status==='in_progress'?'selected':''}>In Progress</option><option value="revised" ${t.status==='revised'?'selected':''}>Revised</option><option value="confident" ${t.status==='confident'?'selected':''}>Confident</option></select></div>`).join('')}</div></div>`;
-  }).join('');
-}
-function toggleSubject(btn){const tl=btn.nextElementSibling;tl.style.display=tl.style.display==='none'?'block':'none';}
-function updateTopic(si,ti,status){const p=getProgress();p.subjects[si].topics[ti].status=status;p.subjects[si].topics[ti].lastUpdated=new Date().toISOString();DB.set('progress_'+currentUser.id,p);currentUser.xp+=20;checkCoverageBadges();saveUser();renderProgress();}
+  document.getElementById('progress-list').innerHTML=p.subjects.map((s,si)=>{const pct=subjProg(s),bc=pct>=70?'green':pct>=40?'yellow':'red';
+    return `<div class="subj-card"><button class="subj-hdr" onclick="toggleSubj(this)"><div class="subj-bw"><div class="subj-bn">${gIcon(s.name)} ${s.name}</div><div class="p-bar"><div class="p-fill ${bc}" style="width:${pct}%"></div></div></div><span class="subj-pct">${pct}%</span></button><div class="top-list" style="display:none">${s.topics.map((t,ti)=>`<div class="top-row"><span class="top-name">${t.name}</span><select class="top-sel ${t.status}" onchange="updTopic(${si},${ti},this.value)"><option value="not_started" ${t.status==='not_started'?'selected':''}>Not Started</option><option value="in_progress" ${t.status==='in_progress'?'selected':''}>In Progress</option><option value="revised" ${t.status==='revised'?'selected':''}>Revised</option><option value="confident" ${t.status==='confident'?'selected':''}>Confident</option></select></div>`).join('')}</div></div>`}).join('')}
 
-// ─── RENDER: LEADERBOARD ───
-function renderLeaderboard() {
-  document.getElementById('lb-subtitle').textContent=(currentUser.targetExam||'')+' rankings';
+function renderRadar(){
+  const p=getProgress();if(!p)return;
+  const labels=p.subjects.map(s=>s.name.length>15?s.name.substring(0,15)+'…':s.name);
+  const data=p.subjects.map(s=>subjProg(s));
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  const ctx=document.getElementById('radar-chart');
+  if(radarChart)radarChart.destroy();
+  radarChart=new Chart(ctx,{type:'radar',data:{labels,datasets:[{label:'Progress',data,backgroundColor:isDark?'rgba(124,58,237,0.15)':'rgba(109,40,217,0.1)',borderColor:isDark?'#a78bfa':'#7c3aed',borderWidth:2,pointBackgroundColor:isDark?'#a78bfa':'#7c3aed',pointRadius:4}]},options:{responsive:true,maintainAspectRatio:true,scales:{r:{beginAtZero:true,max:100,ticks:{stepSize:25,color:isDark?'#64748b':'#94a3b8',backdropColor:'transparent',font:{size:9}},grid:{color:isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)'},pointLabels:{color:isDark?'#94a3b8':'#475569',font:{size:10,weight:'500'}}}},plugins:{legend:{display:false}}}})}
+
+function toggleSubj(btn){const tl=btn.nextElementSibling;tl.style.display=tl.style.display==='none'?'block':'none'}
+function updTopic(si,ti,st){const p=getProgress();p.subjects[si].topics[ti].status=st;p.subjects[si].topics[ti].lastUpdated=new Date().toISOString();DB.set('progress_'+U.id,p);U.xp+=20;checkCovBadges();saveU();renderProgress()}
+
+// ═══ LEADERBOARD WITH LEAGUES ═══
+const LEAGUES=[{id:'bronze',name:'Bronze',icon:'🥉',min:0,max:499,color:'#cd7f32'},{id:'silver',name:'Silver',icon:'🥈',min:500,max:1499,color:'#a8a9ad'},{id:'gold',name:'Gold',icon:'🥇',min:1500,max:3999,color:'#ffd700'},{id:'diamond',name:'Diamond',icon:'💎',min:4000,max:Infinity,color:'#7c3aed'}];
+function getLeague(xp){return LEAGUES.find(l=>xp>=l.min&&xp<=l.max)||LEAGUES[0]}
+
+function renderLeaderboard(){
+  document.getElementById('lb-subtitle').textContent=(U.targetExam||'')+' rankings';
+  const myLeague=getLeague(U.xp);
+  document.getElementById('league-info').innerHTML=`<div class="league-icon">${myLeague.icon}</div><div class="league-name" style="color:${myLeague.color}">${myLeague.name} League</div><div class="league-range">${myLeague.min}–${myLeague.max===Infinity?'∞':myLeague.max} XP</div>`;
+  document.getElementById('league-tabs').innerHTML=`<button class="league-tab ${curLeague==='all'?'active':''}" onclick="setLeague('all')" style="${curLeague==='all'?'background:var(--accent);border-color:var(--accent)':''}">All</button>${LEAGUES.map(l=>`<button class="league-tab ${l.id} ${curLeague===l.id?'active':''}" onclick="setLeague('${l.id}')">${l.icon} ${l.name}</button>`).join('')}`;
   const users=DB.get('users')||{};
-  const se=Object.values(users).filter(u=>u.targetExam===currentUser.targetExam&&u.onboarded).sort((a,b)=>b.xp-a.xp).slice(0,50);
-  if(!se.length){document.getElementById('lb-list').innerHTML='<div class="empty-state"><div class="empty-icon">🏆</div>No competitors yet</div>';return;}
-  document.getElementById('lb-list').innerHTML=se.map((u,i)=>{
-    const r=i+1,isMe=u.id===currentUser.id,medal=r===1?'🥇':r===2?'🥈':r===3?'🥉':'';
-    return `<div class="lb-entry ${isMe?'me':''}"><div class="lb-rank">${medal||`<span class="lb-rank-num">#${r}</span>`}</div><div class="lb-info"><div class="lb-name">${u.name}${isMe?' <span class="you">(You)</span>':''}</div>${u.badges.length>0?`<div class="lb-badges">${u.badges.slice(0,3).map(b=>`<span class="lb-badge">${b}</span>`).join('')}</div>`:''}</div><div class="lb-stats"><div class="lb-xp">${u.xp} XP</div><div class="lb-streak">🔥 ${u.streak?.count||0}</div></div></div>`;
-  }).join('');
-}
+  let list=Object.values(users).filter(u=>u.targetExam===U.targetExam&&u.onboarded).sort((a,b)=>b.xp-a.xp);
+  if(curLeague!=='all'){const league=LEAGUES.find(l=>l.id===curLeague);if(league)list=list.filter(u=>u.xp>=league.min&&u.xp<=league.max)}
+  list=list.slice(0,50);
+  if(!list.length){document.getElementById('lb-list').innerHTML='<div class="empty-s"><div class="empty-i">🏆</div>No users in this league</div>';return}
+  document.getElementById('lb-list').innerHTML=list.map((u,i)=>{const r=i+1,isMe=u.id===U.id,medal=r===1?'🥇':r===2?'🥈':r===3?'🥉':'',ul=getLeague(u.xp);
+    return `<div class="lb-e ${isMe?'me':''}"><div class="lb-r">${medal||`<span class="lb-rn">#${r}</span>`}</div><div class="lb-i"><div class="lb-n">${u.name}${isMe?' <span class="you">(You)</span>':''}</div>${u.badges.length>0?`<div class="lb-bg">${u.badges.slice(0,3).map(b=>`<span class="lb-bd">${b}</span>`).join('')}</div>`:''}</div><div class="lb-s"><div class="lb-xp">${u.xp} XP</div><div class="lb-st">${ul.icon} ${ul.name}</div></div></div>`}).join('')}
+function setLeague(l){curLeague=l;renderLeaderboard()}
 
 init();
 </script>
