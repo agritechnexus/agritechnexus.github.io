@@ -1,651 +1,720 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Happy Birthday Chittithalli ♥</title>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Chittithalli 💕</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    :root {
-      --bg: #1a0a10;
-      --rose: #e8496a;
-      --rose-light: #f47a93;
-      --gold: #d4a853;
-      --gold-light: #e8c97a;
-      --text: #f5e6ea;
-      --text-muted: #c4a0aa;
-    }
+  :root {
+    --rose: #e8496a;
+    --rose-light: #f7a1b0;
+    --rose-dark: #c2294a;
+    --gold: #d4a853;
+    --gold-light: #f0d99c;
+    --cream: #fdf6ee;
+    --deep: #1a0a10;
+    --blush: #fff0f3;
+  }
 
-    html { scroll-behavior: smooth; }
+  body {
+    background: var(--deep);
+    color: var(--cream);
+    font-family: 'Cormorant Garamond', serif;
+    overflow-x: hidden;
+    cursor: default;
+  }
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 18px;
-      line-height: 1.7;
-      overflow-x: hidden;
-      min-height: 100vh;
-    }
+  /* Floating hearts background */
+  .hearts-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
 
-    /* Floating Hearts Background */
-    .floating-hearts {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-    }
+  .floating-heart {
+    position: absolute;
+    bottom: -60px;
+    font-size: 20px;
+    opacity: 0;
+    animation: floatUp linear infinite;
+  }
 
-    .floating-heart {
-      position: absolute;
-      bottom: -60px;
-      font-size: 20px;
-      opacity: 0.15;
-      animation: floatUp linear infinite;
-    }
+  @keyframes floatUp {
+    0% { transform: translateY(0) rotate(0deg) scale(0.5); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.3; }
+    100% { transform: translateY(-110vh) rotate(720deg) scale(1); opacity: 0; }
+  }
 
-    @keyframes floatUp {
-      0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.15; }
-      10% { opacity: 0.25; }
-      90% { opacity: 0.1; }
-      100% { transform: translateY(-110vh) rotate(360deg) scale(0.5); opacity: 0; }
-    }
+  /* Stars / sparkles */
+  .sparkle-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-    /* Gold Sparkles */
-    .sparkle-container {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 0;
-    }
+  .sparkle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: var(--gold-light);
+    border-radius: 50%;
+    animation: twinkle ease-in-out infinite;
+  }
 
-    .sparkle {
-      position: absolute;
-      width: 3px; height: 3px;
-      background: var(--gold);
-      border-radius: 50%;
-      animation: twinkle ease-in-out infinite;
-    }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0; transform: scale(0.5); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
 
-    @keyframes twinkle {
-      0%, 100% { opacity: 0; transform: scale(0.5); }
-      50% { opacity: 0.8; transform: scale(1.2); }
-    }
+  /* ---- SECTIONS ---- */
+  section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    padding: 40px 20px;
+  }
 
-    /* Click hearts burst */
-    .click-heart {
-      position: fixed;
-      pointer-events: none;
-      font-size: 18px;
-      z-index: 999;
-      animation: burstHeart 1s ease-out forwards;
-    }
+  /* ---- HERO ---- */
+  .hero {
+    background: radial-gradient(ellipse at 50% 80%, rgba(232,73,106,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 20% 20%, rgba(212,168,83,0.08) 0%, transparent 50%);
+    text-align: center;
+  }
 
-    @keyframes burstHeart {
-      0% { opacity: 1; transform: translate(0, 0) scale(1); }
-      100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.3); }
-    }
+  .hero-date {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(0.8rem, 2vw, 1rem);
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0;
+    animation: fadeSlideDown 1s 0.3s ease forwards;
+    margin-bottom: 30px;
+  }
 
-    /* Scroll fade-in */
-    .fade-in {
-      opacity: 0;
-      transform: translateY(40px);
-      transition: opacity 0.8s ease, transform 0.8s ease;
-    }
-    .fade-in.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .hero-heart {
+    font-size: clamp(50px, 12vw, 100px);
+    opacity: 0;
+    animation: heartPulseIn 1.2s 0.6s ease forwards;
+    display: block;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 30px rgba(232,73,106,0.5));
+  }
 
-    /* Section shared */
-    section {
-      position: relative;
-      z-index: 1;
-      padding: 80px 20px;
-    }
+  @keyframes heartPulseIn {
+    0% { opacity: 0; transform: scale(0); }
+    50% { opacity: 1; transform: scale(1.3); }
+    70% { transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1); }
+  }
 
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-    }
+  .hero h1 {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(2.5rem, 8vw, 5.5rem);
+    font-weight: 700;
+    color: var(--rose-light);
+    line-height: 1.2;
+    opacity: 0;
+    animation: fadeSlideUp 1s 1s ease forwards;
+    text-shadow: 0 0 40px rgba(232,73,106,0.3);
+  }
 
-    h2 {
-      font-family: 'Dancing Script', cursive;
-      font-size: clamp(2rem, 5vw, 3rem);
-      color: var(--rose);
-      text-align: center;
-      margin-bottom: 50px;
-    }
+  .hero .subtitle {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    color: var(--gold-light);
+    margin-top: 20px;
+    opacity: 0;
+    animation: fadeSlideUp 1s 1.4s ease forwards;
+    letter-spacing: 2px;
+  }
 
-    /* ===== HERO ===== */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 40px 20px;
-    }
+  .scroll-hint {
+    position: absolute;
+    bottom: 40px;
+    opacity: 0;
+    animation: fadeIn 1s 2.5s ease forwards, bounce 2s 3s ease-in-out infinite;
+    font-size: 0.85rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--rose-light);
+  }
 
-    .hero-date {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-      color: var(--gold);
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      margin-bottom: 30px;
-    }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
 
-    .hero-heart {
-      font-size: clamp(80px, 15vw, 120px);
-      animation: pulse 1.2s ease-in-out infinite;
-      display: block;
-      margin-bottom: 30px;
-    }
+  /* ---- LETTER SECTION ---- */
+  .letter-section {
+    background: radial-gradient(ellipse at 50% 50%, rgba(232,73,106,0.08) 0%, transparent 70%);
+  }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      15% { transform: scale(1.15); }
-      30% { transform: scale(1); }
-      45% { transform: scale(1.1); }
-      60% { transform: scale(1); }
-    }
+  .letter-card {
+    max-width: 600px;
+    width: 100%;
+    background: linear-gradient(145deg, rgba(253,246,238,0.06), rgba(253,246,238,0.02));
+    border: 1px solid rgba(212,168,83,0.2);
+    border-radius: 20px;
+    padding: clamp(30px, 6vw, 60px);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 1s ease;
+  }
 
-    .hero h1 {
-      font-family: 'Dancing Script', cursive;
-      font-size: clamp(2.5rem, 8vw, 5rem);
-      color: var(--rose);
-      line-height: 1.2;
-      margin-bottom: 20px;
-      text-shadow: 0 0 40px rgba(232, 73, 106, 0.3);
-    }
+  .letter-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
-    .hero-subtitle {
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
-      font-size: clamp(1rem, 3vw, 1.4rem);
-      color: var(--gold);
-      margin-bottom: 60px;
-    }
+  .letter-card::before {
+    content: '❝';
+    position: absolute;
+    top: 15px;
+    left: 25px;
+    font-size: 60px;
+    color: var(--rose);
+    opacity: 0.15;
+    font-family: serif;
+  }
 
-    .scroll-hint {
-      animation: bobDown 2s ease-in-out infinite;
-      font-size: 28px;
-      color: var(--text-muted);
-    }
+  .letter-card .from-label {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.1rem;
+    color: var(--gold);
+    margin-bottom: 20px;
+    display: block;
+  }
 
-    @keyframes bobDown {
-      0%, 100% { transform: translateY(0); opacity: 0.5; }
-      50% { transform: translateY(12px); opacity: 1; }
-    }
+  .letter-card p {
+    font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+    line-height: 2;
+    color: var(--cream);
+    font-weight: 300;
+    margin-bottom: 15px;
+  }
 
-    /* ===== LOVE LETTER ===== */
-    .love-letter-card {
-      background: rgba(232, 73, 106, 0.08);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(232, 73, 106, 0.15);
-      border-radius: 20px;
-      padding: clamp(30px, 5vw, 50px);
-      max-width: 750px;
-      margin: 0 auto;
-      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
-    }
+  .letter-card p em {
+    color: var(--rose-light);
+    font-style: italic;
+  }
 
-    .love-letter-card p {
-      font-size: clamp(1rem, 2.5vw, 1.2rem);
-      font-style: italic;
-      color: var(--text);
-      margin-bottom: 30px;
-      text-align: center;
-    }
+  .letter-card .signature {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    color: var(--rose);
+    text-align: right;
+    margin-top: 30px;
+  }
 
-    .love-letter-card .signature {
-      font-family: 'Dancing Script', cursive;
-      font-size: 1.5rem;
-      color: var(--rose);
-      text-align: right;
-    }
+  /* ---- REASONS SECTION ---- */
+  .reasons-section {
+    background: radial-gradient(ellipse at 30% 70%, rgba(212,168,83,0.06) 0%, transparent 60%);
+    padding: 80px 20px;
+  }
 
-    /* ===== WHY YOU ARE MY EVERYTHING ===== */
-    .reasons-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 25px;
-    }
+  .reasons-title {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    color: var(--rose-light);
+    margin-bottom: 50px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+  }
 
-    .reason-card {
-      background: rgba(212, 168, 83, 0.06);
-      border: 1px solid rgba(212, 168, 83, 0.12);
-      border-radius: 16px;
-      padding: 30px 25px;
-      text-align: center;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
+  .reasons-title.visible { opacity: 1; transform: translateY(0); }
 
-    .reason-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 30px rgba(232, 73, 106, 0.15);
-    }
+  .reasons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    max-width: 900px;
+    width: 100%;
+  }
 
-    .reason-card .emoji {
-      font-size: 40px;
-      display: block;
-      margin-bottom: 15px;
-    }
+  .reason-card {
+    background: linear-gradient(135deg, rgba(232,73,106,0.08), rgba(212,168,83,0.04));
+    border: 1px solid rgba(232,73,106,0.15);
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    transition: all 0.6s ease;
+  }
 
-    .reason-card p {
-      font-size: 1rem;
-      color: var(--text-muted);
-      line-height: 1.6;
-    }
+  .reason-card.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 
-    /* ===== TIMELINE ===== */
-    .timeline {
-      position: relative;
-      max-width: 650px;
-      margin: 0 auto;
-      padding-left: 40px;
-    }
+  .reason-card:hover {
+    border-color: var(--rose);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 10px 40px rgba(232,73,106,0.15);
+  }
 
-    .timeline::before {
-      content: '';
-      position: absolute;
-      left: 12px;
-      top: 0; bottom: 0;
-      width: 2px;
-      background: linear-gradient(to bottom, var(--rose), var(--gold));
-    }
+  .reason-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    display: block;
+  }
 
-    .timeline-item {
-      position: relative;
-      margin-bottom: 50px;
-    }
+  .reason-text {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--cream);
+    font-weight: 300;
+  }
 
-    .timeline-item:last-child { margin-bottom: 0; }
+  /* ---- TIMELINE ---- */
+  .timeline-section {
+    padding: 80px 20px;
+    background: radial-gradient(ellipse at 70% 30%, rgba(232,73,106,0.06) 0%, transparent 60%);
+  }
 
-    .timeline-item::before {
-      content: '♥';
-      position: absolute;
-      left: -40px;
-      top: 0;
-      width: 28px; height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      color: var(--rose);
-      background: var(--bg);
-      border: 2px solid var(--rose);
-      border-radius: 50%;
-      z-index: 1;
-    }
+  .timeline-title {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    color: var(--gold-light);
+    margin-bottom: 50px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+  }
 
-    .timeline-item h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.3rem;
-      color: var(--gold);
-      margin-bottom: 6px;
-    }
+  .timeline-title.visible { opacity: 1; transform: translateY(0); }
 
-    .timeline-item p {
-      color: var(--text-muted);
-      font-size: 1rem;
-    }
+  .timeline {
+    position: relative;
+    max-width: 500px;
+    width: 100%;
+  }
 
-    /* ===== PROMISE ===== */
-    .promise-section {
-      text-align: center;
-    }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, var(--rose), var(--gold), var(--rose), transparent);
+  }
 
-    .promise-heart {
-      font-size: 80px;
-      display: block;
-      margin-bottom: 30px;
-      animation: beat 0.8s ease-in-out infinite;
-    }
+  .timeline-item {
+    padding-left: 55px;
+    margin-bottom: 40px;
+    position: relative;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: all 0.6s ease;
+  }
 
-    @keyframes beat {
-      0%, 100% { transform: scale(1); }
-      25% { transform: scale(1.1); }
-      40% { transform: scale(1); }
-      55% { transform: scale(1.08); }
-      70% { transform: scale(1); }
-    }
+  .timeline-item.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
 
-    .promise-text {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.1rem, 3vw, 1.5rem);
-      max-width: 700px;
-      margin: 0 auto 30px;
-      line-height: 1.8;
-      color: var(--text);
-    }
+  .timeline-item::before {
+    content: '♥';
+    position: absolute;
+    left: 10px;
+    top: 5px;
+    color: var(--rose);
+    font-size: 1.2rem;
+    z-index: 2;
+  }
 
-    .promise-text strong {
-      color: var(--rose);
-    }
+  .timeline-label {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.2rem;
+    color: var(--gold);
+    margin-bottom: 5px;
+  }
 
-    .promise-sig {
-      font-family: 'Dancing Script', cursive;
-      font-size: 1.5rem;
-      color: var(--gold);
-    }
+  .timeline-text {
+    font-size: 1rem;
+    color: var(--cream);
+    font-weight: 300;
+    line-height: 1.6;
+    opacity: 0.85;
+  }
 
-    /* ===== CAKE ===== */
-    .cake-section {
-      text-align: center;
-    }
+  /* ---- PROMISE SECTION ---- */
+  .promise-section {
+    min-height: 100vh;
+    background: radial-gradient(ellipse at 50% 50%, rgba(232,73,106,0.12) 0%, transparent 60%);
+    text-align: center;
+  }
 
-    .cake-emoji {
-      font-size: 100px;
-      display: block;
-      margin-bottom: 25px;
-      animation: cakeAppear 1s ease-out forwards;
-    }
+  .promise-box {
+    max-width: 600px;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: all 1s ease;
+  }
 
-    @keyframes cakeAppear {
-      0% { opacity: 0; transform: scale(0.3) translateY(40px); }
-      60% { transform: scale(1.1) translateY(-10px); }
-      100% { opacity: 1; transform: scale(1) translateY(0); }
-    }
+  .promise-box.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
 
-    .cake-text {
-      font-family: 'Dancing Script', cursive;
-      font-size: clamp(1.5rem, 4vw, 2.2rem);
-      color: var(--rose-light);
-      margin-bottom: 35px;
-    }
+  .promise-box .big-heart {
+    font-size: clamp(60px, 15vw, 120px);
+    display: block;
+    margin-bottom: 30px;
+    animation: heartbeat 1.5s ease-in-out infinite;
+    filter: drop-shadow(0 0 40px rgba(232,73,106,0.4));
+  }
 
-    .magic-btn {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.1rem;
-      color: var(--bg);
-      background: linear-gradient(135deg, var(--gold), var(--gold-light));
-      border: none;
-      padding: 16px 40px;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      box-shadow: 0 4px 20px rgba(212, 168, 83, 0.3);
-    }
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    15% { transform: scale(1.15); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.1); }
+  }
 
-    .magic-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 30px rgba(212, 168, 83, 0.5);
-    }
+  .promise-text {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(1.3rem, 4vw, 2.2rem);
+    color: var(--cream);
+    line-height: 1.8;
+    margin-bottom: 30px;
+  }
 
-    .magic-btn:active { transform: scale(0.97); }
+  .promise-text .highlight {
+    color: var(--rose-light);
+    font-size: 1.2em;
+  }
 
-    /* Confetti */
-    .confetti-piece {
-      position: fixed;
-      top: -20px;
-      width: 10px; height: 10px;
-      z-index: 9999;
-      pointer-events: none;
-      animation: confettiFall linear forwards;
-    }
+  .promise-name {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    color: var(--gold);
+    letter-spacing: 3px;
+  }
 
-    @keyframes confettiFall {
-      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
-      100% { opacity: 0; transform: translateY(110vh) rotate(720deg); }
-    }
+  /* ---- CAKE SECTION ---- */
+  .cake-section {
+    min-height: 60vh;
+    text-align: center;
+    background: radial-gradient(ellipse at 50% 80%, rgba(212,168,83,0.08) 0%, transparent 50%);
+  }
 
-    /* ===== FOOTER ===== */
-    footer {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      padding: 50px 20px 40px;
-      border-top: 1px solid rgba(232, 73, 106, 0.1);
-    }
+  .cake-emoji {
+    font-size: clamp(80px, 20vw, 150px);
+    display: block;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: cakeAppear 1s ease forwards;
+    animation-play-state: paused;
+    cursor: pointer;
+  }
 
-    footer p {
-      color: var(--text-muted);
-      font-size: 1rem;
-      margin-bottom: 8px;
-    }
+  .cake-emoji.visible {
+    animation-play-state: running;
+  }
 
-    footer p:first-child {
-      font-family: 'Dancing Script', cursive;
-      font-size: 1.3rem;
-      color: var(--rose);
-    }
+  @keyframes cakeAppear {
+    0% { opacity: 0; transform: scale(0) rotate(-20deg); }
+    60% { transform: scale(1.2) rotate(5deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0); }
+  }
 
-    footer p:last-child {
-      font-size: 0.9rem;
-      color: var(--gold);
-    }
+  .cake-text {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    color: var(--rose-light);
+    opacity: 0;
+    transition: opacity 0.8s ease 0.5s;
+  }
 
-    /* Responsive */
-    @media (max-width: 600px) {
-      section { padding: 60px 15px; }
-      .reasons-grid { grid-template-columns: 1fr; }
-      .love-letter-card { padding: 25px 20px; }
-    }
-  </style>
+  .cake-text.visible { opacity: 1; }
+
+  .wish-btn {
+    margin-top: 30px;
+    padding: 15px 50px;
+    border: 2px solid var(--rose);
+    background: transparent;
+    color: var(--rose-light);
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.3rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transition: opacity 0.8s ease 1s, background 0.3s, transform 0.3s;
+  }
+
+  .wish-btn.visible { opacity: 1; }
+
+  .wish-btn:hover {
+    background: var(--rose);
+    color: var(--cream);
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(232,73,106,0.4);
+  }
+
+  /* Confetti */
+  .confetti-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  .confetti {
+    position: absolute;
+    top: -20px;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    animation: confettiFall linear forwards;
+  }
+
+  @keyframes confettiFall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ---- FOOTER ---- */
+  .footer {
+    min-height: auto;
+    padding: 60px 20px;
+    text-align: center;
+    background: linear-gradient(to top, rgba(232,73,106,0.08), transparent);
+  }
+
+  .footer p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.9rem;
+    color: var(--rose-light);
+    opacity: 0.5;
+    letter-spacing: 2px;
+  }
+
+  .footer .made-with {
+    margin-top: 10px;
+    font-size: 0.85rem;
+  }
+
+  /* ---- ANIMATIONS ---- */
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 600px) {
+    .reasons-grid { grid-template-columns: 1fr; }
+    .letter-card { padding: 25px; }
+  }
+</style>
 </head>
 <body>
 
-<!-- Floating Hearts -->
-<div class="floating-hearts" id="floatingHearts"></div>
+<!-- Floating Hearts Background -->
+<div class="hearts-bg" id="heartsBg"></div>
 
-<!-- Gold Sparkles -->
+<!-- Sparkles -->
 <div class="sparkle-container" id="sparkles"></div>
 
-<!-- HERO -->
+<!-- Confetti Container -->
+<div class="confetti-container" id="confetti"></div>
+
+<!-- ======== HERO ======== -->
 <section class="hero">
-  <div class="fade-in">
-    <span class="hero-date">March 16, 2026</span>
-  </div>
-  <div class="fade-in">
-    <span class="hero-heart">❤️</span>
-  </div>
-  <div class="fade-in">
-    <h1>Make a wish,<br>Chittithalli!</h1>
-  </div>
-  <div class="fade-in">
-    <p class="hero-subtitle">— From Your Nagaraju —</p>
-  </div>
-  <div class="fade-in" style="margin-bottom:40px;">
-    <button class="magic-btn" id="heroMagicBtn" onclick="triggerMagic()">✨ Tap for Birthday Magic ✨</button>
-  </div>
-  <div class="scroll-hint">↓</div>
+  <div class="hero-date">March 16, 2026</div>
+  <span class="hero-heart">💕</span>
+  <h1>Happy Birthday<br>Chittithalli</h1>
+  <div class="subtitle">— From Your Nagaraju —</div>
+  <div class="scroll-hint">↓ scroll down ↓</div>
 </section>
 
-<!-- LOVE LETTER -->
-<section>
-  <div class="container">
-    <h2 class="fade-in">A Letter From My Heart</h2>
-    <div class="love-letter-card fade-in">
-      <p>Since your first Hello, I started changing. I'm a man of Teja — not just a Nagaraju anymore. I became Banoth because of you. My every decision is based on you. My life is Teja. You made me believe I can build something. You made me believe I am something. Every morning walk, every late night coding, every small win — it's all because somewhere inside me, I want to become the man you deserve.</p>
-      <div class="signature">— Your Nagaraju ♥</div>
+<!-- ======== LOVE LETTER ======== -->
+<section class="letter-section">
+  <div class="letter-card" data-animate>
+    <span class="from-label">A letter for you, Teja...</span>
+    <p>Since your first <em>Hello</em>, I started changing.</p>
+    <p>I'm a man of Teja — not just a Nagaraju anymore. <em>I became Banoth</em> because of you.</p>
+    <p>My every decision is based on you. My life is <em>Teja</em>.</p>
+    <p>You made me believe I can build something. You made me believe I am something. Every morning walk, every late night coding, every small win — it's all because somewhere inside me, I want to become the man you deserve.</p>
+    <div class="signature">— Your Nagaraju ♥</div>
+  </div>
+</section>
+
+<!-- ======== REASONS I LOVE YOU ======== -->
+<section class="reasons-section">
+  <div class="reasons-title" data-animate>Why You Are My Everything</div>
+  <div class="reasons-grid">
+    <div class="reason-card" data-animate data-delay="0">
+      <span class="reason-icon">🌅</span>
+      <div class="reason-text">You are the reason I wake up with purpose every single morning</div>
+    </div>
+    <div class="reason-card" data-animate data-delay="100">
+      <span class="reason-icon">💪</span>
+      <div class="reason-text">You gave me the strength to believe in myself when nobody else did</div>
+    </div>
+    <div class="reason-card" data-animate data-delay="200">
+      <span class="reason-icon">🏡</span>
+      <div class="reason-text">With you, even my small village feels like the center of the world</div>
+    </div>
+    <div class="reason-card" data-animate data-delay="300">
+      <span class="reason-icon">✨</span>
+      <div class="reason-text">Your smile is the only thing I need to forget all my stress</div>
+    </div>
+    <div class="reason-card" data-animate data-delay="400">
+      <span class="reason-icon">🔥</span>
+      <div class="reason-text">You push me to work harder, dream bigger, and never give up</div>
+    </div>
+    <div class="reason-card" data-animate data-delay="500">
+      <span class="reason-icon">💕</span>
+      <div class="reason-text">Because with Teja, Nagaraju becomes Banoth — complete</div>
     </div>
   </div>
 </section>
 
-<!-- WHY YOU ARE MY EVERYTHING -->
-<section>
-  <div class="container">
-    <h2 class="fade-in">Why You Are My Everything</h2>
-    <div class="reasons-grid">
-      <div class="reason-card fade-in">
-        <span class="emoji">🌅</span>
-        <p>You are the reason I wake up with purpose every single morning</p>
-      </div>
-      <div class="reason-card fade-in">
-        <span class="emoji">💪</span>
-        <p>You gave me the strength to believe in myself when nobody else did</p>
-      </div>
-      <div class="reason-card fade-in">
-        <span class="emoji">🏡</span>
-        <p>With you, even my small village feels like the center of the world</p>
-      </div>
-      <div class="reason-card fade-in">
-        <span class="emoji">✨</span>
-        <p>Your smile is the only thing I need to forget all my stress</p>
-      </div>
-      <div class="reason-card fade-in">
-        <span class="emoji">🔥</span>
-        <p>You push me to work harder, dream bigger, and never give up</p>
-      </div>
-      <div class="reason-card fade-in">
-        <span class="emoji">💕</span>
-        <p>Because with Teja, Nagaraju becomes Banoth — complete</p>
-      </div>
+<!-- ======== OUR JOURNEY ======== -->
+<section class="timeline-section">
+  <div class="timeline-title" data-animate>Our Story</div>
+  <div class="timeline">
+    <div class="timeline-item" data-animate data-delay="0">
+      <div class="timeline-label">Your First Hello</div>
+      <div class="timeline-text">The moment that changed everything. One word from you and my whole world shifted.</div>
+    </div>
+    <div class="timeline-item" data-animate data-delay="150">
+      <div class="timeline-label">Falling for You</div>
+      <div class="timeline-text">I didn't just fall in love — I fell into becoming a better version of myself.</div>
+    </div>
+    <div class="timeline-item" data-animate data-delay="300">
+      <div class="timeline-label">Every Moment Together</div>
+      <div class="timeline-text">Karimnagar, late night calls, the fights, the laughter — every second is precious.</div>
+    </div>
+    <div class="timeline-item" data-animate data-delay="450">
+      <div class="timeline-label">Today — March 16</div>
+      <div class="timeline-text">Your birthday. The day the world got its most beautiful gift. And I got mine.</div>
+    </div>
+    <div class="timeline-item" data-animate data-delay="600">
+      <div class="timeline-label">Our Future</div>
+      <div class="timeline-text">Together. Always. No matter what. Banoth & Teja — forever.</div>
     </div>
   </div>
 </section>
 
-<!-- OUR STORY TIMELINE -->
-<section>
-  <div class="container">
-    <h2 class="fade-in">Our Story</h2>
-    <div class="timeline">
-      <div class="timeline-item fade-in">
-        <h3>Your First Hello</h3>
-        <p>The moment that changed everything</p>
-      </div>
-      <div class="timeline-item fade-in">
-        <h3>Falling for You</h3>
-        <p>I fell into becoming a better version of myself</p>
-      </div>
-      <div class="timeline-item fade-in">
-        <h3>Every Moment Together</h3>
-        <p>Karimnagar, late night calls, fights, laughter</p>
-      </div>
-      <div class="timeline-item fade-in">
-        <h3>Today — March 16</h3>
-        <p>Your birthday. The day the world got its most beautiful gift</p>
-      </div>
-      <div class="timeline-item fade-in">
-        <h3>Our Future</h3>
-        <p>Together. Always. Banoth &amp; Teja forever.</p>
-      </div>
+<!-- ======== PROMISE ======== -->
+<section class="promise-section">
+  <div class="promise-box" data-animate>
+    <span class="big-heart">❤️</span>
+    <div class="promise-text">
+      I promise to always be<br>
+      <span class="highlight">your Nagaraju</span><br>
+      to fight for us,<br>
+      to build our future,<br>
+      and to love you more<br>
+      <span class="highlight">every single day</span>
     </div>
+    <div class="promise-name">— Nagaraju Banoth —</div>
   </div>
 </section>
 
-<!-- PROMISE -->
-<section>
-  <div class="container promise-section fade-in">
-    <span class="promise-heart">💖</span>
-    <p class="promise-text">
-      I promise to always be <strong>YOUR NAGARAJU</strong>, to fight for us, to build our future, and to love you more <strong>EVERY SINGLE DAY</strong>
-    </p>
-    <p class="promise-sig">— Nagaraju Banoth —</p>
-  </div>
+<!-- ======== CAKE ======== -->
+<section class="cake-section">
+  <span class="cake-emoji" data-animate id="cake">🎂</span>
+  <div class="cake-text" data-animate>Make a wish, Chittithalli!</div>
+  <button class="wish-btn" data-animate id="wishBtn">✨ Tap for Birthday Magic ✨</button>
 </section>
 
-<!-- BIRTHDAY CAKE -->
-<section>
-  <div class="container cake-section fade-in">
-    <span class="cake-emoji">🎂</span>
-    <p class="cake-text">Make a wish, Chittithalli!</p>
-    <button class="magic-btn" id="magicBtn" onclick="triggerMagic()">✨ Tap for Birthday Magic ✨</button>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
+<!-- ======== FOOTER ======== -->
+<div class="footer">
   <p>Happy Birthday Teja ♥ March 16, 2026</p>
-  <p>Made with love by Nagaraju</p>
-</footer>
+  <p class="made-with">Made with love by Nagaraju</p>
+</div>
 
 <script>
-  // Floating hearts
-  (function createFloatingHearts() {
-    const container = document.getElementById('floatingHearts');
-    const hearts = ['❤', '♥', '💕', '💗', '💖'];
-    for (let i = 0; i < 20; i++) {
-      const el = document.createElement('span');
-      el.className = 'floating-heart';
-      el.textContent = hearts[Math.floor(Math.random() * hearts.length)];
-      el.style.left = Math.random() * 100 + '%';
-      el.style.fontSize = (14 + Math.random() * 18) + 'px';
-      el.style.animationDuration = (8 + Math.random() * 12) + 's';
-      el.style.animationDelay = Math.random() * 10 + 's';
-      container.appendChild(el);
-    }
-  })();
+  // ---- Floating hearts ----
+  const heartsBg = document.getElementById('heartsBg');
+  const heartSymbols = ['♥', '💕', '💗', '💖', '❤', '♡', '💝'];
+  const heartColors = ['#e8496a', '#f7a1b0', '#d4a853', '#ff6b8a', '#c2294a'];
 
-  // Gold sparkles
-  (function createSparkles() {
-    const container = document.getElementById('sparkles');
-    for (let i = 0; i < 40; i++) {
-      const el = document.createElement('span');
-      el.className = 'sparkle';
-      el.style.left = Math.random() * 100 + '%';
-      el.style.top = Math.random() * 100 + '%';
-      el.style.width = el.style.height = (2 + Math.random() * 3) + 'px';
-      el.style.animationDuration = (1.5 + Math.random() * 3) + 's';
-      el.style.animationDelay = Math.random() * 3 + 's';
-      container.appendChild(el);
-    }
-  })();
+  function createHeart() {
+    const heart = document.createElement('span');
+    heart.className = 'floating-heart';
+    heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+    heart.style.left = Math.random() * 100 + '%';
+    heart.style.animationDuration = (8 + Math.random() * 12) + 's';
+    heart.style.animationDelay = Math.random() * 2 + 's';
+    heart.style.fontSize = (14 + Math.random() * 20) + 'px';
+    heart.style.color = heartColors[Math.floor(Math.random() * heartColors.length)];
+    heartsBg.appendChild(heart);
+    setTimeout(() => heart.remove(), 22000);
+  }
 
-  // Click hearts burst
-  document.addEventListener('click', function(e) {
-    if (e.target.closest('button')) return;
-    const emojis = ['❤', '💕', '♥', '💖', '💗', '💘'];
-    for (let i = 0; i < 6; i++) {
-      const heart = document.createElement('span');
-      heart.className = 'click-heart';
-      heart.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-      heart.style.left = e.clientX + 'px';
-      heart.style.top = e.clientY + 'px';
-      const angle = (Math.PI * 2 / 6) * i + (Math.random() - 0.5);
-      const dist = 40 + Math.random() * 60;
-      heart.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
-      heart.style.setProperty('--ty', Math.sin(angle) * dist - 30 + 'px');
-      document.body.appendChild(heart);
-      setTimeout(() => heart.remove(), 1000);
-    }
-  });
+  setInterval(createHeart, 800);
+  for (let i = 0; i < 8; i++) setTimeout(createHeart, i * 300);
 
-  // Scroll fade-in (Intersection Observer)
-  const observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
+  // ---- Sparkles ----
+  const sparkleContainer = document.getElementById('sparkles');
+  for (let i = 0; i < 50; i++) {
+    const sparkle = document.createElement('div');
+    sparkle.className = 'sparkle';
+    sparkle.style.left = Math.random() * 100 + '%';
+    sparkle.style.top = Math.random() * 100 + '%';
+    sparkle.style.animationDuration = (2 + Math.random() * 3) + 's';
+    sparkle.style.animationDelay = Math.random() * 4 + 's';
+    sparkle.style.width = sparkle.style.height = (2 + Math.random() * 3) + 'px';
+    sparkleContainer.appendChild(sparkle);
+  }
+
+  // ---- Scroll animations ----
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
       if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
+        const delay = entry.target.dataset.delay || 0;
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, parseInt(delay));
       }
     });
-  }, { threshold: 0.15 });
+  }, { threshold: 0.2 });
 
-  document.querySelectorAll('.fade-in').forEach(function(el) {
-    observer.observe(el);
-  });
+  document.querySelectorAll('[data-animate]').forEach(el => observer.observe(el));
 
-  // Birthday magic button + confetti
-  function triggerMagic() {
-    const btn = document.getElementById('magicBtn');
-    btn.textContent = '🎉 Happy Birthday Teja! 🎉';
-    btn.style.background = 'linear-gradient(135deg, #e8496a, #f47a93)';
-    btn.style.color = '#fff';
+  // ---- Confetti on button click ----
+  const confettiContainer = document.getElementById('confetti');
+  const confettiColors = ['#e8496a', '#f7a1b0', '#d4a853', '#f0d99c', '#ff6b8a', '#fdf6ee', '#c2294a'];
 
-    const colors = ['#e8496a', '#d4a853', '#f47a93', '#e8c97a', '#ff6b8a', '#ffd700', '#ff4081', '#ffab40'];
+  function launchConfetti() {
     for (let i = 0; i < 100; i++) {
-      const piece = document.createElement('div');
-      piece.className = 'confetti-piece';
-      piece.style.left = Math.random() * 100 + 'vw';
-      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-      piece.style.width = (6 + Math.random() * 8) + 'px';
-      piece.style.height = (6 + Math.random() * 8) + 'px';
-      piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-      piece.style.animationDuration = (2 + Math.random() * 3) + 's';
-      piece.style.animationDelay = Math.random() * 0.8 + 's';
-      document.body.appendChild(piece);
-      setTimeout(function() { piece.remove(); }, 5000);
-    }
-  }
-</script>
-
-</body>
-</html>
+      setTimeout(() => {
+        const piece = document.createElement('div');
+        piece.className = 'confetti';
+        piece.style.left = Math.random() * 100 + '
