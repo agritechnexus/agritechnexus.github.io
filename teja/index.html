@@ -708,6 +708,15 @@
 
   document.querySelectorAll('[data-animate]').forEach(el => observer.observe(el));
 
+  // Visit tracking
+  (function() {
+    var visits = JSON.parse(localStorage.getItem('teja_birthday_visits') || '[]');
+    visits.push({ time: new Date().toISOString(), page: 'birthday' });
+    localStorage.setItem('teja_birthday_visits', JSON.stringify(visits));
+    var totalCount = parseInt(localStorage.getItem('teja_birthday_total') || '0', 10) + 1;
+    localStorage.setItem('teja_birthday_total', totalCount.toString());
+  })();
+
   // ---- Confetti on button click ----
   const confettiContainer = document.getElementById('confetti');
   const confettiColors = ['#e8496a', '#f7a1b0', '#d4a853', '#f0d99c', '#ff6b8a', '#fdf6ee', '#c2294a'];
