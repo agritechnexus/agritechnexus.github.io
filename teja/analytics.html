@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Birthday Page Analytics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0f0f1a;
+      color: #e0e0f0;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .subtitle {
+      color: #888;
+      font-size: 0.95rem;
+      margin-bottom: 40px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: #1a1a2e;
+      border: 1px solid #2a2a44;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: #e8496a;
+    }
+
+    .stat-number {
+      font-size: 3rem;
+      font-weight: 700;
+      color: #e8496a;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .stat-card.gold .stat-number { color: #d4a853; }
+    .stat-card.purple .stat-number { color: #a855f7; }
+
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #ccc;
+    }
+
+    .visit-log {
+      background: #1a1a2e;
+      border: 1px solid #2a2a44;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 40px;
+    }
+
+    .visit-log-header {
+      display: grid;
+      grid-template-columns: 50px 1fr 1fr 100px;
+      padding: 12px 20px;
+      background: #22223a;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #888;
+      font-weight: 600;
+    }
+
+    .visit-row {
+      display: grid;
+      grid-template-columns: 50px 1fr 1fr 100px;
+      padding: 12px 20px;
+      border-top: 1px solid #2a2a44;
+      font-size: 0.9rem;
+      transition: background 0.15s;
+    }
+
+    .visit-row:hover {
+      background: #22223a;
+    }
+
+    .visit-row .visit-num {
+      color: #e8496a;
+      font-weight: 600;
+    }
+
+    .visit-row .visit-date { color: #ccc; }
+    .visit-row .visit-time { color: #aaa; }
+    .visit-row .visit-ago { color: #666; font-size: 0.8rem; }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #555;
+    }
+
+    .empty-state .emoji { font-size: 3rem; margin-bottom: 16px; }
+    .empty-state p { font-size: 1rem; }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: 1px solid #2a2a44;
+      border-radius: 8px;
+      background: #1a1a2e;
+      color: #ccc;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn:hover {
+      border-color: #e8496a;
+      color: #fff;
+      background: #22223a;
+    }
+
+    .btn-danger {
+      border-color: #4a1a1a;
+      color: #e85555;
+    }
+
+    .btn-danger:hover {
+      border-color: #e85555;
+      background: #2a1010;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: #444;
+      font-size: 0.8rem;
+    }
+
+    .footer a {
+      color: #e8496a;
+      text-decoration: none;
+    }
+
+    .footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 500px) {
+      .visit-log-header, .visit-row {
+        grid-template-columns: 40px 1fr 100px;
+      }
+      .visit-log-header > :nth-child(3),
+      .visit-row > :nth-child(3) {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Birthday Page Analytics</h1>
+  <p class="subtitle">Track how many times the birthday page has been opened on this device</p>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-number" id="totalVisits">0</div>
+      <div class="stat-label">Total Visits</div>
+    </div>
+    <div class="stat-card gold">
+      <div class="stat-number" id="todayVisits">0</div>
+      <div class="stat-label">Today</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-number" id="firstVisit">—</div>
+      <div class="stat-label">First Visit</div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <a href="index.html" class="btn">Open Birthday Page</a>
+    <button class="btn" onclick="refreshData()">Refresh</button>
+    <button class="btn btn-danger" onclick="clearData()">Clear All Data</button>
+  </div>
+
+  <h2 class="section-title">Visit Log</h2>
+  <div class="visit-log" id="visitLog">
+    <div class="visit-log-header">
+      <span>#</span>
+      <span>Date</span>
+      <span>Time</span>
+      <span>Ago</span>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <a href="index.html">Back to Birthday Page</a>
+</div>
+
+<script>
+  function timeAgo(dateStr) {
+    var now = new Date();
+    var then = new Date(dateStr);
+    var diff = Math.floor((now - then) / 1000);
+    if (diff < 60) return diff + 's ago';
+    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+    return Math.floor(diff / 86400) + 'd ago';
+  }
+
+  function formatDate(dateStr) {
+    var d = new Date(dateStr);
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+  }
+
+  function formatTime(dateStr) {
+    var d = new Date(dateStr);
+    var h = d.getHours();
+    var m = d.getMinutes().toString().padStart(2, '0');
+    var ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return h + ':' + m + ' ' + ampm;
+  }
+
+  function isToday(dateStr) {
+    var d = new Date(dateStr);
+    var now = new Date();
+    return d.getFullYear() === now.getFullYear() &&
+           d.getMonth() === now.getMonth() &&
+           d.getDate() === now.getDate();
+  }
+
+  function loadData() {
+    var visits = JSON.parse(localStorage.getItem('teja_birthday_visits') || '[]');
+    var total = parseInt(localStorage.getItem('teja_birthday_total') || '0', 10);
+
+    document.getElementById('totalVisits').textContent = total;
+
+    var todayCount = visits.filter(function(v) { return isToday(v.time); }).length;
+    document.getElementById('todayVisits').textContent = todayCount;
+
+    var firstEl = document.getElementById('firstVisit');
+    if (visits.length > 0) {
+      firstEl.textContent = formatDate(visits[0].time);
+      firstEl.style.fontSize = '1rem';
+    } else {
+      firstEl.textContent = '—';
+    }
+
+    var logEl = document.getElementById('visitLog');
+    // Keep header, remove old rows
+    var rows = logEl.querySelectorAll('.visit-row');
+    rows.forEach(function(r) { r.remove(); });
+
+    if (visits.length === 0) {
+      var empty = document.createElement('div');
+      empty.className = 'empty-state';
+      empty.innerHTML = '<div class="emoji">📊</div><p>No visits recorded yet.<br>Open the <a href="index.html" style="color:#e8496a;">birthday page</a> to start tracking!</p>';
+      logEl.appendChild(empty);
+      return;
+    }
+
+    // Show visits in reverse order (newest first)
+    var reversed = visits.slice().reverse();
+    reversed.forEach(function(visit, i) {
+      var num = visits.length - i;
+      var row = document.createElement('div');
+      row.className = 'visit-row';
+      row.innerHTML =
+        '<span class="visit-num">' + num + '</span>' +
+        '<span class="visit-date">' + formatDate(visit.time) + '</span>' +
+        '<span class="visit-time">' + formatTime(visit.time) + '</span>' +
+        '<span class="visit-ago">' + timeAgo(visit.time) + '</span>';
+      logEl.appendChild(row);
+    });
+  }
+
+  function refreshData() {
+    loadData();
+  }
+
+  function clearData() {
+    if (confirm('Clear all visit data? This cannot be undone.')) {
+      localStorage.removeItem('teja_birthday_visits');
+      localStorage.removeItem('teja_birthday_total');
+      loadData();
+    }
+  }
+
+  loadData();
+</script>
+
+</body>
+</html>
