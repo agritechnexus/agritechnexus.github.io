@@ -1,7 +1,10 @@
 package com.fixmybill.app.presentation.screens.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -15,10 +18,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-private val TealPrimary = Color(0xFF0D7377)
+private val PrimaryTeal = Color(0xFF0D7377)
+private val WarningOrange = Color(0xFFFF6B35)
 private val SuccessGreen = Color(0xFF2EC4B6)
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,232 +33,363 @@ fun SettingsScreen(
     onBack: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
-    val state by viewModel.settingsState.collectAsStateWithLifecycle()
+    val uiState by viewModel.settingsState.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = {
+                    Text(
+                        text = "Settings",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = TealPrimary,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         }
-    ) { padding ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             // Profile Section
-            ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+            ElevatedCard(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
+            ) {
                 Row(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        Icons.Default.AccountCircle,
-                        contentDescription = null,
+                    Surface(
                         modifier = Modifier.size(56.dp),
-                        tint = TealPrimary
-                    )
+                        shape = CircleShape,
+                        color = PrimaryTeal.copy(alpha = 0.12f)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = "Profile",
+                                tint = PrimaryTeal,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                    }
                     Spacer(modifier = Modifier.width(16.dp))
-                    Column {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = state.userName.ifEmpty { "User" },
+                            text = uiState.userName.ifBlank { "User" },
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = state.userEmail.ifEmpty { "Not signed in" },
-                            style = MaterialTheme.typography.bodySmall,
+                            text = uiState.userPhone.ifBlank { "Not signed in" },
+                            style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    IconButton(onClick = { /* Edit profile */ }) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit Profile",
+                            tint = PrimaryTeal
                         )
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Premium Card
+            ElevatedCard(
+                onClick = onPremiumClick,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.elevatedCardColors(
+                    containerColor = PrimaryTeal
+                ),
+                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.WorkspacePremium,
+                        contentDescription = "Premium",
+                        tint = Color.White,
+                        modifier = Modifier.size(36.dp)
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = if (uiState.isPremium) "Premium Active" else "Upgrade to Premium",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            text = if (uiState.isPremium) "Enjoy unlimited features" else "Unlock unlimited scans & features",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.White.copy(alpha = 0.85f)
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
 
             // Location Settings
             Text(
                 text = "Location",
                 style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            // State Dropdown
-            var stateExpanded by remember { mutableStateOf(false) }
-            val states = listOf(
-                "Telangana", "Andhra Pradesh", "Karnataka", "Maharashtra",
-                "Tamil Nadu", "Delhi", "West Bengal", "Uttar Pradesh",
-                "Gujarat", "Rajasthan", "Kerala", "Madhya Pradesh"
-            )
-
-            ExposedDropdownMenuBox(
-                expanded = stateExpanded,
-                onExpandedChange = { stateExpanded = it }
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
-                OutlinedTextField(
-                    value = state.selectedState,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("State") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = stateExpanded) },
-                    modifier = Modifier.fillMaxWidth().menuAnchor()
-                )
-                ExposedDropdownMenu(
-                    expanded = stateExpanded,
-                    onDismissRequest = { stateExpanded = false }
-                ) {
-                    states.forEach { stateName ->
-                        DropdownMenuItem(
-                            text = { Text(stateName) },
-                            onClick = {
-                                viewModel.updateState(stateName)
-                                stateExpanded = false
-                            }
+                Column(modifier = Modifier.padding(4.dp)) {
+                    // State Dropdown
+                    var stateExpanded by remember { mutableStateOf(false) }
+                    val states = listOf(
+                        "Maharashtra", "Delhi", "Karnataka", "Tamil Nadu",
+                        "Uttar Pradesh", "Gujarat", "Rajasthan", "West Bengal",
+                        "Telangana", "Andhra Pradesh", "Kerala", "Madhya Pradesh"
+                    )
+
+                    ExposedDropdownMenuBox(
+                        expanded = stateExpanded,
+                        onExpandedChange = { stateExpanded = it }
+                    ) {
+                        OutlinedTextField(
+                            value = uiState.selectedState,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("State") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = stateExpanded) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor()
+                                .padding(horizontal = 12.dp, vertical = 4.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = PrimaryTeal,
+                                focusedLabelColor = PrimaryTeal
+                            )
                         )
+                        ExposedDropdownMenu(
+                            expanded = stateExpanded,
+                            onDismissRequest = { stateExpanded = false }
+                        ) {
+                            states.forEach { state ->
+                                DropdownMenuItem(
+                                    text = { Text(state) },
+                                    onClick = {
+                                        viewModel.setState(state)
+                                        stateExpanded = false
+                                    }
+                                )
+                            }
+                        }
                     }
+
+                    // City Dropdown
+                    var cityExpanded by remember { mutableStateOf(false) }
+                    val cities = listOf(
+                        "Mumbai", "Pune", "Nagpur", "Delhi", "Bengaluru",
+                        "Chennai", "Hyderabad", "Kolkata", "Ahmedabad", "Jaipur"
+                    )
+
+                    ExposedDropdownMenuBox(
+                        expanded = cityExpanded,
+                        onExpandedChange = { cityExpanded = it }
+                    ) {
+                        OutlinedTextField(
+                            value = uiState.selectedCity,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("City") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = cityExpanded) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor()
+                                .padding(horizontal = 12.dp, vertical = 4.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = PrimaryTeal,
+                                focusedLabelColor = PrimaryTeal
+                            )
+                        )
+                        ExposedDropdownMenu(
+                            expanded = cityExpanded,
+                            onDismissRequest = { cityExpanded = false }
+                        ) {
+                            cities.forEach { city ->
+                                DropdownMenuItem(
+                                    text = { Text(city) },
+                                    onClick = {
+                                        viewModel.setCity(city)
+                                        cityExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
 
-            // City Input
-            OutlinedTextField(
-                value = state.selectedCity,
-                onValueChange = { viewModel.updateCity(it) },
-                label = { Text("City") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            HorizontalDivider()
+            Spacer(modifier = Modifier.height(24.dp))
 
             // Preferences
             Text(
                 text = "Preferences",
                 style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            SettingsToggleItem(
-                icon = Icons.Default.DarkMode,
-                title = "Dark Mode",
-                subtitle = "Enable dark theme",
-                checked = state.isDarkMode,
-                onCheckedChange = { viewModel.toggleDarkMode() }
-            )
-
-            SettingsToggleItem(
-                icon = Icons.Default.Notifications,
-                title = "Notifications",
-                subtitle = "Bill due date reminders",
-                checked = state.notificationsEnabled,
-                onCheckedChange = { viewModel.toggleNotifications() }
-            )
-
-            // Language Selector
-            var langExpanded by remember { mutableStateOf(false) }
-            val languages = listOf("English", "Hindi", "Telugu", "Tamil", "Kannada", "Marathi", "Bengali")
-
-            ExposedDropdownMenuBox(
-                expanded = langExpanded,
-                onExpandedChange = { langExpanded = it }
-            ) {
-                OutlinedTextField(
-                    value = state.language,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Language") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = langExpanded) },
-                    modifier = Modifier.fillMaxWidth().menuAnchor()
-                )
-                ExposedDropdownMenu(
-                    expanded = langExpanded,
-                    onDismissRequest = { langExpanded = false }
-                ) {
-                    languages.forEach { lang ->
-                        DropdownMenuItem(
-                            text = { Text(lang) },
-                            onClick = {
-                                viewModel.updateLanguage(lang)
-                                langExpanded = false
-                            }
-                        )
-                    }
-                }
-            }
-
-            HorizontalDivider()
-
-            // Premium Card
-            ElevatedCard(
+            Card(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = onPremiumClick,
-                colors = CardDefaults.elevatedCardColors(
-                    containerColor = Color(0xFFF0FFFE)
-                )
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        Icons.Default.Star,
-                        contentDescription = null,
-                        tint = SuccessGreen,
-                        modifier = Modifier.size(40.dp)
+                Column {
+                    // Dark Mode Toggle
+                    SettingsToggleItem(
+                        icon = Icons.Default.DarkMode,
+                        title = "Dark Mode",
+                        subtitle = "Use dark theme",
+                        checked = uiState.isDarkMode,
+                        onCheckedChange = { viewModel.toggleDarkMode() }
                     )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = if (state.isPremium) "Premium Active" else "Go Premium",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = TealPrimary
-                        )
-                        Text(
-                            text = if (state.isPremium) "You have access to all features"
-                            else "Unlimited scans, AI analysis & more",
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                    Icon(
-                        Icons.Default.ChevronRight,
-                        contentDescription = null,
-                        tint = TealPrimary
+
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+
+                    // Notifications Toggle
+                    SettingsToggleItem(
+                        icon = Icons.Default.Notifications,
+                        title = "Notifications",
+                        subtitle = "Bill reminders & overcharge alerts",
+                        checked = uiState.isNotificationsEnabled,
+                        onCheckedChange = { viewModel.toggleNotifications() }
                     )
                 }
             }
 
-            HorizontalDivider()
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // About links
-            SettingsClickItem(icon = Icons.Default.Info, title = "About FixMyBill", onClick = {})
-            SettingsClickItem(icon = Icons.Default.Help, title = "Help & FAQ", onClick = {})
-            SettingsClickItem(icon = Icons.Default.Star, title = "Rate Us", onClick = {})
+            // About
+            Text(
+                text = "About",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
 
-            // Logout
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            ) {
+                Column {
+                    SettingsLinkItem(
+                        icon = Icons.Default.PrivacyTip,
+                        title = "Privacy Policy",
+                        onClick = { /* Open privacy policy */ }
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                    SettingsLinkItem(
+                        icon = Icons.Default.Description,
+                        title = "Terms of Service",
+                        onClick = { /* Open terms */ }
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                    SettingsLinkItem(
+                        icon = Icons.Default.HelpOutline,
+                        title = "Help & Support",
+                        onClick = { /* Open help */ }
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                    SettingsLinkItem(
+                        icon = Icons.Default.Star,
+                        title = "Rate the App",
+                        onClick = { /* Open store listing */ }
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                    SettingsLinkItem(
+                        icon = Icons.Default.Info,
+                        title = "App Version",
+                        subtitle = "1.0.0",
+                        onClick = { }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Sign Out
             OutlinedButton(
-                onClick = { },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red)
+                onClick = { viewModel.signOut() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                shape = MaterialTheme.shapes.medium,
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = Color(0xFFD32F2F)
+                )
             ) {
-                Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null)
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Logout,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Logout")
+                Text(
+                    text = "Sign Out",
+                    fontWeight = FontWeight.SemiBold
+                )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
@@ -264,16 +400,28 @@ private fun SettingsToggleItem(
     title: String,
     subtitle: String,
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onCheckedChange() }
+            .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(icon, contentDescription = null, tint = TealPrimary)
+        Icon(
+            imageVector = icon,
+            contentDescription = title,
+            tint = PrimaryTeal,
+            modifier = Modifier.size(24.dp)
+        )
         Spacer(modifier = Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = title, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium
+            )
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodySmall,
@@ -282,29 +430,56 @@ private fun SettingsToggleItem(
         }
         Switch(
             checked = checked,
-            onCheckedChange = onCheckedChange,
-            colors = SwitchDefaults.colors(checkedTrackColor = TealPrimary)
+            onCheckedChange = { onCheckedChange() },
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color.White,
+                checkedTrackColor = PrimaryTeal,
+                uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
+            )
         )
     }
 }
 
 @Composable
-private fun SettingsClickItem(
+private fun SettingsLinkItem(
     icon: ImageVector,
     title: String,
+    subtitle: String? = null,
     onClick: () -> Unit
 ) {
-    Surface(onClick = onClick) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(icon, contentDescription = null, tint = TealPrimary)
-            Spacer(modifier = Modifier.width(16.dp))
-            Text(text = title, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
-            Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.Gray)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = title,
+            tint = PrimaryTeal,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium
+            )
+            if (subtitle != null) {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
+        Icon(
+            imageVector = Icons.Default.ChevronRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
