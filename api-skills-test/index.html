@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude API Skills Tester</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --surface-2: #1a1a28;
+            --border: #2a2a3d;
+            --text: #e4e4ed;
+            --text-muted: #8888a0;
+            --accent: #7c3aed;
+            --accent-glow: rgba(124, 58, 237, 0.3);
+            --green: #22c55e;
+            --green-glow: rgba(34, 197, 94, 0.2);
+            --red: #ef4444;
+            --red-glow: rgba(239, 68, 68, 0.2);
+            --yellow: #eab308;
+            --blue: #3b82f6;
+            --cyan: #06b6d4;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            border-bottom: 1px solid var(--border);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .api-key-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .api-key-input {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            width: 320px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .api-key-input:focus { border-color: var(--accent); }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--red);
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        .status-dot.connected {
+            background: var(--green);
+            box-shadow: 0 0 10px var(--green-glow);
+        }
+
+        /* Main Layout */
+        .main { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+        .page-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            font-size: 0.95rem;
+        }
+
+        /* Skill Grid */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 20px;
+        }
+
+        /* Skill Card */
+        .skill-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .skill-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 30px rgba(124, 58, 237, 0.08);
+        }
+
+        .skill-header {
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .skill-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .skill-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .skill-tag {
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .skill-body { padding: 18px 20px; }
+
+        .skill-desc {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 14px;
+        }
+
+        .skill-input {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            outline: none;
+            resize: vertical;
+            min-height: 40px;
+            transition: border-color 0.2s;
+        }
+
+        .skill-input:focus { border-color: var(--accent); }
+
+        textarea.skill-input { min-height: 70px; }
+
+        .skill-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .skill-input-group label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select.skill-input {
+            appearance: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238888a0' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
+
+        .skill-footer {
+            padding: 14px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .run-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .run-btn:hover { opacity: 0.9; }
+        .run-btn:active { transform: scale(0.97); }
+        .run-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .run-btn.running {
+            background: var(--surface-2);
+            color: var(--text-muted);
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: none;
+        }
+
+        .status-badge.success {
+            display: inline;
+            background: var(--green-glow);
+            color: var(--green);
+        }
+
+        .status-badge.error {
+            display: inline;
+            background: var(--red-glow);
+            color: var(--red);
+        }
+
+        .status-badge.running {
+            display: inline;
+            background: rgba(234, 179, 8, 0.15);
+            color: var(--yellow);
+        }
+
+        /* Output Panel */
+        .output-panel {
+            margin-top: 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            max-height: 250px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .output-panel.visible { display: block; }
+
+        .output-content {
+            padding: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: var(--text-muted);
+        }
+
+        .output-content .stream-text { color: var(--text); }
+
+        /* Color themes per skill */
+        .theme-purple .skill-icon { background: rgba(124, 58, 237, 0.15); color: var(--accent); }
+        .theme-purple .skill-tag { background: rgba(124, 58, 237, 0.15); color: var(--accent); }
+
+        .theme-blue .skill-icon { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
+        .theme-blue .skill-tag { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
+
+        .theme-green .skill-icon { background: rgba(34, 197, 94, 0.15); color: var(--green); }
+        .theme-green .skill-tag { background: rgba(34, 197, 94, 0.15); color: var(--green); }
+
+        .theme-cyan .skill-icon { background: rgba(6, 182, 212, 0.15); color: var(--cyan); }
+        .theme-cyan .skill-tag { background: rgba(6, 182, 212, 0.15); color: var(--cyan); }
+
+        .theme-pink .skill-icon { background: rgba(236, 72, 153, 0.15); color: var(--pink); }
+        .theme-pink .skill-tag { background: rgba(236, 72, 153, 0.15); color: var(--pink); }
+
+        .theme-orange .skill-icon { background: rgba(249, 115, 22, 0.15); color: var(--orange); }
+        .theme-orange .skill-tag { background: rgba(249, 115, 22, 0.15); color: var(--orange); }
+
+        .theme-yellow .skill-icon { background: rgba(234, 179, 8, 0.15); color: var(--yellow); }
+        .theme-yellow .skill-tag { background: rgba(234, 179, 8, 0.15); color: var(--yellow); }
+
+        .theme-red .skill-icon { background: rgba(239, 68, 68, 0.15); color: var(--red); }
+        .theme-red .skill-tag { background: rgba(239, 68, 68, 0.15); color: var(--red); }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 20px;
+            min-width: 140px;
+        }
+
+        .stat-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        /* Spinner */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .skills-grid { grid-template-columns: 1fr; }
+            .api-key-input { width: 180px; }
+            .header-inner { flex-wrap: wrap; gap: 12px; }
+            .page-title { font-size: 1.5rem; }
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            z-index: 200;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Run All Button */
+        .run-all-btn {
+            background: linear-gradient(135deg, var(--accent), var(--cyan));
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: opacity 0.2s;
+        }
+
+        .run-all-btn:hover { opacity: 0.9; }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="header-inner">
+        <div class="logo">Claude API Skills Tester</div>
+        <div class="api-key-section">
+            <input type="password" class="api-key-input" id="apiKey" placeholder="sk-ant-api03-... (your Anthropic API key)">
+            <div class="status-dot" id="statusDot" title="API connection status"></div>
+        </div>
+    </div>
+</header>
+
+<main class="main">
+    <h1 class="page-title">API Skills Test Suite</h1>
+    <p class="page-subtitle">Test 10 different Claude API capabilities — from basic chat to advanced tool use, streaming, and vision.</p>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-value" id="statTotal">10</div>
+            <div class="stat-label">Total Skills</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="statPassed" style="color: var(--green)">0</div>
+            <div class="stat-label">Passed</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="statFailed" style="color: var(--red)">0</div>
+            <div class="stat-label">Failed</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="statLatency" style="color: var(--cyan)">—</div>
+            <div class="stat-label">Avg Latency</div>
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <div style="color: var(--text-muted); font-size: 0.85rem;" id="runStatus"></div>
+        <button class="run-all-btn" onclick="runAllSkills()">Run All Skills</button>
+    </div>
+
+    <div class="skills-grid" id="skillsGrid"></div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API_URL = 'https://api.anthropic.com/v1/messages';
+const MODEL = 'claude-sonnet-4-20250514';
+
+let stats = { passed: 0, failed: 0, latencies: [] };
+
+function getApiKey() {
+    return document.getElementById('apiKey').value.trim();
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function updateStats() {
+    document.getElementById('statPassed').textContent = stats.passed;
+    document.getElementById('statFailed').textContent = stats.failed;
+    if (stats.latencies.length > 0) {
+        const avg = Math.round(stats.latencies.reduce((a, b) => a + b, 0) / stats.latencies.length);
+        document.getElementById('statLatency').textContent = avg + 'ms';
+    }
+}
+
+// API key validation
+document.getElementById('apiKey').addEventListener('input', function() {
+    const dot = document.getElementById('statusDot');
+    dot.classList.toggle('connected', this.value.startsWith('sk-ant-'));
+});
+
+// Core API call function
+async function callClaude(body) {
+    const key = getApiKey();
+    if (!key) throw new Error('Please enter your Anthropic API key');
+
+    const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': key,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({ model: MODEL, max_tokens: 1024, ...body })
+    });
+
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error?.message || `API error: ${res.status}`);
+    }
+    return res.json();
+}
+
+// Streaming API call
+async function callClaudeStream(body, onChunk) {
+    const key = getApiKey();
+    if (!key) throw new Error('Please enter your Anthropic API key');
+
+    const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': key,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({ model: MODEL, max_tokens: 1024, stream: true, ...body })
+    });
+
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error?.message || `API error: ${res.status}`);
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let fullText = '';
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+
+        for (const line of lines) {
+            if (line.startsWith('data: ')) {
+                try {
+                    const data = JSON.parse(line.slice(6));
+                    if (data.type === 'content_block_delta' && data.delta?.text) {
+                        fullText += data.delta.text;
+                        onChunk(data.delta.text, fullText);
+                    }
+                } catch(e) {}
+            }
+        }
+    }
+    return fullText;
+}
+
+// =========== SKILL DEFINITIONS ===========
+const skills = [
+    {
+        id: 'basic-chat',
+        title: 'Basic Chat Completion',
+        icon: '💬',
+        theme: 'theme-purple',
+        tag: 'Messages API',
+        desc: 'Send a simple message and get a response. Tests the core messages endpoint.',
+        inputs: [
+            { id: 'prompt', label: 'Prompt', type: 'textarea', placeholder: 'Ask Claude anything...', value: 'What is the capital of France? Reply in one sentence.' }
+        ],
+        run: async function(inputs, output) {
+            const res = await callClaude({
+                messages: [{ role: 'user', content: inputs.prompt }]
+            });
+            return res.content[0].text;
+        }
+    },
+    {
+        id: 'system-prompt',
+        title: 'System Prompt & Personas',
+        icon: '🎭',
+        theme: 'theme-blue',
+        tag: 'System Messages',
+        desc: 'Use system prompts to control Claude\'s behavior and persona.',
+        inputs: [
+            { id: 'system', label: 'System Prompt', type: 'textarea', placeholder: 'Define persona...', value: 'You are a pirate captain. Speak only in pirate dialect.' },
+            { id: 'prompt', label: 'User Message', type: 'input', placeholder: 'Message...', value: 'Tell me about the weather today.' }
+        ],
+        run: async function(inputs) {
+            const res = await callClaude({
+                system: inputs.system,
+                messages: [{ role: 'user', content: inputs.prompt }]
+            });
+            return res.content[0].text;
+        }
+    },
+    {
+        id: 'streaming',
+        title: 'Streaming Response',
+        icon: '⚡',
+        theme: 'theme-yellow',
+        tag: 'Streaming',
+        desc: 'Stream tokens in real-time using server-sent events (SSE).',
+        inputs: [
+            { id: 'prompt', label: 'Prompt', type: 'textarea', placeholder: 'Prompt for streaming...', value: 'Write a short haiku about programming.' }
+        ],
+        run: async function(inputs, outputEl) {
+            const text = await callClaudeStream(
+                { messages: [{ role: 'user', content: inputs.prompt }] },
+                (chunk, full) => {
+                    outputEl.innerHTML = '<span class="stream-text">' + escapeHtml(full) + '</span><span class="spinner"></span>';
+                }
+            );
+            return text;
+        }
+    },
+    {
+        id: 'multi-turn',
+        title: 'Multi-Turn Conversation',
+        icon: '🔄',
+        theme: 'theme-cyan',
+        tag: 'Context',
+        desc: 'Test multi-turn context retention across conversation turns.',
+        inputs: [
+            { id: 'msg1', label: 'Turn 1 (User)', type: 'input', value: 'My name is Alex and I love chess.' },
+            { id: 'msg2', label: 'Turn 2 (User)', type: 'input', value: 'What is my name and what do I love?' }
+        ],
+        run: async function(inputs) {
+            const res = await callClaude({
+                messages: [
+                    { role: 'user', content: inputs.msg1 },
+                    { role: 'assistant', content: 'Nice to meet you, Alex! Chess is a wonderful game.' },
+                    { role: 'user', content: inputs.msg2 }
+                ]
+            });
+            return res.content[0].text;
+        }
+    },
+    {
+        id: 'tool-use',
+        title: 'Tool Use / Function Calling',
+        icon: '🔧',
+        theme: 'theme-orange',
+        tag: 'Tools',
+        desc: 'Claude selects and calls tools with structured parameters.',
+        inputs: [
+            { id: 'prompt', label: 'Prompt', type: 'input', value: 'What is the weather in San Francisco?' }
+        ],
+        run: async function(inputs) {
+            const res = await callClaude({
+                messages: [{ role: 'user', content: inputs.prompt }],
+                tools: [{
+                    name: 'get_weather',
+                    description: 'Get the current weather for a location',
+                    input_schema: {
+                        type: 'object',
+                        properties: {
+                            location: { type: 'string', description: 'City name' },
+                            unit: { type: 'string', enum: ['celsius', 'fahrenheit'], description: 'Temperature unit' }
+                        },
+                        required: ['location']
+                    }
+                }]
+            });
+
+            let output = '';
+            for (const block of res.content) {
+                if (block.type === 'text') output += block.text + '\n';
+                if (block.type === 'tool_use') {
+                    output += `\n✅ Tool Called: ${block.name}\n`;
+                    output += `📎 Input: ${JSON.stringify(block.input, null, 2)}`;
+                }
+            }
+            return output || 'No tool was called.';
+        }
+    },
+    {
+        id: 'json-mode',
+        title: 'Structured JSON Output',
+        icon: '📋',
+        theme: 'theme-green',
+        tag: 'JSON',
+        desc: 'Force Claude to return structured JSON responses.',
+        inputs: [
+            { id: 'prompt', label: 'Prompt', type: 'textarea', value: 'List 3 programming languages with their year of creation and primary use case.' }
+        ],
+        run: async function(inputs) {
+            const res = await callClaude({
+                system: 'Always respond with valid JSON only. No markdown, no explanation. Output a JSON object.',
+                messages: [{ role: 'user', content: inputs.prompt }]
+            });
+            const text = res.content[0].text;
+            try {
+                const parsed = JSON.parse(text);
+                return '✅ Valid JSON:\n' + JSON.stringify(parsed, null, 2);
+            } catch {
+                return '⚠️ Response (not strict JSON):\n' + text;
+            }
+        }
+    },
+    {
+        id: 'vision',
+        title: 'Vision / Image Analysis',
+        icon: '👁️',
+        theme: 'theme-pink',
+        tag: 'Vision',
+        desc: 'Analyze images via URL using Claude\'s multimodal capabilities.',
+        inputs: [
+            { id: 'imageUrl', label: 'Image URL', type: 'input', value: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png' },
+            { id: 'prompt', label: 'Question', type: 'input', value: 'Describe what you see in this image in one sentence.' }
+        ],
+        run: async function(inputs) {
+            const res = await callClaude({
+                messages: [{
+                    role: 'user',
+                    content: [
+                        { type: 'image', source: { type: 'url', url: inputs.imageUrl } },
+                        { type: 'text', text: inputs.prompt }
+                    ]
+                }]
+            });
+            return res.content[0].text;
+        }
+    },
+    {
+        id: 'summarization',
+        title: 'Text Summarization',
+        icon: '📝',
+        theme: 'theme-purple',
+        tag: 'Summarize',
+        desc: 'Summarize long text into concise bullet points.',
+        inputs: [
+            { id: 'text', label: 'Text to Summarize', type: 'textarea', value: 'Artificial intelligence (AI) is intelligence demonstrated by machines, as opposed to natural intelligence displayed by animals including humans. AI research has been defined as the field of study of intelligent agents, which refers to any system that perceives its environment and takes actions that maximize its chance of achieving its goals. The term "artificial intelligence" had previously been used to describe machines that mimic and display human cognitive skills that are associated with the human mind, such as learning and problem-solving. This definition has since been rejected by major AI researchers who now describe AI in terms of rationality and acting rationally, which does not limit how intelligence can be articulated.' }
+        ],
+        run: async function(inputs) {
+            const res = await callClaude({
+                system: 'Summarize the given text into 3-5 concise bullet points. Start each with •',
+                messages: [{ role: 'user', content: inputs.text }]
+            });
+            return res.content[0].text;
+        }
+    },
+    {
+        id: 'code-gen',
+        title: 'Code Generation',
+        icon: '💻',
+        theme: 'theme-cyan',
+        tag: 'Code',
+        desc: 'Generate code in a specified programming language.',
+        inputs: [
+            { id: 'lang', label: 'Language', type: 'select', options: ['Python', 'JavaScript', 'TypeScript', 'Rust', 'Go'], value: 'Python' },
+            { id: 'prompt', label: 'Description', type: 'textarea', value: 'Write a function that checks if a string is a valid palindrome, ignoring spaces and punctuation.' }
+        ],
+        run: async function(inputs) {
+            const res = await callClaude({
+                system: `You are a code generator. Write clean, well-commented ${inputs.lang} code. Return only the code block.`,
+                messages: [{ role: 'user', content: inputs.prompt }]
+            });
+            return res.content[0].text;
+        }
+    },
+    {
+        id: 'classification',
+        title: 'Text Classification',
+        icon: '🏷️',
+        theme: 'theme-red',
+        tag: 'Classify',
+        desc: 'Classify text into categories with confidence scores.',
+        inputs: [
+            { id: 'text', label: 'Text to Classify', type: 'textarea', value: 'I absolutely loved this product! It exceeded all my expectations and the customer service was fantastic.' },
+            { id: 'categories', label: 'Categories (comma-separated)', type: 'input', value: 'Positive, Negative, Neutral, Mixed' }
+        ],
+        run: async function(inputs) {
+            const res = await callClaude({
+                system: `Classify the given text into exactly one of these categories: ${inputs.categories}. Respond with JSON: {"category": "...", "confidence": 0.0-1.0, "reasoning": "..."}`,
+                messages: [{ role: 'user', content: inputs.text }]
+            });
+            const text = res.content[0].text;
+            try {
+                const parsed = JSON.parse(text);
+                return `Category: ${parsed.category}\nConfidence: ${(parsed.confidence * 100).toFixed(0)}%\nReasoning: ${parsed.reasoning}`;
+            } catch {
+                return text;
+            }
+        }
+    }
+];
+
+// =========== RENDER ===========
+function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function renderSkills() {
+    const grid = document.getElementById('skillsGrid');
+    grid.innerHTML = skills.map(skill => `
+        <div class="skill-card ${skill.theme}" id="card-${skill.id}">
+            <div class="skill-header">
+                <div class="skill-icon">${skill.icon}</div>
+                <div>
+                    <div class="skill-title">${skill.title}</div>
+                    <span class="skill-tag">${skill.tag}</span>
+                </div>
+            </div>
+            <div class="skill-body">
+                <div class="skill-desc">${skill.desc}</div>
+                ${skill.inputs.map(inp => `
+                    <div class="skill-input-group">
+                        <label for="${skill.id}-${inp.id}">${inp.label}</label>
+                        ${inp.type === 'textarea'
+                            ? `<textarea class="skill-input" id="${skill.id}-${inp.id}" placeholder="${inp.placeholder || ''}">${inp.value || ''}</textarea>`
+                            : inp.type === 'select'
+                            ? `<select class="skill-input" id="${skill.id}-${inp.id}">${inp.options.map(o => `<option ${o === inp.value ? 'selected' : ''}>${o}</option>`).join('')}</select>`
+                            : `<input class="skill-input" id="${skill.id}-${inp.id}" placeholder="${inp.placeholder || ''}" value="${inp.value || ''}">`
+                        }
+                    </div>
+                `).join('')}
+                <div class="output-panel" id="output-${skill.id}">
+                    <div class="output-content" id="output-content-${skill.id}"></div>
+                </div>
+            </div>
+            <div class="skill-footer">
+                <span class="status-badge" id="badge-${skill.id}"></span>
+                <button class="run-btn" id="btn-${skill.id}" onclick="runSkill('${skill.id}')">Run Test</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function runSkill(id) {
+    const skill = skills.find(s => s.id === id);
+    if (!skill) return;
+
+    if (!getApiKey()) { showToast('Enter your API key first'); return; }
+
+    const btn = document.getElementById(`btn-${id}`);
+    const badge = document.getElementById(`badge-${id}`);
+    const outputPanel = document.getElementById(`output-${id}`);
+    const outputContent = document.getElementById(`output-content-${id}`);
+
+    // Collect inputs
+    const inputs = {};
+    for (const inp of skill.inputs) {
+        inputs[inp.id] = document.getElementById(`${id}-${inp.id}`).value;
+    }
+
+    // Set running state
+    btn.disabled = true;
+    btn.classList.add('running');
+    btn.innerHTML = '<span class="spinner"></span> Running...';
+    badge.className = 'status-badge running';
+    badge.textContent = 'Running...';
+    outputPanel.classList.add('visible');
+    outputContent.textContent = 'Sending request to Claude API...';
+
+    const start = performance.now();
+
+    try {
+        const result = await skill.run(inputs, outputContent);
+        const latency = Math.round(performance.now() - start);
+
+        outputContent.innerHTML = '<span class="stream-text">' + escapeHtml(result) + '</span>';
+        badge.className = 'status-badge success';
+        badge.textContent = `✓ ${latency}ms`;
+
+        stats.passed++;
+        stats.latencies.push(latency);
+    } catch (err) {
+        outputContent.innerHTML = '<span style="color: var(--red)">' + escapeHtml(err.message) + '</span>';
+        badge.className = 'status-badge error';
+        badge.textContent = '✗ Failed';
+        stats.failed++;
+    }
+
+    btn.disabled = false;
+    btn.classList.remove('running');
+    btn.textContent = 'Run Test';
+    updateStats();
+}
+
+async function runAllSkills() {
+    if (!getApiKey()) { showToast('Enter your API key first'); return; }
+
+    stats = { passed: 0, failed: 0, latencies: [] };
+    updateStats();
+
+    const status = document.getElementById('runStatus');
+    for (let i = 0; i < skills.length; i++) {
+        status.textContent = `Running ${i + 1} of ${skills.length}: ${skills[i].title}...`;
+        await runSkill(skills[i].id);
+    }
+    status.textContent = `Complete — ${stats.passed} passed, ${stats.failed} failed`;
+    showToast(`All tests complete: ${stats.passed}/${skills.length} passed`);
+}
+
+// Initialize
+renderSkills();
+</script>
+</body>
+</html>
