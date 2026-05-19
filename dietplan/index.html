@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>12-Day Reset · Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  /* =======================================================
+     MOBILE-FIRST: base styles target phones.
+     Larger screens are enhanced via min-width queries only.
+  ======================================================= */
+  :root{
+    --bg:#0c0d0a; --bg-grid:#15170f;
+    --card:#14160f; --card-hi:#1b1e13;
+    --line:#2a2d1d; --ink:#f3f2e7; --muted:#8d9079;
+    --lime:#d4f24a; --lime-dim:#9aae37;
+    --orange:#ff8a3d; --blue:#6fb6ff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{max-width:100%;overflow-x:hidden}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);color:var(--ink);
+    font-family:'Hanken Grotesk',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    font-size:16px;line-height:1.5;
+  }
+  img,svg{max-width:100%}
+
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:linear-gradient(var(--bg-grid) 1px,transparent 1px),
+      linear-gradient(90deg,var(--bg-grid) 1px,transparent 1px);
+    background-size:46px 46px;
+    -webkit-mask-image:radial-gradient(ellipse 95% 50% at 50% 0%,#000,transparent 75%);
+    mask-image:radial-gradient(ellipse 95% 50% at 50% 0%,#000,transparent 75%);
+    opacity:.5;
+  }
+  body::after{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(circle at 85% 5%,rgba(212,242,74,.10),transparent 40%),
+               radial-gradient(circle at 8% 90%,rgba(255,138,61,.07),transparent 45%);
+  }
+
+  .wrap{position:relative;z-index:1;width:100%;max-width:1180px;margin:0 auto;padding:0 15px}
+
+  /* ---------- sticky header ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:rgba(12,13,10,.85);backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+    padding-top:env(safe-area-inset-top);
+  }
+  .topbar .inner{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    width:100%;max-width:1180px;margin:0 auto;padding:10px 15px;
+  }
+  .mark{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:.95rem;letter-spacing:-.01em;white-space:nowrap}
+  .mark b{color:var(--lime)}
+  .status-pill{
+    display:flex;align-items:center;gap:8px;padding:6px 11px;border-radius:999px;
+    border:1px solid var(--line);background:var(--card);flex-shrink:0;
+  }
+  .status-pill .blip{width:8px;height:8px;border-radius:50%;flex-shrink:0;animation:pulse 1.6s infinite}
+  .status-pill.eat .blip{background:var(--lime);box-shadow:0 0 10px var(--lime)}
+  .status-pill.fast .blip{background:var(--orange);box-shadow:0 0 10px var(--orange)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .status-pill .st b{font-family:'Bricolage Grotesque',sans-serif;font-size:.78rem;font-weight:700;display:block;line-height:1.15;white-space:nowrap}
+  .status-pill .st span{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--muted);white-space:nowrap}
+  .status-pill.eat .st b{color:var(--lime)}
+  .status-pill.fast .st b{color:var(--orange)}
+
+  /* ---------- reveal ---------- */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+  .reveal{opacity:0;animation:fadeUp .75s cubic-bezier(.2,.7,.2,1) both;
+    animation-timeline:view();animation-range:entry 0% cover 20%}
+  @supports not (animation-timeline:view()){.reveal{animation:fadeUp .75s ease both}}
+
+  /* ---------- hero ---------- */
+  .hero{padding:24px 0 2px;text-align:center}
+  .kicker{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--lime-dim)}
+  h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;
+    font-size:clamp(2.2rem,10vw,3.2rem);line-height:.97;letter-spacing:-.03em;margin:9px 0}
+  h1 em{font-style:normal;color:var(--lime)}
+  .hero p{color:var(--muted);font-size:.92rem;max-width:420px;margin:6px auto 0}
+
+  /* ---------- dashboard: single column by default ---------- */
+  .dash{display:flex;flex-direction:column;gap:13px;margin-top:20px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px 17px}
+  .panel-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .panel-h .lab{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--lime-dim)}
+
+  /* progress ring */
+  .prog{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px}
+  .ring-wrap{position:relative;width:130px;height:130px;flex-shrink:0}
+  .ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg)}
+  #progRing{transition:stroke-dashoffset .7s cubic-bezier(.3,.9,.3,1)}
+  .ring-center{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+  .ring-center .pct{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:2.15rem;line-height:1}
+  .ring-center .pl{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.14em;
+    color:var(--muted);text-transform:uppercase}
+  .prog-side{width:100%}
+  .prog-side .day{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.4rem}
+  .prog-side .hint{color:var(--muted);font-size:.84rem;margin:3px 0 13px}
+  .reset{
+    font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    background:transparent;color:var(--muted);border:1px solid var(--line);
+    border-radius:999px;padding:9px 18px;cursor:pointer;touch-action:manipulation;transition:.2s;
+  }
+  .reset:active{transform:scale(.94);color:var(--orange);border-color:var(--orange)}
+
+  /* day selector */
+  .days{display:flex;gap:8px;overflow-x:auto;margin-top:16px;padding-bottom:4px;
+    -ms-overflow-style:none;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .days::-webkit-scrollbar{display:none}
+  .day-chip{
+    flex:0 0 auto;width:52px;height:60px;border-radius:14px;
+    background:var(--bg);border:1px solid var(--line);cursor:pointer;touch-action:manipulation;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    transition:transform .18s,border-color .2s,background .2s;
+  }
+  .day-chip:active{transform:scale(.92)}
+  .day-chip .dn{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.25rem;line-height:1}
+  .day-chip .dl{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.1em;color:var(--muted)}
+  .day-chip.active{background:var(--lime);border-color:var(--lime)}
+  .day-chip.active .dn{color:#161a08}
+  .day-chip.active .dl{color:#3a4012}
+
+  /* water tracker */
+  .water-amt{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:2.2rem;line-height:1;margin-bottom:14px}
+  .water-amt b{color:var(--blue)}
+  .water-amt span{font-size:1rem;color:var(--muted)}
+  .glasses{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+  .glass{
+    height:clamp(54px,14vw,74px);
+    border:1px solid var(--line);border-radius:5px 5px 8px 8px;
+    background:var(--bg);position:relative;overflow:hidden;cursor:pointer;
+    touch-action:manipulation;transition:transform .15s,border-color .2s;
+  }
+  .glass:active{transform:scale(.88)}
+  .glass::after{
+    content:"";position:absolute;left:0;right:0;bottom:0;top:0;
+    background:linear-gradient(180deg,var(--blue),#3d7fc4);
+    transform:translateY(100%);transition:transform .4s cubic-bezier(.3,.9,.3,1);
+  }
+  .glass.full::after{transform:translateY(0)}
+  .glass.full{border-color:var(--blue)}
+  .water-tip{font-size:.78rem;color:var(--muted);margin-top:11px;
+    font-family:'Space Mono',monospace;letter-spacing:.03em}
+
+  /* ---------- sections ---------- */
+  section{padding:26px 0}
+  .sec-h{margin-bottom:4px}
+  .eyebrow{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--lime-dim);display:flex;align-items:center;gap:10px}
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--lime-dim);flex-shrink:0}
+  h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;
+    font-size:clamp(1.55rem,6.5vw,2.3rem);letter-spacing:-.025em;line-height:1.08;margin-top:7px}
+
+  /* fasting clock */
+  .window{
+    display:flex;flex-direction:column;align-items:center;text-align:center;gap:24px;
+    background:var(--card);border:1px solid var(--line);border-radius:22px;
+    padding:24px 17px;margin-top:16px;
+  }
+  .clock-box{position:relative;width:min(228px,72vw);height:min(228px,72vw)}
+  .clock-box svg{transform:rotate(-90deg);width:100%;height:100%;overflow:visible}
+  @keyframes drawEat{from{stroke-dasharray:0 515.22}to{stroke-dasharray:171.74 515.22}}
+  #eatArc{stroke-dasharray:171.74 515.22;animation:drawEat 1.6s cubic-bezier(.2,.8,.2,1) .3s both}
+  .now-hand{position:absolute;inset:0;display:flex;justify-content:center;
+    transition:transform .8s cubic-bezier(.3,.9,.3,1)}
+  .now-dot{width:14px;height:14px;border-radius:50%;background:#fff;margin-top:-1px;
+    border:3px solid var(--bg);box-shadow:0 0 12px rgba(255,255,255,.7)}
+  .clock-center{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+  .clock-center .h{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:2.3rem;line-height:1;color:var(--lime)}
+  .clock-center .h.f{color:var(--orange);font-size:1.35rem}
+  .clock-center .t{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-top:2px}
+  .clock-center hr{width:38px;border:0;border-top:1px solid var(--line);margin:7px auto}
+  .win-info{display:flex;flex-direction:column;gap:15px;width:100%}
+  .win-row{display:flex;gap:12px;align-items:flex-start;text-align:left}
+  .win-row .sw{width:13px;height:13px;border-radius:4px;margin-top:4px;flex-shrink:0}
+  .win-row .sw.e{background:var(--lime);box-shadow:0 0 12px rgba(212,242,74,.5)}
+  .win-row .sw.f{background:var(--orange)}
+  .win-row h3{font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:600}
+  .win-row .tm{font-family:'Space Mono',monospace;font-size:.85rem}
+  .win-row p{color:var(--muted);font-size:.88rem;margin-top:2px}
+
+  /* checklist */
+  .timeline{margin-top:16px;position:relative;padding-left:26px}
+  .timeline::before{content:"";position:absolute;left:7px;top:10px;bottom:10px;width:2px;
+    background:linear-gradient(180deg,var(--lime),var(--orange))}
+  .slot{position:relative;margin-bottom:16px}
+  .slot::before{content:"";position:absolute;left:-27px;top:8px;width:17px;height:17px;
+    border-radius:50%;background:var(--bg);border:2px solid var(--lime);
+    box-shadow:0 0 0 5px var(--bg),0 0 14px rgba(212,242,74,.4)}
+  .slot.evening::before{border-color:var(--orange);box-shadow:0 0 0 5px var(--bg),0 0 14px rgba(255,138,61,.4)}
+  .slot-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 15px}
+  .slot-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:13px}
+  .slot-head h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.3rem}
+  .slot-head .clk{font-family:'Space Mono',monospace;font-size:.74rem;color:var(--muted);white-space:nowrap}
+  .items{display:flex;flex-direction:column;gap:9px}
+  .item{
+    display:flex;gap:12px;align-items:center;padding:14px 13px;border-radius:13px;
+    background:var(--bg);border:1px solid transparent;cursor:pointer;touch-action:manipulation;
+    transition:border-color .2s,background .2s,transform .12s;
+  }
+  .item:active{transform:scale(.98)}
+  .tick{
+    width:26px;height:26px;border-radius:50%;flex-shrink:0;
+    border:2px solid var(--line);position:relative;transition:.22s;
+  }
+  .tick::after{content:"";position:absolute;left:8px;top:4px;width:6px;height:11px;
+    border:solid var(--bg);border-width:0 2.6px 2.6px 0;transform:rotate(45deg) scale(0);
+    transition:transform .2s cubic-bezier(.3,1.6,.4,1)}
+  .item .txt b{font-weight:600;font-size:.96rem;transition:.2s}
+  .item .txt span{display:block;color:var(--muted);font-size:.79rem;margin-top:1px}
+  .item.checked{background:rgba(212,242,74,.07);border-color:rgba(212,242,74,.28)}
+  .item.checked .tick{background:var(--lime);border-color:var(--lime)}
+  .item.checked .tick::after{transform:rotate(45deg) scale(1)}
+  .item.checked .txt b{color:var(--muted);text-decoration:line-through}
+  .slot.evening .item.checked{background:rgba(255,138,61,.08);border-color:rgba(255,138,61,.3)}
+  .slot.evening .item.checked .tick{background:var(--orange);border-color:var(--orange)}
+
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .chips .cl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);width:100%;margin-bottom:1px}
+  .chip{font-size:.8rem;padding:6px 11px;border-radius:999px;background:var(--card-hi);
+    border:1px solid var(--line);transition:.2s}
+  .chip.warn{color:var(--orange);border-color:rgba(255,138,61,.4)}
+
+  /* rules: single column by default */
+  .rules{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+  .rule{background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:18px 16px;transition:transform .3s,border-color .3s}
+  .rule .rn{font-family:'Space Mono',monospace;font-size:10px;color:var(--lime-dim);letter-spacing:.13em}
+  .rule h4{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.15rem;margin:8px 0 4px}
+  .rule p{color:var(--muted);font-size:.85rem;line-height:1.5}
+
+  footer{padding:28px 0 calc(48px + env(safe-area-inset-bottom));text-align:center}
+  .foot-card{background:linear-gradient(150deg,var(--card-hi),var(--card));
+    border:1px solid var(--line);border-radius:22px;padding:30px 20px}
+  .foot-card .q{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;
+    font-size:clamp(1.3rem,5.5vw,2rem);letter-spacing:-.02em;line-height:1.18}
+  .foot-card .q span{color:var(--lime)}
+  .foot-card .m{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--muted);margin-top:13px}
+
+  /* =======================================================
+     TABLET AND UP — enhancements layered on top
+  ======================================================= */
+  @media(min-width:680px){
+    .wrap{padding:0 26px}
+    .topbar .inner{padding:12px 26px}
+    .mark{font-size:1.05rem}
+    .hero{padding:40px 0 6px}
+    .hero p{font-size:1.02rem}
+    section{padding:38px 0}
+    .panel{padding:26px}
+    .dash{margin-top:26px;gap:16px}
+    .rules{flex-direction:row;gap:13px}
+    .rule{flex:1}
+    .window{flex-direction:row;text-align:left;align-items:center;gap:42px;padding:36px}
+    .clock-box{flex-shrink:0}
+    .timeline{padding-left:32px}
+    .slot::before{left:-33px;width:18px;height:18px}
+  }
+  @media(min-width:880px){
+    .dash{flex-direction:row;align-items:stretch}
+    .dash .panel:first-child{flex:1.15}
+    .dash .panel:last-child{flex:1}
+    .prog{flex-direction:row;text-align:left;align-items:center;gap:24px}
+    .prog-side{width:auto;flex:1}
+    .ring-wrap{width:150px;height:150px}
+    .ring-center .pct{font-size:2.5rem}
+  }
+
+  @media(hover:hover){
+    .rule:hover{transform:translateY(-5px);border-color:var(--lime-dim)}
+    .item:hover{border-color:var(--line)}
+    .chip:hover{transform:translateY(-3px);background:var(--lime);color:#161a08}
+    .chip.warn:hover{background:var(--orange);color:#1a0f04}
+    .reset:hover{color:var(--orange);border-color:var(--orange)}
+    .day-chip:hover{border-color:var(--lime-dim)}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{animation-duration:.01ms !important}
+    .reveal{opacity:1}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="inner">
+    <div class="mark">12&#8209;DAY <b>RESET</b></div>
+    <div class="status-pill fast" id="statusPill">
+      <span class="blip"></span>
+      <div class="st"><b id="statusText">Checking</b><span id="statusSub">&mdash;</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker reveal">May 20 &mdash; May 31 Protocol</div>
+    <h1 class="reveal">Track the <em>Reset</em>.</h1>
+    <p class="reveal">Tap to check off meals, movement and water. Watch the ring fill as your day comes together.</p>
+  </div>
+
+  <div class="dash">
+    <div class="panel reveal">
+      <div class="panel-h"><span class="lab">Today&#8217;s Progress</span></div>
+      <div class="prog">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 140 140">
+            <circle cx="70" cy="70" r="54" fill="none" stroke="var(--line)" stroke-width="13"/>
+            <circle id="progRing" cx="70" cy="70" r="54" fill="none" stroke="var(--lime)"
+                    stroke-width="13" stroke-linecap="round"
+                    stroke-dasharray="339.29" stroke-dashoffset="339.29"/>
+          </svg>
+          <div class="ring-center">
+            <div class="pct" id="progPct">0%</div>
+            <div class="pl">Complete</div>
+          </div>
+        </div>
+        <div class="prog-side">
+          <div class="day" id="dayLabel">Day 1 of 12</div>
+          <div class="hint">Pick a day, then check off your tasks.</div>
+          <button class="reset" id="resetBtn">Reset day</button>
+        </div>
+      </div>
+      <div class="days" id="days"></div>
+    </div>
+
+    <div class="panel reveal">
+      <div class="panel-h"><span class="lab">Water &middot; 4 Litre Goal</span></div>
+      <div class="water-amt"><b id="waterAmt">0.0</b><span>&nbsp;/ 4.0 L</span></div>
+      <div class="glasses" id="glasses"></div>
+      <div class="water-tip">Tap a glass &mdash; each one is 500 ml</div>
+    </div>
+  </div>
+
+  <section>
+    <div class="sec-h reveal">
+      <div class="eyebrow">The Window</div>
+      <h2>8 hours to eat. 16 to fast.</h2>
+    </div>
+    <div class="window reveal">
+      <div class="clock-box">
+        <svg viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="82" fill="none" stroke="var(--line)" stroke-width="20"/>
+          <circle cx="100" cy="100" r="82" fill="none" stroke="var(--orange)" stroke-width="20"
+                  opacity=".55" stroke-dasharray="337.5 515.22" stroke-dashoffset="-364.98"/>
+          <circle id="eatArc" cx="100" cy="100" r="82" fill="none" stroke="var(--lime)"
+                  stroke-width="20" stroke-linecap="round" stroke-dashoffset="-193.21"/>
+        </svg>
+        <div class="now-hand" id="nowHand"><span class="now-dot"></span></div>
+        <div class="clock-center">
+          <div class="h">8h</div><div class="t">Eat</div>
+          <hr>
+          <div class="h f">16h</div><div class="t">Fast</div>
+        </div>
+      </div>
+      <div class="win-info">
+        <div class="win-row">
+          <div class="sw e"></div>
+          <div><h3>Eating Window</h3><div class="tm">9:00 AM &rarr; 5:00 PM</div>
+          <p>All meals fit inside this 8-hour block.</p></div>
+        </div>
+        <div class="win-row">
+          <div class="sw f"></div>
+          <div><h3>Fasting Window</h3><div class="tm">5:00 PM &rarr; 9:00 AM</div>
+          <p>Water, black coffee or plain tea only. The white dot marks the time now.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-h reveal">
+      <div class="eyebrow">Daily Checklist</div>
+      <h2>Tap each one as you go.</h2>
+    </div>
+    <div class="timeline">
+
+      <div class="slot reveal">
+        <div class="slot-card">
+          <div class="slot-head"><h3>Morning</h3><span class="clk">06:00 &mdash; 10:00</span></div>
+          <div class="items">
+            <div class="item" data-task="walk"><span class="tick"></span><div class="txt"><b>Brisk Walking</b><span>One full hour, steady pace</span></div></div>
+            <div class="item" data-task="workout"><span class="tick"></span><div class="txt"><b>Workout</b><span>45 minutes of strength &amp; sweat</span></div></div>
+            <div class="item" data-task="breakfast"><span class="tick"></span><div class="txt"><b>Breakfast</b><span>2 whole eggs + 1 glass jaava</span></div></div>
+            <div class="item" data-task="coffee"><span class="tick"></span><div class="txt"><b>Black Coffee</b><span>No sugar, no milk</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slot reveal">
+        <div class="slot-card">
+          <div class="slot-head"><h3>Afternoon</h3><span class="clk">12:30 &mdash; 14:00</span></div>
+          <div class="items">
+            <div class="item" data-task="rice"><span class="tick"></span><div class="txt"><b>1 Bowl Rice</b><span>150 grams &mdash; measured</span></div></div>
+            <div class="item" data-task="salad"><span class="tick"></span><div class="txt"><b>1 Cup Salad</b><span>Carrot, cucumber, beetroot</span></div></div>
+            <div class="item" data-task="curry"><span class="tick"></span><div class="txt"><b>Curry + &frac12; Cup Curd</b><span>Protein-forward, light on oil</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slot evening reveal">
+        <div class="slot-card">
+          <div class="slot-head"><h3>Evening</h3><span class="clk">16:00 &mdash; 17:00</span></div>
+          <div class="items">
+            <div class="item" data-task="drink"><span class="tick"></span><div class="txt"><b>One Drink</b><span>Black / green / normal tea, or buttermilk</span></div></div>
+            <div class="item" data-task="fruit"><span class="tick"></span><div class="txt"><b>1 Fruit or 1 Roti</b><span>Pick one &mdash; close the eating window</span></div></div>
+          </div>
+          <div class="chips">
+            <span class="cl">Fruit options</span>
+            <span class="chip">Guava</span><span class="chip">Banana</span>
+            <span class="chip">Papaya</span><span class="chip">Watermelon</span>
+            <span class="chip">Cucumber</span><span class="chip warn">Mango &mdash; 1 small only</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-h reveal">
+      <div class="eyebrow">Non-Negotiables</div>
+      <h2>Three rules, every day.</h2>
+    </div>
+    <div class="rules">
+      <div class="rule reveal"><div class="rn">RULE / 01</div><h4>4 Litres Water</h4><p>Hydrate hard, tracked glass by glass above.</p></div>
+      <div class="rule reveal"><div class="rn">RULE / 02</div><h4>Zero Junk</h4><p>No sugar, no fried food, no processed snacks.</p></div>
+      <div class="rule reveal"><div class="rn">RULE / 03</div><h4>Protein First</h4><p>Eggs, meat, sprouts and dal anchor every plate.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="foot-card reveal">
+      <div class="q">Twelve days of <span>discipline</span>.<br>One window that changes everything.</div>
+      <div class="m">May 20 &ndash; May 31 &middot; Stay Consistent</div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var WGOAL = 8;
+  var DAYS = 12;
+  var store = {};
+  var cur = 1;
+  var taskKeys = [];
+
+  function dayState(d){
+    if(!store[d]){ store[d] = { done:{}, water:0 }; }
+    return store[d];
+  }
+
+  var daysEl = document.getElementById('days');
+  var di;
+  for(di=1; di<=DAYS; di++){
+    var chip = document.createElement('div');
+    chip.className = 'day-chip' + (di===1 ? ' active' : '');
+    chip.setAttribute('data-day', di);
+    chip.innerHTML = '<span class="dn">' + di + '</span><span class="dl">DAY</span>';
+    daysEl.appendChild(chip);
+  }
+
+  var glassesEl = document.getElementById('glasses');
+  var gi;
+  for(gi=0; gi<WGOAL; gi++){
+    var g = document.createElement('div');
+    g.className = 'glass';
+    g.setAttribute('data-idx', gi);
+    glassesEl.appendChild(g);
+  }
+
+  var itemEls = document.querySelectorAll('.item');
+  itemEls.forEach(function(el){ taskKeys.push(el.getAttribute('data-task')); });
+
+  var progRing = document.getElementById('progRing');
+  var RC = 339.29;
+
+  function render(){
+    var s = dayState(cur);
+    itemEls.forEach(function(el){
+      var k = el.getAttribute('data-task');
+      if(s.done[k]){ el.classList.add('checked'); }
+      else{ el.classList.remove('checked'); }
+    });
+    glassesEl.querySelectorAll('.glass').forEach(function(el, idx){
+      if(idx < s.water){ el.classList.add('full'); }
+      else{ el.classList.remove('full'); }
+    });
+    document.getElementById('waterAmt').textContent = (s.water*0.5).toFixed(1);
+    var doneN = 0;
+    var ki;
+    for(ki=0; ki<taskKeys.length; ki++){
+      if(s.done[taskKeys[ki]]){ doneN++; }
+    }
+    doneN += s.water;
+    var tot = taskKeys.length + WGOAL;
+    var frac = tot ? doneN/tot : 0;
+    progRing.style.strokeDashoffset = RC*(1-frac);
+    document.getElementById('progPct').textContent = Math.round(frac*100) + '%';
+    document.getElementById('dayLabel').textContent = 'Day ' + cur + ' of ' + DAYS;
+    daysEl.querySelectorAll('.day-chip').forEach(function(el){
+      var d = parseInt(el.getAttribute('data-day'), 10);
+      el.classList.toggle('active', d===cur);
+    });
+  }
+
+  itemEls.forEach(function(el){
+    el.addEventListener('click', function(){
+      var k = el.getAttribute('data-task');
+      var s = dayState(cur);
+      if(s.done[k]){ delete s.done[k]; }
+      else{ s.done[k] = true; }
+      render();
+    });
+  });
+
+  glassesEl.addEventListener('click', function(ev){
+    var t = ev.target.closest('.glass');
+    if(!t){ return; }
+    var idx = parseInt(t.getAttribute('data-idx'), 10);
+    var s = dayState(cur);
+    if(s.water === idx+1){ s.water = idx; }
+    else{ s.water = idx+1; }
+    render();
+  });
+
+  daysEl.addEventListener('click', function(ev){
+    var t = ev.target.closest('.day-chip');
+    if(!t){ return; }
+    cur = parseInt(t.getAttribute('data-day'), 10);
+    render();
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    store[cur] = { done:{}, water:0 };
+    render();
+  });
+
+  function fmt(mins){
+    var hh = Math.floor(mins/60);
+    var mm = mins%60;
+    if(hh<=0){ return mm + 'm'; }
+    return hh + 'h ' + mm + 'm';
+  }
+
+  function updateStatus(){
+    var now = new Date();
+    var h = now.getHours() + now.getMinutes()/60;
+    var eating = (h>=9 && h<17);
+    var pill = document.getElementById('statusPill');
+    var txt = document.getElementById('statusText');
+    var sub = document.getElementById('statusSub');
+    if(eating){
+      pill.className = 'status-pill eat';
+      txt.textContent = 'Eating Window';
+      sub.textContent = fmt(Math.round((17-h)*60)) + ' left';
+    } else {
+      pill.className = 'status-pill fast';
+      txt.textContent = 'Fasting';
+      var until = (h<9) ? (9-h) : (24-h+9);
+      sub.textContent = fmt(Math.round(until*60)) + ' to go';
+    }
+    var hand = document.getElementById('nowHand');
+    if(hand){ hand.style.transform = 'rotate(' + (h/24*360) + 'deg)'; }
+  }
+
+  updateStatus();
+  setInterval(updateStatus, 30000);
+  render();
+})();
+</script>
+</body>
+</html>
